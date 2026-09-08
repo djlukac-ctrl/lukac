@@ -1,0 +1,18 @@
+/* Ajustements du hero : encadré photo plus compact */
+@media (min-width:1051px){
+  .hero{grid-template-columns:1fr .88fr;min-height:700px;column-gap:58px}
+  .hero__visual{justify-content:flex-end;padding:22px 0 32px}
+  .photo-card{width:min(100%,560px);height:500px;border-radius:30px}
+  .photo-card__image{object-position:60% center}
+  .photo-card__tagline{right:5.5%;top:51%;font-size:21px}
+  .photo-card__services{right:5.5%;bottom:6.5%;font-size:9px}
+}
+
+@media (max-width:1050px) and (min-width:641px){
+  .hero__visual{justify-content:flex-start}
+  .photo-card{width:min(100%,680px);height:550px}
+}
+
+@media (max-width:640px){
+  .photo-card{height:470px}
+}
