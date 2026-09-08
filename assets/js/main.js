@@ -3,6 +3,11 @@ logoStyles.rel = 'stylesheet';
 logoStyles.href = 'assets/css/logo-transparent.css?v=20260908-1';
 document.head.appendChild(logoStyles);
 
+const heroCompactStyles = document.createElement('link');
+heroCompactStyles.rel = 'stylesheet';
+heroCompactStyles.href = 'assets/css/hero-compact.css?v=20260908-1';
+document.head.appendChild(heroCompactStyles);
+
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('.mobile-nav');
 
