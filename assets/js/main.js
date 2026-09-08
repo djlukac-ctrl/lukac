@@ -1,3 +1,8 @@
+const logoStyles = document.createElement('link');
+logoStyles.rel = 'stylesheet';
+logoStyles.href = 'assets/css/logo-transparent.css?v=20260908-1';
+document.head.appendChild(logoStyles);
+
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('.mobile-nav');
 
