@@ -8,14 +8,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260908-2">
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
 
   <header class="site-header" id="top">
     <a class="brand" href="#top" aria-label="Luka C — Accueil">
-      <img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+      <span class="brand__frame">
+        <img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo" onerror="this.hidden=true;this.parentElement.nextElementSibling.hidden=false">
+      </span>
       <span class="brand__fallback" hidden>LUKA C</span>
     </a>
 
@@ -64,9 +66,13 @@
 
       <div class="hero__visual reveal reveal--delay">
         <div class="visual-card">
-          <div class="visual-card__shine"></div>
-          <div class="visual-card__label">LUKA C</div>
-          <div class="visual-card__copy">DJ • ANIMATION • ÉVÉNEMENT</div>
+          <div class="visual-card__beam visual-card__beam--red"></div>
+          <div class="visual-card__beam visual-card__beam--gold"></div>
+          <div class="visual-card__disc" aria-hidden="true"></div>
+          <div class="visual-card__logo-wrap">
+            <img src="assets/img/logo-lukac.png" alt="Luka C" class="visual-card__logo">
+          </div>
+          <p class="visual-card__copy">DJ • ANIMATION • ÉVÉNEMENT</p>
           <div class="visual-card__equalizer" aria-hidden="true">
             <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
           </div>
@@ -168,7 +174,7 @@
 
   <footer class="site-footer">
     <a class="brand brand--footer" href="#top">
-      <span class="brand__fallback">LUKA C</span>
+      <span class="brand__frame brand__frame--footer"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo"></span>
     </a>
     <p>DJ & animateur événementiel</p>
     <div class="site-footer__links">
