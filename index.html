@@ -8,16 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260908-2">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20260908-3">
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
 
   <header class="site-header" id="top">
     <a class="brand" href="#top" aria-label="Luka C — Accueil">
-      <span class="brand__frame">
-        <img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo" onerror="this.hidden=true;this.parentElement.nextElementSibling.hidden=false">
-      </span>
+      <img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
       <span class="brand__fallback" hidden>LUKA C</span>
     </a>
 
@@ -28,7 +26,7 @@
       <a href="#contact">Contact</a>
     </nav>
 
-    <a class="header-cta" href="#contact">Demander un devis</a>
+    <a class="header-cta" href="#contact">Demander un devis <span>→</span></a>
 
     <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false">
       <span></span><span></span>
@@ -54,29 +52,31 @@
         <h1>Votre soirée.<br><em>Votre ambiance.</em><br>Mon énergie.</h1>
         <p class="hero__lead">Mariages, anniversaires, événements privés et soirées publiques : une prestation pensée pour faire vivre un vrai moment à vos invités.</p>
         <div class="hero__actions">
-          <a class="btn btn--primary" href="#contact">Parler de mon événement</a>
-          <a class="btn btn--ghost" href="#prestations">Découvrir les prestations</a>
-        </div>
-        <div class="hero__meta">
-          <div><strong>Sur mesure</strong><span>Une ambiance adaptée à votre public</span></div>
-          <div><strong>Clé en main</strong><span>Son, lumière, animation & options</span></div>
-          <div><strong>Proximité</strong><span>Un accompagnement simple et humain</span></div>
+          <a class="btn btn--primary" href="#contact">Parler de mon événement <span>→</span></a>
+          <a class="btn btn--ghost" href="#prestations">Découvrir les prestations <span>→</span></a>
         </div>
       </div>
 
       <div class="hero__visual reveal reveal--delay">
-        <div class="visual-card">
-          <div class="visual-card__beam visual-card__beam--red"></div>
-          <div class="visual-card__beam visual-card__beam--gold"></div>
-          <div class="visual-card__disc" aria-hidden="true"></div>
-          <div class="visual-card__logo-wrap">
-            <img src="assets/img/logo-lukac.png" alt="Luka C" class="visual-card__logo">
-          </div>
-          <p class="visual-card__copy">DJ • ANIMATION • ÉVÉNEMENT</p>
-          <div class="visual-card__equalizer" aria-hidden="true">
-            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+        <div class="photo-card">
+          <img src="assets/img/hero-lukac.jpg" alt="Luka C en prestation DJ" class="photo-card__image">
+          <div class="photo-card__overlay" aria-hidden="true"></div>
+          <div class="photo-card__logo"><img src="assets/img/logo-lukac.png" alt=""></div>
+          <p class="photo-card__tagline">Plus qu’un DJ,<br><span>une ambiance !</span></p>
+          <div class="photo-card__services">
+            <i></i>
+            <span>Mariages</span>
+            <span>Anniversaires</span>
+            <span>Soirées privées</span>
+            <span>Événements pro</span>
           </div>
         </div>
+      </div>
+
+      <div class="hero__meta">
+        <div><b class="hero__meta-icon">◉</b><span><strong>Sur mesure</strong>Une ambiance adaptée à votre public</span></div>
+        <div><b class="hero__meta-icon">✦</b><span><strong>Clé en main</strong>Son, lumière, animation & options</span></div>
+        <div><b class="hero__meta-icon">●</b><span><strong>Proximité</strong>Un accompagnement simple et humain</span></div>
       </div>
     </section>
 
@@ -141,21 +141,9 @@
       </div>
 
       <div class="reviews-grid">
-        <blockquote class="review reveal">
-          <div class="stars">★★★★★</div>
-          <p>“Une soirée parfaitement menée, une super ambiance et une vraie capacité à s’adapter aux invités. Merci pour ce moment !”</p>
-          <footer>— Avis client</footer>
-        </blockquote>
-        <blockquote class="review reveal reveal--delay-small">
-          <div class="stars">★★★★★</div>
-          <p>“À l’écoute du début à la fin, très professionnel et une piste de danse remplie. On recommande sans hésiter.”</p>
-          <footer>— Avis client</footer>
-        </blockquote>
-        <blockquote class="review reveal reveal--delay">
-          <div class="stars">★★★★★</div>
-          <p>“De très bons conseils avant l’événement et une ambiance au rendez-vous le jour J. Tout était fluide.”</p>
-          <footer>— Avis client</footer>
-        </blockquote>
+        <blockquote class="review reveal"><div class="stars">★★★★★</div><p>“Une soirée parfaitement menée, une super ambiance et une vraie capacité à s’adapter aux invités. Merci pour ce moment !”</p><footer>— Avis client</footer></blockquote>
+        <blockquote class="review reveal reveal--delay-small"><div class="stars">★★★★★</div><p>“À l’écoute du début à la fin, très professionnel et une piste de danse remplie. On recommande sans hésiter.”</p><footer>— Avis client</footer></blockquote>
+        <blockquote class="review reveal reveal--delay"><div class="stars">★★★★★</div><p>“De très bons conseils avant l’événement et une ambiance au rendez-vous le jour J. Tout était fluide.”</p><footer>— Avis client</footer></blockquote>
       </div>
       <p class="reviews-note">Les vrais avis clients du site actuel seront intégrés dans la prochaine étape.</p>
     </section>
@@ -173,16 +161,10 @@
   </main>
 
   <footer class="site-footer">
-    <a class="brand brand--footer" href="#top">
-      <span class="brand__frame brand__frame--footer"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo"></span>
-    </a>
+    <a class="brand brand--footer" href="#top"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo brand__logo--footer"></a>
     <p>DJ & animateur événementiel</p>
     <div class="site-footer__links">
-      <a href="#prestations">Prestations</a>
-      <a href="#avis">Avis</a>
-      <a href="#contact">Contact</a>
-      <a href="https://www.facebook.com/" target="_blank" rel="noopener">Facebook</a>
-      <a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
+      <a href="#prestations">Prestations</a><a href="#avis">Avis</a><a href="#contact">Contact</a><a href="https://www.facebook.com/" target="_blank" rel="noopener">Facebook</a><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
     </div>
     <small>© 2026 Luka C • Tous droits réservés</small>
   </footer>
