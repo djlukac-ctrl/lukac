@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css?v=20260908-4">
+  <link rel="stylesheet" href="assets/css/disponibilites.css?v=20260908-1">
 </head>
 <body>
   <div class="noise" aria-hidden="true"></div>
@@ -20,6 +21,7 @@
     </a>
 
     <nav class="desktop-nav" aria-label="Navigation principale">
+      <a href="#disponibilites">Disponibilités</a>
       <a href="#prestations">Prestations</a>
       <a href="#experience">Expérience</a>
       <a href="#avis">Avis</a>
@@ -34,6 +36,7 @@
   </header>
 
   <nav class="mobile-nav" aria-label="Navigation mobile" hidden>
+    <a href="#disponibilites">Disponibilités</a>
     <a href="#prestations">Prestations</a>
     <a href="#experience">Expérience</a>
     <a href="#avis">Avis</a>
@@ -82,6 +85,70 @@
     <section class="marquee" aria-hidden="true">
       <div class="marquee__track">
         <span>MARIAGES</span><i>•</i><span>ANNIVERSAIRES</span><i>•</i><span>ÉVÉNEMENTS PRIVÉS</span><i>•</i><span>SOIRÉES</span><i>•</i><span>MARIAGES</span><i>•</i><span>ANNIVERSAIRES</span><i>•</i><span>ÉVÉNEMENTS PRIVÉS</span><i>•</i><span>SOIRÉES</span>
+      </div>
+    </section>
+
+    <section class="availability" id="disponibilites">
+      <div class="availability__head reveal">
+        <div>
+          <p class="eyebrow"><span></span> VOS DATES</p>
+          <h2>Votre date est-elle<br><em>encore disponible ?</em></h2>
+          <p>Les dates les plus demandées partent vite. Consultez mes disponibilités 2026 et 2027 avant de m’envoyer votre demande.</p>
+        </div>
+        <a class="btn btn--ghost availability__cta" href="#contact">Vérifier ma date <span>→</span></a>
+      </div>
+
+      <div class="availability__grid">
+        <article class="availability__year reveal">
+          <div class="availability__year-head">
+            <span class="availability__year-number availability__year-number--accent">2026</span>
+            <span class="availability__year-title">Mes disponibilités</span>
+          </div>
+          <div class="availability__months">
+            <div class="availability__month availability__month--closed"><span class="availability__icon">×</span><span class="availability__month-name">Juillet</span><span class="availability__status">Fermé</span></div>
+            <div class="availability__month availability__month--closed"><span class="availability__icon">×</span><span class="availability__month-name">Août</span><span class="availability__status">Fermé</span></div>
+            <div class="availability__month availability__month--limited"><span class="availability__icon">◷</span><span class="availability__month-name">Septembre</span><span class="availability__status">Quelques disponibilités</span></div>
+            <div class="availability__month availability__month--limited"><span class="availability__icon">◷</span><span class="availability__month-name">Octobre</span><span class="availability__status">Quelques disponibilités</span></div>
+            <div class="availability__month availability__month--limited"><span class="availability__icon">◷</span><span class="availability__month-name">Novembre</span><span class="availability__status">Quelques disponibilités</span></div>
+            <div class="availability__month availability__month--open"><span class="availability__icon">✓</span><span class="availability__month-name">Décembre</span><span class="availability__status">Ouvert</span></div>
+          </div>
+        </article>
+
+        <article class="availability__year reveal reveal--delay-small">
+          <div class="availability__year-head">
+            <span class="availability__year-number availability__year-number--accent">2027</span>
+            <span class="availability__year-title">Mes disponibilités</span>
+          </div>
+          <div class="availability__months">
+            <div class="availability__month availability__month--open"><span class="availability__icon">✓</span><span class="availability__month-name">Janvier</span><span class="availability__status">Ouvert</span></div>
+            <div class="availability__month availability__month--open"><span class="availability__icon">✓</span><span class="availability__month-name">Février</span><span class="availability__status">Ouvert</span></div>
+            <div class="availability__month availability__month--open"><span class="availability__icon">✓</span><span class="availability__month-name">Mars</span><span class="availability__status">Ouvert</span></div>
+            <div class="availability__month availability__month--open"><span class="availability__icon">✓</span><span class="availability__month-name">Avril</span><span class="availability__status">Ouvert</span></div>
+            <div class="availability__month availability__month--limited"><span class="availability__icon">◷</span><span class="availability__month-name">Mai</span><span class="availability__status">Quelques disponibilités</span></div>
+            <div class="availability__month availability__month--closed"><span class="availability__icon">×</span><span class="availability__month-name">Juin</span><span class="availability__status">Complet</span></div>
+            <div class="availability__month availability__month--limited"><span class="availability__icon">◷</span><span class="availability__month-name">Juillet</span><span class="availability__status">Quelques disponibilités</span></div>
+            <div class="availability__month availability__month--limited"><span class="availability__icon">◷</span><span class="availability__month-name">Août</span><span class="availability__status">Quelques disponibilités</span></div>
+            <div class="availability__month availability__month--open"><span class="availability__icon">✓</span><span class="availability__month-name">Septembre</span><span class="availability__status">Ouvert</span></div>
+            <div class="availability__month availability__month--open"><span class="availability__icon">✓</span><span class="availability__month-name">Octobre</span><span class="availability__status">Ouvert</span></div>
+            <div class="availability__month availability__month--open"><span class="availability__icon">✓</span><span class="availability__month-name">Novembre</span><span class="availability__status">Ouvert</span></div>
+            <div class="availability__month availability__month--open"><span class="availability__icon">✓</span><span class="availability__month-name">Décembre</span><span class="availability__status">Ouvert</span></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="availability__legend reveal">
+        <span class="open"><i></i>Ouvert</span>
+        <span class="limited"><i></i>Quelques disponibilités restantes</span>
+        <span class="closed"><i></i>Complet / Fermé</span>
+      </div>
+      <p class="availability__updated">Calendrier mis à jour en septembre 2026.</p>
+
+      <div class="availability__foot reveal">
+        <div>
+          <strong>Une date vous intéresse ?</strong>
+          <p>Envoyez votre demande rapidement : une date n’est définitivement bloquée qu’après validation.</p>
+        </div>
+        <a class="btn btn--primary" href="#contact">Demander un devis <span>→</span></a>
       </div>
     </section>
 
@@ -163,7 +230,7 @@
     <a class="brand brand--footer" href="#top"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo brand__logo--footer"></a>
     <p>DJ & animateur événementiel</p>
     <div class="site-footer__links">
-      <a href="#prestations">Prestations</a><a href="#avis">Avis</a><a href="#contact">Contact</a><a href="https://www.facebook.com/" target="_blank" rel="noopener">Facebook</a><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
+      <a href="#disponibilites">Disponibilités</a><a href="#prestations">Prestations</a><a href="#avis">Avis</a><a href="#contact">Contact</a><a href="https://www.facebook.com/" target="_blank" rel="noopener">Facebook</a><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a>
     </div>
     <small>© 2026 Luka C • Tous droits réservés</small>
   </footer>
