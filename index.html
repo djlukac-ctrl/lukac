@@ -7,25 +7,19 @@
   <title>Luka C — DJ & Animateur</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/styles.css?v=20260908-4">
-  <link rel="stylesheet" href="assets/css/disponibilites.css?v=20260908-1">
-  <link rel="stylesheet" href="assets/css/avis.css?v=20260908-1">
-  <link rel="stylesheet" href="assets/css/elegance.css?v=20260909-1">
+  <link rel="stylesheet" href="assets/css/editorial.css?v=20260909-1">
 </head>
 <body>
-  <div class="noise" aria-hidden="true"></div>
-
   <header class="site-header" id="top">
     <a class="brand" href="#top" aria-label="Luka C — Accueil">
-      <img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo" onerror="this.hidden=true;this.nextElementSibling.hidden=false">
+      <img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo">
       <span class="brand__fallback" hidden>LUKA C</span>
     </a>
 
     <nav class="desktop-nav" aria-label="Navigation principale">
       <a href="prestations.html">Prestations</a>
       <a href="#disponibilites">Disponibilités</a>
-      <a href="#avis">Avis</a>
+      <a href="#avis">Avis clients</a>
     </nav>
 
     <a class="header-cta" href="mailto:contact@lukac.fr">Demander un devis <span>→</span></a>
@@ -38,50 +32,44 @@
   <nav class="mobile-nav" aria-label="Navigation mobile" hidden>
     <a href="prestations.html">Prestations</a>
     <a href="#disponibilites">Disponibilités</a>
-    <a href="#avis">Avis</a>
+    <a href="#avis">Avis clients</a>
     <a class="mobile-nav__cta" href="mailto:contact@lukac.fr">Demander un devis</a>
   </nav>
 
   <main>
-    <section class="hero">
-      <div class="hero__glow hero__glow--one"></div>
-      <div class="hero__glow hero__glow--two"></div>
-      <div class="hero__rings" aria-hidden="true"></div>
-
-      <div class="hero__content reveal">
-        <p class="eyebrow"><span></span> DJ & ANIMATEUR ÉVÉNEMENTIEL</p>
-        <h1>Votre soirée.<br><em>Votre ambiance.</em><br>Mon énergie.</h1>
-        <p class="hero__lead">Mariages, anniversaires, événements privés et soirées publiques : une prestation pensée pour faire vivre un vrai moment à vos invités.</p>
-        <div class="hero__actions">
-          <a class="btn btn--primary" href="mailto:contact@lukac.fr">Demander un devis <span>→</span></a>
-          <a class="btn btn--ghost" href="prestations.html">Découvrir les prestations <span>→</span></a>
+    <section class="editorial-hero">
+      <div class="editorial-hero__copy reveal">
+        <p class="editorial-kicker">DJ & animateur événementiel</p>
+        <h1>Des soirées qui <em>vous ressemblent.</em></h1>
+        <p class="editorial-hero__lead">Mariages, anniversaires, événements privés et soirées publiques : je construis une ambiance sur mesure, avec une présence juste, une vraie écoute et l’énergie adaptée à votre public.</p>
+        <div class="editorial-hero__actions">
+          <a class="btn-editorial btn-editorial--dark" href="mailto:contact@lukac.fr">Demander un devis <span>→</span></a>
+          <a class="btn-editorial btn-editorial--link" href="prestations.html">Découvrir les prestations <span>↗</span></a>
         </div>
       </div>
 
-      <div class="hero__visual reveal reveal--delay">
-        <div class="photo-card">
-          <img src="assets/img/hero-lukac.png" alt="Luka C en prestation DJ" class="photo-card__image">
-          <div class="photo-card__overlay" aria-hidden="true"></div>
-          <p class="photo-card__tagline">Plus qu’un DJ,<br><span>une ambiance !</span></p>
-          <div class="photo-card__services">
-            <i></i>
-            <span>Mariages</span>
-            <span>Anniversaires</span>
-            <span>Soirées privées</span>
-            <span>Événements pro</span>
-          </div>
-        </div>
-      </div>
+      <figure class="editorial-hero__visual reveal reveal--delay">
+        <span class="editorial-hero__number" aria-hidden="true">01</span>
+        <img src="assets/img/hero-lukac.png" alt="Luka C en prestation DJ">
+        <figcaption>Luka C — DJ & animation événementielle</figcaption>
+      </figure>
+    </section>
+
+    <section class="editorial-strip" aria-label="Types d'événements">
+      <span>Mariages</span>
+      <span>Anniversaires</span>
+      <span>Soirées privées</span>
+      <span>Événements professionnels</span>
     </section>
 
     <section class="availability" id="disponibilites">
       <div class="availability__head reveal">
         <div>
-          <p class="eyebrow"><span></span> VOS DATES</p>
+          <p class="section-kicker">Vos dates</p>
           <h2>Votre date est-elle<br><em>encore disponible ?</em></h2>
           <p>Les dates les plus demandées partent vite. Consultez mes disponibilités 2026 et 2027 avant de m’envoyer votre demande.</p>
         </div>
-        <a class="btn btn--ghost availability__cta" href="mailto:contact@lukac.fr">Vérifier ma date <span>→</span></a>
+        <a class="availability__cta" href="mailto:contact@lukac.fr">Vérifier ma date <span>→</span></a>
       </div>
 
       <div class="availability__grid">
@@ -132,7 +120,7 @@
       <div class="availability__foot reveal">
         <div>
           <strong>Une date vous intéresse ?</strong>
-          <p>Envoyez votre demande rapidement : une date n’est définitivement bloquée qu’après validation.</p>
+          <p>Une date n’est définitivement bloquée qu’après validation.</p>
         </div>
         <a class="btn btn--primary" href="mailto:contact@lukac.fr">Demander un devis <span>→</span></a>
       </div>
@@ -140,7 +128,7 @@
 
     <section class="section section--reviews" id="avis">
       <div class="section-heading reveal">
-        <p class="eyebrow"><span></span> VOS RETOURS</p>
+        <p class="section-kicker">Avis clients</p>
         <h2>La plus belle récompense de mon travail<br><em>reste la satisfaction des clients.</em></h2>
         <p>Merci à celles et ceux qui prennent le temps de partager leur expérience après leur événement.</p>
       </div>
@@ -163,7 +151,7 @@
         </blockquote>
       </div>
 
-      <div class="reviews-actions reveal" style="margin-top:28px;display:flex;justify-content:center;">
+      <div class="reviews-actions reveal">
         <a class="btn btn--primary" href="mailto:contact@lukac.fr?subject=Avis%20client%20-%20Luka%20C">Laisser un avis <span>→</span></a>
       </div>
     </section>
@@ -175,7 +163,7 @@
     <div class="site-footer__links">
       <a href="prestations.html">Prestations</a>
       <a href="#disponibilites">Disponibilités</a>
-      <a href="#avis">Avis</a>
+      <a href="#avis">Avis clients</a>
       <a href="mailto:contact@lukac.fr">Contact</a>
     </div>
     <small>© 2026 Luka C • Tous droits réservés</small>
