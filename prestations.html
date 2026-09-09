@@ -10,113 +10,71 @@
 </head>
 <body>
   <header class="site-header" id="top">
-    <a class="brand" href="index.html" aria-label="Luka C — Accueil">
-      <img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo">
-    </a>
+    <a class="brand" href="index.html" aria-label="Luka C — Accueil"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo"></a>
     <nav class="desktop-nav" aria-label="Navigation principale">
-      <a href="index.html">Accueil</a>
-      <a href="prestations.html">Prestations</a>
-      <a href="index.html#disponibilites">Disponibilités</a>
-      <a href="index.html#avis">Avis clients</a>
+      <a href="index.html">Accueil</a><a href="prestations.html">Prestations</a><a href="formules.html">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a>
     </nav>
-    <a class="header-cta" href="mailto:contact@lukac.fr">Demander un devis <span>→</span></a>
+    <a class="header-cta" href="devis.php">Demander un devis <span>→</span></a>
     <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
   </header>
 
   <nav class="mobile-nav" aria-label="Navigation mobile" hidden>
-    <a href="index.html">Accueil</a>
-    <a href="prestations.html">Prestations</a>
-    <a href="index.html#disponibilites">Disponibilités</a>
-    <a href="index.html#avis">Avis clients</a>
-    <a class="mobile-nav__cta" href="mailto:contact@lukac.fr">Demander un devis</a>
+    <a href="index.html">Accueil</a><a href="prestations.html">Prestations</a><a href="formules.html">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a><a class="mobile-nav__cta" href="devis.php">Demander un devis</a>
   </nav>
 
   <main class="prestations-page">
     <section class="prestations-hero reveal">
       <p class="prestations-kicker">Prestations</p>
-      <h1>Des prestations pensées<br>pour <span>votre événement.</span></h1>
-      <p>Chaque soirée est unique. Je vous propose des solutions sur mesure pour créer une ambiance qui vous ressemble, du début à la fin.</p>
+      <h1><span data-cms="prestations.hero_title" style="color:inherit">Des prestations pensées</span><br><span data-cms="prestations.hero_highlight">pour votre événement.</span></h1>
+      <p data-cms="prestations.hero_intro">Chaque soirée est unique. Je vous propose des solutions sur mesure pour créer une ambiance qui vous ressemble, du début à la fin.</p>
     </section>
 
     <section class="prestations-list">
       <article class="prestation-card reveal">
         <div class="prestation-card__content">
           <span class="prestation-card__kicker">DJ & ambiance musicale</span>
-          <h2>DJ</h2>
-          <p>Une ambiance sur mesure du début à la fin. Je m’adapte à votre événement et à vos invités pour créer une soirée dynamique, fluide et inoubliable.</p>
-          <ul>
-            <li>Mariages, anniversaires et soirées privées</li>
-            <li>Programmation musicale préparée avec vous</li>
-            <li>Adaptation en direct selon l’ambiance</li>
-          </ul>
-          <a class="prestation-card__cta" href="mailto:contact@lukac.fr?subject=Demande%20prestation%20DJ">Demander cette prestation <span>→</span></a>
+          <h2 data-cms="prestations.dj.title">DJ</h2>
+          <p data-cms="prestations.dj.desc">Une ambiance sur mesure du début à la fin. Je m’adapte à votre événement et à vos invités pour créer une soirée dynamique, fluide et inoubliable.</p>
+          <ul data-cms-list="prestations.dj.items"><li>Mariages, anniversaires et soirées privées</li><li>Programmation musicale préparée avec vous</li><li>Adaptation en direct selon l’ambiance</li></ul>
+          <a class="prestation-card__cta" href="devis.php">Demander cette prestation <span>→</span></a>
         </div>
-        <div class="prestation-card__visual prestation-card__visual--dj">
-          <span class="prestation-card__badge"><i></i> Luka C — DJ & animation</span>
-        </div>
+        <div class="prestation-card__visual prestation-card__visual--dj"><span class="prestation-card__badge"><i></i> Luka C — DJ & animation</span></div>
       </article>
 
       <article class="prestation-card reveal reveal--delay-small">
         <div class="prestation-card__content">
           <span class="prestation-card__kicker">Créer des moments ensemble</span>
-          <h2>Animations interactives</h2>
-          <p>Faites participer vos invités et créez de vrais temps forts au cours de la soirée, sans casser le rythme ni surcharger l’animation.</p>
-          <ul>
-            <li>Karaoké</li>
-            <li>Quiz musical et blind test</li>
-            <li>Jeux et animations personnalisées selon vos envies</li>
-          </ul>
-          <a class="prestation-card__cta" href="mailto:contact@lukac.fr?subject=Demande%20animations%20interactives">Demander cette prestation <span>→</span></a>
+          <h2 data-cms="prestations.animations.title">Animations interactives</h2>
+          <p data-cms="prestations.animations.desc">Faites participer vos invités et créez de vrais temps forts au cours de la soirée, sans casser le rythme ni surcharger l’animation.</p>
+          <ul data-cms-list="prestations.animations.items"><li>Karaoké</li><li>Quiz musical et blind test</li><li>Jeux et animations personnalisées selon vos envies</li></ul>
+          <a class="prestation-card__cta" href="devis.php">Demander cette prestation <span>→</span></a>
         </div>
-        <div class="prestation-card__visual prestation-card__visual--animations">
-          <div class="prestation-card__visual-copy">
-            <span>Participer.</span>
-            <strong>Partager.</strong>
-            <small>Des animations qui créent de vrais souvenirs.</small>
-          </div>
-        </div>
+        <div class="prestation-card__visual prestation-card__visual--animations"><div class="prestation-card__visual-copy"><span>Participer.</span><strong>Partager.</strong><small>Des animations qui créent de vrais souvenirs.</small></div></div>
       </article>
 
       <article class="prestation-card reveal reveal--delay">
         <div class="prestation-card__content">
           <span class="prestation-card__kicker">Dès les premiers instants</span>
-          <h2>Sonorisation de vin d’honneur</h2>
-          <p>Je m’occupe de la diffusion musicale pour accompagner vos moments clés avec élégance, tout en gardant un volume adapté aux échanges entre invités.</p>
-          <ul>
-            <li>Musique adaptée au moment</li>
-            <li>Volume maîtrisé</li>
-            <li>Installation propre et professionnelle</li>
-          </ul>
-          <a class="prestation-card__cta" href="mailto:contact@lukac.fr?subject=Demande%20sonorisation%20vin%20d%27honneur">Demander cette prestation <span>→</span></a>
+          <h2 data-cms="prestations.cocktail.title">Sonorisation de vin d’honneur</h2>
+          <p data-cms="prestations.cocktail.desc">Je m’occupe de la diffusion musicale pour accompagner vos moments clés avec élégance, tout en gardant un volume adapté aux échanges entre invités.</p>
+          <ul data-cms-list="prestations.cocktail.items"><li>Musique adaptée au moment</li><li>Volume maîtrisé</li><li>Installation propre et professionnelle</li></ul>
+          <a class="prestation-card__cta" href="devis.php">Demander cette prestation <span>→</span></a>
         </div>
-        <div class="prestation-card__visual prestation-card__visual--cocktail">
-          <div class="prestation-card__visual-copy">
-            <span>Élégant.</span>
-            <strong>Discret.</strong>
-            <small>La bonne ambiance, au bon volume.</small>
-          </div>
-        </div>
+        <div class="prestation-card__visual prestation-card__visual--cocktail"><div class="prestation-card__visual-copy"><span>Élégant.</span><strong>Discret.</strong><small>La bonne ambiance, au bon volume.</small></div></div>
       </article>
     </section>
 
-    <section class="prestations-cta reveal">
-      <div>
-        <strong>Vous avez une idée précise ?</strong>
-        <p>Parlez-moi de votre événement : nous construirons ensemble la prestation qui correspond le mieux à votre soirée.</p>
-      </div>
-      <a class="prestations-cta__button" href="mailto:contact@lukac.fr">Demander un devis <span>→</span></a>
-    </section>
+    <section class="prestations-cta reveal"><div><strong>Vous avez une idée précise ?</strong><p>Parlez-moi de votre événement : nous construirons ensemble la prestation qui correspond le mieux à votre soirée.</p></div><a class="prestations-cta__button" href="devis.php">Demander un devis <span>→</span></a></section>
   </main>
 
   <footer class="site-footer">
     <a class="brand brand--footer" href="index.html"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo brand__logo--footer"></a>
     <p>DJ & animateur événementiel</p>
-    <div class="site-footer__links">
-      <a href="prestations.html">Prestations</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a><a href="mailto:contact@lukac.fr">Contact</a>
-    </div>
+    <div class="site-footer__links"><a href="prestations.html">Prestations</a><a href="formules.html">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a><a href="devis.php">Demander un devis</a></div>
     <small>© 2026 Luka C • Tous droits réservés</small>
   </footer>
 
   <script src="assets/js/main.js"></script>
+  <script src="assets/js/cms.js?v=20260909-1"></script>
 </body>
 </html>
