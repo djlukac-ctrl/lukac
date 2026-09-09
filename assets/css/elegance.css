@@ -1,0 +1,166 @@
+/* Direction artistique 2026 — plus sobre, élégante et premium */
+:root{
+  --bg:#090909;
+  --panel:#111111;
+  --panel2:#161513;
+  --text:#f3f0ea;
+  --muted:#a9a49c;
+  --line:rgba(236,224,207,.13);
+  --red:#a84536;
+  --orange:#c88a52;
+  --gold:#c9a66b;
+}
+
+body{
+  background:
+    radial-gradient(circle at 82% 10%,rgba(155,84,57,.07),transparent 30%),
+    radial-gradient(circle at 12% 78%,rgba(201,166,107,.025),transparent 32%),
+    #090909;
+  color:var(--text);
+}
+.noise{opacity:.012}
+
+/* Header */
+.site-header{
+  height:104px;
+  border-bottom-color:rgba(236,224,207,.09);
+}
+.brand__logo{width:178px;filter:drop-shadow(0 7px 16px rgba(0,0,0,.28))}
+.desktop-nav{gap:40px;color:#bbb6ae;font-size:12px;font-weight:600;letter-spacing:.01em}
+.desktop-nav a:after{height:1px;background:#c88a52}
+.header-cta{
+  border-color:rgba(200,138,82,.34);
+  background:rgba(255,255,255,.018);
+  box-shadow:none;
+  font-weight:700;
+}
+.header-cta:hover{background:#f1ede5;color:#151515;border-color:#f1ede5;box-shadow:none}
+
+/* Common typography */
+.eyebrow{color:#bdb7ae;font-size:10px;letter-spacing:.2em;margin-bottom:20px}
+.eyebrow span{width:26px;height:1px;background:#c88a52}
+.hero h1,.section-heading h2,.experience h2,.contact h2,.prestations-hero h1,.prestation-card h2{
+  font-family:Manrope,Arial,sans-serif;
+  text-transform:none;
+  letter-spacing:-.045em;
+  font-weight:700;
+}
+.hero h1 em,.section-heading h2 em,.experience h2 em,.contact h2 em,.prestations-hero h1 em{
+  background:none;
+  -webkit-background-clip:initial;
+  background-clip:initial;
+  color:#c9a66b;
+  font-style:normal;
+}
+
+/* Homepage hero */
+.hero{
+  min-height:700px;
+  padding-top:46px;
+  grid-template-columns:1fr .92fr;
+  column-gap:76px;
+}
+.hero__content{padding-bottom:34px}
+.hero h1{
+  font-size:clamp(48px,4.8vw,76px);
+  line-height:1.02;
+  max-width:690px;
+  margin-bottom:24px;
+}
+.hero__lead{font-size:14px;line-height:1.85;color:#bcb7af;max-width:590px;margin-bottom:30px}
+.hero__glow--one{width:430px;height:430px;background:rgba(143,68,47,.06);filter:blur(130px)}
+.hero__glow--two{background:rgba(201,166,107,.025);filter:blur(130px)}
+.hero__rings{opacity:.32;border-color:rgba(201,166,107,.07)}
+.btn{padding:14px 22px;font-size:12px;font-weight:700;gap:13px}
+.btn--primary{
+  background:#eee9df;
+  color:#171615;
+  border-color:#eee9df;
+  box-shadow:none;
+}
+.btn--primary:hover{background:#fff;box-shadow:0 12px 35px rgba(0,0,0,.2)}
+.btn--ghost{border-color:rgba(236,224,207,.18);background:rgba(255,255,255,.012);color:#ded9d1}
+.btn--ghost:hover{border-color:rgba(200,138,82,.45);background:rgba(200,138,82,.045)}
+.hero__visual{padding-right:0}
+.photo-card{
+  height:505px;
+  border-radius:24px;
+  border-color:rgba(236,224,207,.14);
+  box-shadow:0 28px 70px rgba(0,0,0,.34);
+}
+.photo-card__overlay{background:linear-gradient(90deg,rgba(4,4,4,.35),transparent 45%),linear-gradient(0deg,rgba(5,5,5,.2),transparent 38%)}
+.photo-card__tagline,.photo-card__services{display:none}
+
+/* Availability */
+.availability{padding-top:78px;padding-bottom:86px}
+.availability:before{opacity:.25}
+.availability__head{margin-bottom:38px}
+.availability__head h2{font-family:Manrope,Arial,sans-serif;text-transform:none;letter-spacing:-.04em;font-size:clamp(38px,4.2vw,58px);font-weight:700;line-height:1.06}
+.availability__head h2 em{background:none;color:#c9a66b;-webkit-background-clip:initial;background-clip:initial}
+.availability__head p:last-child{color:#aaa59d}
+.availability__year{border-color:rgba(236,224,207,.1);border-radius:20px;background:linear-gradient(160deg,#121211,#0d0d0c);box-shadow:0 20px 48px rgba(0,0,0,.2)}
+.availability__year:before{height:1px;background:linear-gradient(90deg,#9d6f4d,#c9a66b,transparent 82%)}
+.availability__year-number{color:#d8c4aa;font-size:48px}
+.availability__year-number--accent{color:#d8c4aa}
+.availability__year-title{font-family:Manrope,Arial,sans-serif;text-transform:none;font-size:19px;font-weight:700;letter-spacing:-.02em}
+.availability__month{border-color:rgba(236,224,207,.08);background:rgba(255,255,255,.012)}
+.availability__month-name{font-family:Manrope,Arial,sans-serif;text-transform:none;font-size:15px;font-weight:700}
+.availability__month--open{color:#92ad70;border-color:rgba(146,173,112,.16)}
+.availability__month--limited{color:#caa05f;border-color:rgba(202,160,95,.17)}
+.availability__month--closed{color:#b96359;border-color:rgba(185,99,89,.17)}
+.availability__foot{border-color:rgba(200,138,82,.14);background:rgba(255,255,255,.012);border-radius:18px}
+.availability__foot strong{font-family:Manrope,Arial,sans-serif;text-transform:none;font-size:20px;letter-spacing:-.02em}
+
+/* Reviews */
+.section--reviews{padding-top:70px}
+.section--reviews .section-heading h2{font-size:clamp(36px,3.8vw,54px);line-height:1.08;max-width:850px}
+.review{border-color:rgba(236,224,207,.1);background:linear-gradient(160deg,#121211,#0d0d0c);border-radius:18px}
+.review:hover{transform:translateY(-2px);border-color:rgba(201,166,107,.2);box-shadow:0 16px 38px rgba(0,0,0,.18)}
+.stars{color:#c9a66b;letter-spacing:.11em}
+.review p{color:#c6c0b7;font-size:14px}
+.review footer{color:#77736d}
+
+/* Prestations */
+.prestations-page{padding-top:62px}
+.prestations-hero{grid-template-columns:1.15fr .85fr;gap:70px;padding:28px 0 50px}
+.prestations-hero h1{font-size:clamp(46px,4.9vw,70px);line-height:1.02;margin-bottom:20px}
+.prestations-hero p{color:#aaa59d;font-size:14px;line-height:1.85}
+.prestations-hero__aside{border-color:rgba(201,166,107,.14);background:rgba(255,255,255,.015);border-radius:18px;padding:25px}
+.prestations-hero__aside strong{font-family:Manrope,Arial,sans-serif;text-transform:none;font-size:18px;letter-spacing:-.02em}
+.prestations-list{gap:18px;padding-top:34px}
+.prestation-card{min-height:290px;border-color:rgba(236,224,207,.1);border-radius:20px;background:linear-gradient(155deg,#121211,#0d0d0c)}
+.prestation-card:hover{transform:translateY(-2px);border-color:rgba(201,166,107,.22);box-shadow:0 22px 56px rgba(0,0,0,.22)}
+.prestation-card__content{padding:36px 40px}
+.prestation-card__kicker{color:#b98a5e;letter-spacing:.14em;font-size:9px}
+.prestation-card h2{font-size:clamp(30px,3vw,44px);line-height:1.08;margin-bottom:15px}
+.prestation-card p{color:#a9a49c;font-size:13px;line-height:1.8}
+.prestation-card li{color:#c7c1b8;font-size:11px}
+.prestation-card li:before{width:5px;height:5px;background:#b98a5e}
+.prestation-card__visual{min-height:290px;background:radial-gradient(circle at 35% 30%,rgba(142,74,54,.08),transparent 35%),linear-gradient(145deg,#151413,#0c0c0c)}
+.prestation-card__visual:before,.prestation-card__visual:after{border-color:rgba(201,166,107,.055)}
+.prestation-card__icon{color:#b98a5e;font-size:32px}
+.prestation-card__shape{color:rgba(236,224,207,.045);font-size:clamp(46px,6vw,84px)}
+.prestation-card__badge{border-color:rgba(236,224,207,.12);background:rgba(5,5,5,.55);font-size:9px;color:#d8d2c8}
+.prestation-card__cta{border-color:rgba(201,166,107,.24)!important;color:#d9d2c8!important;background:transparent!important;box-shadow:none!important}
+.prestation-card__cta:hover{border-color:#c9a66b!important;color:#f3f0ea!important;background:rgba(201,166,107,.05)!important}
+.prestations-cta{border-color:rgba(201,166,107,.13);background:rgba(255,255,255,.012);border-radius:18px}
+.prestations-cta strong{font-family:Manrope,Arial,sans-serif;text-transform:none;font-size:24px;letter-spacing:-.025em}
+
+.site-footer{border-top-color:rgba(236,224,207,.08);color:#77736d}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;min-height:0;padding-top:38px}
+  .hero__visual{padding-top:12px}
+  .photo-card{height:440px}
+  .prestations-hero{gap:28px}
+}
+@media(max-width:640px){
+  .site-header{height:88px}
+  .brand__logo{width:142px}
+  .hero{padding-top:28px}
+  .hero h1{font-size:48px}
+  .photo-card{height:390px;border-radius:18px}
+  .availability{padding-top:62px}
+  .prestations-page{padding-top:40px}
+  .prestations-hero h1{font-size:44px}
+}
