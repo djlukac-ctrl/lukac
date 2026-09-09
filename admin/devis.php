@@ -30,30 +30,71 @@ if ($id > 0) {
         $quote['status'] = 'read';
     }
 
+    $services = array_values(array_filter(array_map('trim', explode('|', (string)($quote['services'] ?? '')))));
+    $selections = array_values(array_filter(array_map('trim', explode('|', (string)($quote['selections'] ?? '')))));
+    $formulaNames = ['Essentiel', 'Ambiance', 'Expérience'];
+    $formulas = array_values(array_intersect($selections, $formulaNames));
+    $options = array_values(array_diff($selections, $formulaNames));
+
     admin_header('Demande #' . $id, 'devis');
     if (isset($_GET['saved'])): ?><div class="flash flash--success">Statut mis à jour.</div><?php endif; ?>
     <div class="quote-detail">
-      <section class="form-card">
-        <div class="admin-section__head"><h2><?= e($quote['name']) ?></h2><span class="status status--<?= e($quote['status']) ?>"><?= e(quote_status_label($quote['status'])) ?></span></div>
-        <div class="quote-meta">
-          <div><span>E-mail</span><a href="mailto:<?= e($quote['email']) ?>"><?= e($quote['email']) ?></a></div>
-          <div><span>Téléphone</span><?= $quote['phone'] ? '<a href="tel:' . e($quote['phone']) . '">' . e($quote['phone']) . '</a>' : '—' ?></div>
-          <div><span>Adresse postale</span><?= e($quote['postal_address'] ?: '—') ?></div>
-          <div><span>Recommandé par</span><?= e($quote['referral'] ?: 'Non renseigné') ?></div>
-          <div><span>Événement</span><?= e($quote['event_type']) ?></div>
-          <div><span>Date</span><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></div>
-          <div><span>Lieu</span><?= e($quote['venue'] ?: 'À définir') ?></div>
-          <div><span>Invités</span><?= $quote['guest_count'] ? (int) $quote['guest_count'] : '—' ?></div>
-          <div><span>Arrivée des invités</span><?= e($quote['start_time'] ?: '—') ?></div>
-          <div><span>Fin de soirée</span><?= e($quote['end_time'] ?: '—') ?></div>
-          <div><span>Budget indicatif</span><?= e($quote['budget'] ?: 'Non renseigné') ?></div>
-          <div><span>Reçue le</span><?= e(date('d/m/Y à H:i', strtotime($quote['created_at']))) ?></div>
-        </div>
-        <div class="admin-section"><h2>Prestations souhaitées</h2><div class="quote-message"><?= e($quote['services'] ?: 'Aucune prestation renseignée.') ?></div></div>
-        <div class="admin-section"><h2>Formules, packs & options</h2><div class="quote-message"><?= e($quote['selections'] ?: 'Aucune sélection renseignée.') ?></div></div>
-        <div class="admin-section"><h2>Projet du client</h2><div class="quote-message"><?= e($quote['message'] ?: 'Aucun message complémentaire.') ?></div></div>
+      <section class="quote-main">
+        <section class="form-card quote-block">
+          <div class="admin-section__head">
+            <div>
+              <span class="quote-section-kicker">Client</span>
+              <h2>Coordonnées du client</h2>
+            </div>
+            <span class="status status--<?= e($quote['status']) ?>"><?= e(quote_status_label($quote['status'])) ?></span>
+          </div>
+          <div class="quote-meta quote-meta--client">
+            <div><span>Nom et prénom</span><strong><?= e($quote['name']) ?></strong></div>
+            <div><span>E-mail</span><a href="mailto:<?= e($quote['email']) ?>"><?= e($quote['email']) ?></a></div>
+            <div><span>Téléphone</span><?= $quote['phone'] ? '<a href="tel:' . e($quote['phone']) . '">' . e($quote['phone']) . '</a>' : '—' ?></div>
+            <div class="quote-meta__wide"><span>Adresse postale</span><?= e($quote['postal_address'] ?: '—') ?></div>
+          </div>
+        </section>
+
+        <section class="form-card quote-block">
+          <div class="quote-block__heading"><span class="quote-section-kicker">Événement</span><h2>Détails de la soirée</h2></div>
+          <div class="quote-meta">
+            <div><span>Type d’événement</span><?= e($quote['event_type']) ?></div>
+            <div><span>Date</span><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></div>
+            <div><span>Lieu de réception / commune</span><?= e($quote['venue'] ?: 'À définir') ?></div>
+            <div><span>Nombre d’invités</span><?= $quote['guest_count'] ? (int) $quote['guest_count'] : '—' ?></div>
+            <div><span>Arrivée des invités</span><?= e($quote['start_time'] ?: '—') ?></div>
+            <div><span>Fin de soirée</span><?= e($quote['end_time'] ?: '—') ?></div>
+            <div><span>Budget indicatif</span><?= e($quote['budget'] ?: 'Non renseigné') ?></div>
+            <div><span>Recommandé par</span><?= e($quote['referral'] ?: 'Non renseigné') ?></div>
+            <div class="quote-meta__wide"><span>Demande reçue le</span><?= e(date('d/m/Y à H:i', strtotime($quote['created_at']))) ?></div>
+          </div>
+          <div class="quote-project">
+            <span>Projet du client</span>
+            <p><?= nl2br(e($quote['message'] ?: 'Aucun message complémentaire.')) ?></p>
+          </div>
+        </section>
+
+        <section class="form-card quote-block">
+          <div class="quote-block__heading"><span class="quote-section-kicker">Choix du client</span><h2>Prestations, formules & options</h2></div>
+          <div class="quote-choice-grid">
+            <div class="quote-choice">
+              <h3>Prestations</h3>
+              <?php if ($services): ?><ul><?php foreach ($services as $item): ?><li><?= e($item) ?></li><?php endforeach; ?></ul><?php else: ?><p>Non renseigné</p><?php endif; ?>
+            </div>
+            <div class="quote-choice">
+              <h3>Formules</h3>
+              <?php if ($formulas): ?><ul><?php foreach ($formulas as $item): ?><li><?= e($item) ?></li><?php endforeach; ?></ul><?php else: ?><p>Aucune formule sélectionnée</p><?php endif; ?>
+            </div>
+            <div class="quote-choice">
+              <h3>Packs & options</h3>
+              <?php if ($options): ?><ul><?php foreach ($options as $item): ?><li><?= e($item) ?></li><?php endforeach; ?></ul><?php else: ?><p>Aucun pack ou option sélectionné</p><?php endif; ?>
+            </div>
+          </div>
+        </section>
       </section>
-      <aside class="form-card">
+
+      <aside class="form-card quote-followup">
         <h2>Suivi de la demande</h2>
         <form method="post" class="admin-form">
           <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
