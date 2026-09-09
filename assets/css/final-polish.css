@@ -1,0 +1,43 @@
+/* Finitions de la DA sombre premium */
+.hero-modern{padding-top:50px;padding-bottom:60px;min-height:640px;gap:64px}
+.hero-modern h1{font-size:clamp(52px,5.1vw,80px);line-height:.98;max-width:680px}
+.hero-modern h1 span{color:#d43a38}
+.hero-modern__lead{font-size:14px;line-height:1.75;max-width:560px}
+.hero-modern__frame{height:540px;border-radius:18px}
+.hero-modern__label{padding:9px 12px;font-size:8px;letter-spacing:.12em}
+.hero-modern__proof{margin-top:36px;padding-top:20px;gap:24px}
+.event-bar{margin-bottom:66px}
+
+.availability{padding-top:66px;padding-bottom:72px}
+.availability__head{margin-bottom:38px}
+.availability__head h2{font-size:clamp(40px,4.1vw,62px)}
+.availability__year{padding:24px 26px 20px}
+.availability__year-head{padding-bottom:14px}
+.availability__year-number{font-size:38px}
+.availability__month{padding:9px 0}
+.availability__icon{width:20px;height:20px;font-size:9px}
+.availability__month-name{font-size:12px}
+.availability__status{font-size:7.5px}
+.availability__legend{margin-top:18px}
+.availability__updated{margin-top:10px}
+.availability__foot{margin-top:28px;padding-top:20px}
+
+.section--reviews{padding-top:70px}
+.section--reviews .section-heading{margin-bottom:36px}
+.section--reviews h2{font-size:clamp(40px,4.1vw,62px)}
+.review{min-height:250px}
+
+@media(max-width:980px){
+  .hero-modern{padding-top:42px;padding-bottom:52px}
+  .hero-modern__frame{height:500px}
+  .availability{padding-top:60px;padding-bottom:66px}
+}
+
+@media(max-width:620px){
+  .hero-modern h1{font-size:46px}
+  .hero-modern__frame{height:400px}
+  .event-bar{margin-bottom:52px}
+  .availability{padding-top:52px;padding-bottom:60px}
+  .availability__year{padding:20px 17px}
+  .availability__month{padding:8px 0}
+}
