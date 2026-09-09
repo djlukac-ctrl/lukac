@@ -3,6 +3,25 @@ finalPolishStyles.rel = 'stylesheet';
 finalPolishStyles.href = 'assets/css/final-polish.css?v=20260909-1';
 document.head.appendChild(finalPolishStyles);
 
+function ensureFormulesLink(container) {
+  if (!container || container.querySelector('a[href="formules.html"]')) return;
+  const link = document.createElement('a');
+  link.href = 'formules.html';
+  link.textContent = 'Formules';
+  const prestationsLink = container.querySelector('a[href="prestations.html"]');
+  if (prestationsLink && prestationsLink.nextSibling) {
+    container.insertBefore(link, prestationsLink.nextSibling);
+  } else if (prestationsLink) {
+    prestationsLink.insertAdjacentElement('afterend', link);
+  } else {
+    container.prepend(link);
+  }
+}
+
+ensureFormulesLink(document.querySelector('.desktop-nav'));
+ensureFormulesLink(document.querySelector('.mobile-nav'));
+ensureFormulesLink(document.querySelector('.site-footer__links'));
+
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('.mobile-nav');
 
