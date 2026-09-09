@@ -22,6 +22,17 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
+function ensure_column(PDO $pdo, string $table, string $column, string $definition): void
+{
+    $columns = $pdo->query('PRAGMA table_info(' . $table . ')')->fetchAll();
+    foreach ($columns as $info) {
+        if (($info['name'] ?? '') === $column) {
+            return;
+        }
+    }
+    $pdo->exec('ALTER TABLE ' . $table . ' ADD COLUMN ' . $column . ' ' . $definition);
+}
+
 function db(): PDO
 {
     static $pdo = null;
@@ -57,6 +68,13 @@ function db(): PDO
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )');
+
+    ensure_column($pdo, 'quotes', 'postal_address', 'TEXT');
+    ensure_column($pdo, 'quotes', 'referral', 'TEXT');
+    ensure_column($pdo, 'quotes', 'start_time', 'TEXT');
+    ensure_column($pdo, 'quotes', 'end_time', 'TEXT');
+    ensure_column($pdo, 'quotes', 'services', 'TEXT');
+    ensure_column($pdo, 'quotes', 'selections', 'TEXT');
 
     $pdo->exec('CREATE TABLE IF NOT EXISTS availability (
         year INTEGER NOT NULL,
