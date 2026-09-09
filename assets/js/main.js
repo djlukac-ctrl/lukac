@@ -1,3 +1,8 @@
+const finalPolishStyles = document.createElement('link');
+finalPolishStyles.rel = 'stylesheet';
+finalPolishStyles.href = 'assets/css/final-polish.css?v=20260909-1';
+document.head.appendChild(finalPolishStyles);
+
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('.mobile-nav');
 
