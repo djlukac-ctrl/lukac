@@ -38,14 +38,20 @@ if ($id > 0) {
         <div class="quote-meta">
           <div><span>E-mail</span><a href="mailto:<?= e($quote['email']) ?>"><?= e($quote['email']) ?></a></div>
           <div><span>Téléphone</span><?= $quote['phone'] ? '<a href="tel:' . e($quote['phone']) . '">' . e($quote['phone']) . '</a>' : '—' ?></div>
+          <div><span>Adresse postale</span><?= e($quote['postal_address'] ?: '—') ?></div>
+          <div><span>Recommandé par</span><?= e($quote['referral'] ?: 'Non renseigné') ?></div>
           <div><span>Événement</span><?= e($quote['event_type']) ?></div>
           <div><span>Date</span><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></div>
           <div><span>Lieu</span><?= e($quote['venue'] ?: 'À définir') ?></div>
           <div><span>Invités</span><?= $quote['guest_count'] ? (int) $quote['guest_count'] : '—' ?></div>
+          <div><span>Arrivée des invités</span><?= e($quote['start_time'] ?: '—') ?></div>
+          <div><span>Fin de soirée</span><?= e($quote['end_time'] ?: '—') ?></div>
           <div><span>Budget indicatif</span><?= e($quote['budget'] ?: 'Non renseigné') ?></div>
           <div><span>Reçue le</span><?= e(date('d/m/Y à H:i', strtotime($quote['created_at']))) ?></div>
         </div>
-        <div class="admin-section"><h2>Message</h2><div class="quote-message"><?= e($quote['message'] ?: 'Aucun message complémentaire.') ?></div></div>
+        <div class="admin-section"><h2>Prestations souhaitées</h2><div class="quote-message"><?= e($quote['services'] ?: 'Aucune prestation renseignée.') ?></div></div>
+        <div class="admin-section"><h2>Formules, packs & options</h2><div class="quote-message"><?= e($quote['selections'] ?: 'Aucune sélection renseignée.') ?></div></div>
+        <div class="admin-section"><h2>Projet du client</h2><div class="quote-message"><?= e($quote['message'] ?: 'Aucun message complémentaire.') ?></div></div>
       </section>
       <aside class="form-card">
         <h2>Suivi de la demande</h2>
@@ -85,13 +91,14 @@ admin_header('Demandes de devis', 'devis');
   </div>
 </div>
 <div class="admin-table-wrap">
-<table><thead><tr><th>Client</th><th>Événement</th><th>Date</th><th>Lieu</th><th>Reçue le</th><th>Statut</th><th></th></tr></thead><tbody>
-<?php if (!$quotes): ?><tr><td colspan="7">Aucune demande dans cette catégorie.</td></tr><?php else: foreach ($quotes as $quote): ?>
+<table><thead><tr><th>Client</th><th>Événement</th><th>Date</th><th>Lieu</th><th>Horaires</th><th>Reçue le</th><th>Statut</th><th></th></tr></thead><tbody>
+<?php if (!$quotes): ?><tr><td colspan="8">Aucune demande dans cette catégorie.</td></tr><?php else: foreach ($quotes as $quote): ?>
 <tr>
   <td><strong><?= e($quote['name']) ?></strong><br><span style="color:#777"><?= e($quote['email']) ?></span></td>
   <td><?= e($quote['event_type']) ?></td>
   <td><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></td>
   <td><?= e($quote['venue'] ?: '—') ?></td>
+  <td><?= e(($quote['start_time'] ?: '—') . ' → ' . ($quote['end_time'] ?: '—')) ?></td>
   <td><?= e(date('d/m/Y H:i', strtotime($quote['created_at']))) ?></td>
   <td><span class="status status--<?= e($quote['status']) ?>"><?= e(quote_status_label($quote['status'])) ?></span></td>
   <td><a class="admin-link" href="devis.php?id=<?= (int) $quote['id'] ?>">Ouvrir →</a></td>
