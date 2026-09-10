@@ -8,6 +8,8 @@
 .hero-modern__proof{margin-top:36px;padding-top:20px;gap:24px}
 .event-bar{margin-bottom:66px}
 
+.site-header>.header-cta{display:none!important}
+
 .availability{padding-top:66px;padding-bottom:72px}
 .availability__head{margin-bottom:38px}
 .availability__head h2{font-size:clamp(40px,4.1vw,62px)}
