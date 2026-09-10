@@ -86,11 +86,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <header class="site-header" id="top">
   <a class="brand" href="index.html"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo"></a>
-  <nav class="desktop-nav"><a href="index.html">Accueil</a><a href="prestations.html">Prestations</a><a href="formules.html">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a></nav>
+  <nav class="desktop-nav"><a href="index.html">Accueil</a><a href="index.html#prestations">Prestations</a><a href="index.html#formules">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a></nav>
   <a class="header-cta" href="devis.php">Demander un devis <span>→</span></a>
   <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
 </header>
-<nav class="mobile-nav" hidden><a href="index.html">Accueil</a><a href="prestations.html">Prestations</a><a href="formules.html">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a></nav>
+<nav class="mobile-nav" hidden><a href="index.html">Accueil</a><a href="index.html#prestations">Prestations</a><a href="index.html#formules">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a></nav>
 <main class="quote-page">
   <section class="quote-head"><p>Demande de devis</p><h1>Parlons de <span>votre événement.</span></h1><p>Merci de me transmettre les premières informations concernant votre événement. Elles me permettront d’étudier votre demande et de vous proposer une prestation adaptée à votre date, votre lieu et vos attentes.</p></section>
   <?php if ($success): ?>
@@ -145,6 +145,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
   <?php endif; ?>
 </main>
-<footer class="site-footer"><a class="brand brand--footer" href="index.html"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo brand__logo--footer"></a><p>DJ & animateur événementiel</p><div class="site-footer__links"><a href="prestations.html">Prestations</a><a href="formules.html">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a></div><small>© 2026 Luka C • Tous droits réservés</small></footer>
+<footer class="site-footer"><a class="brand brand--footer" href="index.html"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo brand__logo--footer"></a><p>DJ & animateur événementiel</p><div class="site-footer__links"><a href="index.html#prestations">Prestations</a><a href="index.html#formules">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a></div><small>© 2026 Luka C • Tous droits réservés</small></footer>
 <script src="assets/js/main.js"></script>
 </body></html>
