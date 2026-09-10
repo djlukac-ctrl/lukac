@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':postal_address'=>$postalAddress, ':referral'=>$values['referral'] ?: null,
             ':event_type'=>$values['event_type'], ':event_date'=>$values['event_date'],
             ':venue'=>$values['venue'], ':guest_count'=>$values['guest_count'] !== '' ? (int)$values['guest_count'] : null,
-            ':budget'=>$values['budget'] ?: null, ':start_time'=>$values['start_time'], ':end_time'=>$values['end_time'],
+            ':budget'=>null, ':start_time'=>$values['start_time'], ':end_time'=>$values['end_time'],
             ':services'=>implode(' | ', $selectedServices), ':selections'=>implode(' | ', $selectedSelections),
             ':message'=>$values['message'] ?: null,
         ]);
@@ -147,7 +147,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
         </fieldset>
 
-        <div class="quote-field quote-field--full"><label for="budget">Budget indicatif</label><select id="budget" name="budget"><option value=""></option><?php foreach(['Moins de 800 €','800 à 1 200 €','1 200 à 1 800 €','Plus de 1 800 €'] as $option): ?><option value="<?= e($option) ?>" <?= $values['budget']===$option?'selected':'' ?>><?= e($option) ?></option><?php endforeach; ?></select></div>
         <div class="quote-field quote-field--full"><label for="message">Parlez-moi de votre projet :</label><textarea id="message" name="message"><?= e($values['message']) ?></textarea></div>
       </div>
       <div class="quote-actions"><p>* Champs obligatoires afin que je puisse étudier votre demande dans les meilleures conditions.</p><button class="quote-submit" type="submit">Envoyer ma demande →</button></div>
