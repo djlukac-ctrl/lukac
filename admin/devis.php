@@ -65,7 +65,6 @@ if ($id > 0) {
             <div><span>Nombre d’invités</span><?= $quote['guest_count'] ? (int) $quote['guest_count'] : '—' ?></div>
             <div><span>Arrivée des invités</span><?= e($quote['start_time'] ?: '—') ?></div>
             <div><span>Fin de soirée</span><?= e($quote['end_time'] ?: '—') ?></div>
-            <div><span>Budget indicatif</span><?= e($quote['budget'] ?: 'Non renseigné') ?></div>
             <div><span>Recommandé par</span><?= e($quote['referral'] ?: 'Non renseigné') ?></div>
             <div class="quote-meta__wide"><span>Demande reçue le</span><?= e(date('d/m/Y à H:i', strtotime($quote['created_at']))) ?></div>
           </div>
