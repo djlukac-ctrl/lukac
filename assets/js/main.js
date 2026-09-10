@@ -23,6 +23,170 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
     homeFormules.style.order = '5';
     homeFormules.style.width = '100%';
   }
+
+  const quoteSection = document.createElement('section');
+  quoteSection.id = 'devis';
+  quoteSection.className = 'home-quote reveal';
+  quoteSection.style.order = '6';
+  quoteSection.innerHTML = `
+    <div class="home-quote__head">
+      <p class="home-quote__kicker">Demande de devis</p>
+      <h2>Parlons de <em>votre événement.</em></h2>
+      <p>Transmettez-moi les premières informations concernant votre événement. Elles me permettront d’étudier votre demande et de vous proposer une prestation adaptée à votre date, votre lieu et vos attentes.</p>
+    </div>
+
+    <div class="home-quote__message" aria-live="polite"></div>
+
+    <form class="home-quote__form" method="post" action="devis.php">
+      <input type="hidden" name="csrf" value="">
+      <div class="home-quote__hp"><label>Entreprise<input name="company" tabindex="-1" autocomplete="off"></label></div>
+
+      <div class="home-quote__grid">
+        <div class="home-quote__field"><label>Nom et prénom *</label><input name="name" required autocomplete="name"></div>
+        <div class="home-quote__field"><label>E-mail *</label><input name="email" type="email" required autocomplete="email"></div>
+        <div class="home-quote__field"><label>Téléphone *</label><input name="phone" type="tel" required autocomplete="tel"></div>
+        <div class="home-quote__field"><label>Quelqu’un vous a parlé de moi ?</label><input name="referral" placeholder="Ex. DUPONT Marie"></div>
+
+        <fieldset class="home-quote__group home-quote__group--full">
+          <legend>Adresse postale *</legend>
+          <div class="home-quote__address">
+            <div class="home-quote__field"><label>N° *</label><input name="address_number" required placeholder="12"></div>
+            <div class="home-quote__field"><label>Rue *</label><input name="address_street" required placeholder="Rue du Lac"></div>
+            <div class="home-quote__field"><label>Ville *</label><input name="address_city" required placeholder="Saint-Dizier"></div>
+            <div class="home-quote__field"><label>Code postal *</label><input name="address_postcode" required inputmode="numeric" maxlength="5" pattern="[0-9]{5}" placeholder="52100"></div>
+          </div>
+        </fieldset>
+
+        <div class="home-quote__field"><label>Type d’événement *</label><select name="event_type" required><option value="">Choisir…</option><option>Mariage</option><option>Anniversaire</option><option>Baptême</option><option>Retraite</option><option>Autre</option></select></div>
+        <div class="home-quote__field"><label>Date de l’événement *</label><input name="event_date" type="date" required></div>
+        <div class="home-quote__field"><label>Lieu de réception / commune</label><input name="venue"></div>
+        <div class="home-quote__field"><label>Nombre d’invités</label><input name="guest_count" type="number" min="1" max="5000"></div>
+        <div class="home-quote__field"><label>Arrivée des invités *</label><input name="start_time" type="time" required></div>
+        <div class="home-quote__field"><label>Fin de soirée *</label><input name="end_time" type="time" required></div>
+
+        <fieldset class="home-quote__group home-quote__group--full">
+          <legend>Quelle(s) prestation(s) souhaitez-vous ? *</legend>
+          <div class="home-quote__checks">
+            <label><input type="checkbox" name="services[]" value="DJ"><span>DJ</span></label>
+            <label><input type="checkbox" name="services[]" value="Animations"><span>Animations</span></label>
+            <label><input type="checkbox" name="services[]" value="Karaoké"><span>Karaoké</span></label>
+            <label><input type="checkbox" name="services[]" value="Sonorisation de vin d’honneur"><span>Sonorisation de vin d’honneur</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="home-quote__group home-quote__group--full">
+          <legend>Quelle formule, quel pack ou quelle option avez-vous choisi ? *</legend>
+          <div class="home-quote__checks">
+            ${['Essentiel','Ambiance','Expérience','Pack Instant Magique','Pack Instant Magique Signature','Fumée lourde','Étincelles froides','Éclairage mural','Écran & projecteur'].map(item => `<label><input type="checkbox" name="selections[]" value="${item}"><span>${item}</span></label>`).join('')}
+          </div>
+        </fieldset>
+
+        <div class="home-quote__field home-quote__field--full"><label>Budget indicatif</label><select name="budget"><option value="">Non défini</option><option>Moins de 800 €</option><option>800 à 1 200 €</option><option>1 200 à 1 800 €</option><option>Plus de 1 800 €</option></select></div>
+        <div class="home-quote__field home-quote__field--full"><label>Parlez-moi de votre projet</label><textarea name="message" placeholder="Ambiance souhaitée, déroulement de la journée ou de la soirée, attentes particulières, informations utiles…"></textarea></div>
+      </div>
+
+      <div class="home-quote__actions">
+        <p>* Champs obligatoires afin que je puisse étudier votre demande dans les meilleures conditions.</p>
+        <button type="submit">Envoyer ma demande <span>→</span></button>
+      </div>
+    </form>`;
+
+  homeMain.appendChild(quoteSection);
+
+  const quoteStyles = document.createElement('style');
+  quoteStyles.textContent = `
+    .home-quote{max-width:var(--max);width:100%;margin:0 auto;padding:88px 34px 110px;color:#181716}
+    .home-quote__head{max-width:820px;margin-bottom:38px}.home-quote__kicker{margin:0 0 14px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#c93431;font-weight:700}
+    .home-quote__head h2{font:600 clamp(42px,4.5vw,68px)/1.02 'Space Grotesk',sans-serif;letter-spacing:-.04em;margin:0 0 16px}.home-quote__head h2 em{font-style:normal;color:#c93431}.home-quote__head>p:last-child{max-width:690px;margin:0;color:#6f6862;font-size:13px;line-height:1.75}
+    .home-quote__form{background:#fff;border:1px solid rgba(24,23,22,.10);border-radius:22px;padding:28px;box-shadow:0 16px 40px rgba(50,38,28,.06)}
+    .home-quote__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.home-quote__field{display:grid;gap:7px}.home-quote__field--full,.home-quote__group--full{grid-column:1/-1}
+    .home-quote__field label,.home-quote__group legend{font-size:11px;color:#6f6862}.home-quote__field input,.home-quote__field select,.home-quote__field textarea{width:100%;border:1px solid rgba(24,23,22,.12);border-radius:12px;background:#faf8f5;color:#181716;padding:13px 14px;outline:none;font:inherit}.home-quote__field textarea{min-height:140px;resize:vertical}
+    .home-quote__field input:focus,.home-quote__field select:focus,.home-quote__field textarea:focus{border-color:#a99f95;box-shadow:0 0 0 3px rgba(201,52,49,.06)}
+    .home-quote__group{border:1px solid rgba(24,23,22,.10);border-radius:16px;padding:16px;margin:0;background:#fbf9f6}.home-quote__group legend{padding:0 7px}.home-quote__address{display:grid;grid-template-columns:120px 1.5fr 1fr 150px;gap:12px}.home-quote__checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}.home-quote__checks label{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid rgba(24,23,22,.10);border-radius:11px;background:#fff;color:#393531;font-size:12px;cursor:pointer}.home-quote__checks input{width:16px;height:16px;margin:1px 0 0;accent-color:#c93431}
+    .home-quote__actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px}.home-quote__actions p{margin:0;color:#817a73;font-size:10px}.home-quote__actions button{border:0;border-radius:999px;background:#181716;color:#fff;padding:14px 20px;font-weight:700;cursor:pointer}.home-quote__actions button:hover{background:#c93431}.home-quote__actions button:disabled{opacity:.55;cursor:wait}
+    .home-quote__message{display:none;margin-bottom:16px;padding:16px 18px;border-radius:14px;font-size:13px}.home-quote__message.is-success{display:block;background:#f2f8ee;color:#27451f;border:1px solid rgba(96,128,75,.22)}.home-quote__message.is-error{display:block;background:#fff1f0;color:#9a413d;border:1px solid rgba(168,76,71,.20)}
+    .home-quote__hp{position:absolute;left:-9999px;opacity:0;pointer-events:none}
+    @media(max-width:850px){.home-quote__address{grid-template-columns:1fr 1fr}}
+    @media(max-width:700px){.home-quote{padding:64px 18px 80px}.home-quote__grid{grid-template-columns:1fr}.home-quote__field--full,.home-quote__group--full{grid-column:auto}.home-quote__address,.home-quote__checks{grid-template-columns:1fr}.home-quote__form{padding:20px}.home-quote__actions{align-items:stretch;flex-direction:column}.home-quote__actions button{width:100%}}
+  `;
+  document.head.appendChild(quoteStyles);
+
+  document.querySelectorAll('a[href="devis.php"]').forEach(link => {
+    link.setAttribute('href', '#devis');
+  });
+
+  const quoteForm = quoteSection.querySelector('.home-quote__form');
+  const csrfInput = quoteForm.querySelector('input[name="csrf"]');
+  const quoteMessage = quoteSection.querySelector('.home-quote__message');
+  const quoteButton = quoteForm.querySelector('button[type="submit"]');
+
+  async function loadCsrfToken() {
+    try {
+      const response = await fetch('devis.php', { credentials: 'same-origin' });
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const token = doc.querySelector('input[name="csrf"]')?.value || '';
+      csrfInput.value = token;
+      return token;
+    } catch (error) {
+      return '';
+    }
+  }
+
+  loadCsrfToken();
+
+  quoteForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    quoteMessage.className = 'home-quote__message';
+    quoteMessage.textContent = '';
+
+    const servicesChecked = quoteForm.querySelectorAll('input[name="services[]"]:checked').length;
+    const selectionsChecked = quoteForm.querySelectorAll('input[name="selections[]"]:checked').length;
+    if (!servicesChecked || !selectionsChecked) {
+      quoteMessage.className = 'home-quote__message is-error';
+      quoteMessage.textContent = 'Merci de sélectionner au moins une prestation et une formule, un pack ou une option.';
+      quoteMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    if (!csrfInput.value && !(await loadCsrfToken())) {
+      quoteMessage.className = 'home-quote__message is-error';
+      quoteMessage.textContent = 'Impossible de préparer le formulaire pour le moment. Merci de réessayer.';
+      return;
+    }
+
+    quoteButton.disabled = true;
+    quoteButton.textContent = 'Envoi en cours…';
+
+    try {
+      const response = await fetch('devis.php', {
+        method: 'POST',
+        body: new FormData(quoteForm),
+        credentials: 'same-origin'
+      });
+      const html = await response.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const success = doc.querySelector('.quote-success');
+      const error = doc.querySelector('.quote-error');
+
+      if (success) {
+        quoteMessage.className = 'home-quote__message is-success';
+        quoteMessage.textContent = 'Merci ! Votre demande de devis a bien été envoyée. Je reviendrai vers vous dès que possible.';
+        quoteForm.reset();
+        await loadCsrfToken();
+      } else {
+        quoteMessage.className = 'home-quote__message is-error';
+        quoteMessage.textContent = error?.textContent?.trim() || 'Une erreur est survenue pendant l’envoi. Merci de vérifier les informations saisies.';
+      }
+    } catch (error) {
+      quoteMessage.className = 'home-quote__message is-error';
+      quoteMessage.textContent = 'Une erreur réseau est survenue pendant l’envoi. Merci de réessayer.';
+    } finally {
+      quoteButton.disabled = false;
+      quoteButton.innerHTML = 'Envoyer ma demande <span>→</span>';
+      quoteMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  });
 }
 
 const menuToggle = document.querySelector('.menu-toggle');
