@@ -22,10 +22,20 @@ ensureFormulesLink(document.querySelector('.desktop-nav'));
 ensureFormulesLink(document.querySelector('.mobile-nav'));
 ensureFormulesLink(document.querySelector('.site-footer__links'));
 
-const homePrestations = document.querySelector('main > .home-prestations');
+const homeMain = document.querySelector('body > main');
+const homeHero = document.querySelector('main > .hero-modern');
+const reviewsSection = document.querySelector('main > #avis');
 const availabilitySection = document.querySelector('main > #disponibilites');
-if (homePrestations && availabilitySection) {
-  availabilitySection.insertAdjacentElement('afterend', homePrestations);
+const homePrestations = document.querySelector('main > .home-prestations');
+
+if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestations) {
+  homeMain.style.display = 'flex';
+  homeMain.style.flexDirection = 'column';
+  homeHero.style.order = '1';
+  reviewsSection.style.order = '2';
+  availabilitySection.style.order = '3';
+  homePrestations.style.order = '4';
+  homePrestations.style.width = '100%';
 }
 
 const menuToggle = document.querySelector('.menu-toggle');
