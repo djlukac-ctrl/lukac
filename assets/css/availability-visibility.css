@@ -38,6 +38,13 @@
 .availability__foot strong{font-size:24px;color:#171717}
 .availability__foot p{font-size:11px;color:#746c65}
 
+/* Ordre commercial : avis clients avant les disponibilités */
+main{display:flex;flex-direction:column}
+.hero-modern{order:1}
+.section--reviews{order:2}
+.availability{order:3}
+.section--reviews h2 em{color:#c93431!important}
+
 @media(max-width:620px){
   .availability__year{padding:20px 16px}
   .availability__month{grid-template-columns:32px 1fr;padding:10px;margin:5px 0}
