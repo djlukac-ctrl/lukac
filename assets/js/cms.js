@@ -10,6 +10,8 @@
     juillet: 7, aout: 8, août: 8, septembre: 9, octobre: 10, novembre: 11, decembre: 12, décembre: 12
   };
 
+  const allowedImagePositions = new Set(['center', 'top', 'bottom', 'left', 'right']);
+
   function normalize(value) {
     return value.trim().toLowerCase();
   }
@@ -36,12 +38,18 @@
       const key = el.dataset.cmsImage;
       const path = key && content[key] ? String(content[key]).trim() : '';
       if (!path) return;
+
+      const savedPosition = key && content[`${key}.position`] ? String(content[`${key}.position`]).trim().toLowerCase() : 'center';
+      const position = allowedImagePositions.has(savedPosition) ? savedPosition : 'center';
+
       if (el.tagName === 'IMG') {
         el.src = path;
+        el.style.objectFit = 'cover';
+        el.style.objectPosition = position;
       } else {
         el.style.backgroundImage = `url("${path.replace(/"/g, '%22')}")`;
         el.style.backgroundSize = 'cover';
-        el.style.backgroundPosition = 'center';
+        el.style.backgroundPosition = position;
         el.classList.add('has-cms-image');
       }
     });
