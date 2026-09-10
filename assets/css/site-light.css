@@ -88,7 +88,7 @@ body{background:#f5f2ed;color:#181716}
 .formule-card__body{background:#fff!important;color:#181716!important}.formule-card__body h2,.signature-card h3,.option-card h3{color:#181716!important}
 .formule-card__intro,.signature-card p,.option-card p{color:#6b645e!important}.formule-card li,.signature-card li{color:#4e4944!important}
 .formule-card__visual{background-color:#ded8d0!important}.extras-section{background:#eee9e2!important;border-color:rgba(24,23,22,.08)!important}.options-section{background:#f7f4ef!important}
-.option-card__mark,.signature-card__visual{color:#c93431!important}
+.option-card__mark,.signature-card__visual{display:none!important}
 
 /* Devis */
 .quote-page{color:#181716}.quote-head p:first-child{color:#c93431!important}.quote-head h1{color:#181716!important}.quote-head>p:last-child{color:#6b645e!important}
