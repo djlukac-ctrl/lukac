@@ -84,50 +84,90 @@ admin_header('Bon plan', 'bon-plan');
 <?php if ($saved): ?><div class="flash flash--success">Le bon plan a bien été enregistré.</div><?php endif; ?>
 <?php if ($error): ?><div class="flash flash--error"><?= e($error) ?></div><?php endif; ?>
 
-<section class="admin-section">
-  <div class="admin-section__head">
-    <div>
-      <h2>Opération dernière minute</h2>
-      <p style="margin:6px 0 0;color:#777">Active le bloc uniquement lorsqu’une offre doit être visible sur le site.</p>
-    </div>
+<div class="content-page-heading">
+  <div>
+    <span class="content-page-heading__eyebrow">Mise en avant</span>
+    <h2>Opération dernière minute</h2>
+    <p>Prépare ici une offre ponctuelle pour une date qui se libère. Le bloc peut être activé ou masqué à tout moment sans supprimer son contenu.</p>
   </div>
+  <a class="btn" href="../index.html#bon-plan" target="_blank" rel="noopener">Voir sur le site ↗</a>
+</div>
 
-  <form method="post" enctype="multipart/form-data" class="admin-form">
-    <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+<p class="content-help">Renseigne les informations de l’offre puis active sa visibilité lorsque tout est prêt. L’image est facultative.</p>
 
+<form method="post" enctype="multipart/form-data" class="admin-form">
+  <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+
+  <div class="content-groups">
     <section class="form-card">
-      <label style="display:flex;align-items:center;gap:10px;font-weight:700;margin-bottom:20px">
-        <input type="checkbox" name="enabled" value="1" <?= ($content['deal.enabled'] ?? '0') === '1' ? 'checked' : '' ?>>
-        Afficher le bon plan sur le site
-      </label>
-
-      <div class="form-grid">
-        <label>Accroche
-          <input type="text" name="badge" value="<?= e($content['deal.badge'] ?? '') ?>" placeholder="Offre dernière minute">
-        </label>
-        <label>Date / disponibilité
-          <input type="text" name="date" value="<?= e($content['deal.date'] ?? '') ?>" placeholder="Samedi 19 septembre">
-        </label>
-        <label class="form-grid__full">Titre
-          <input type="text" name="title" value="<?= e($content['deal.title'] ?? '') ?>" placeholder="Une date vient de se libérer.">
-        </label>
-        <label class="form-grid__full">Texte
-          <textarea name="text" rows="5"><?= e($content['deal.text'] ?? '') ?></textarea>
-        </label>
-      </div>
-
-      <div style="margin-top:22px">
-        <strong style="display:block;margin-bottom:8px">Image du bon plan</strong>
-        <?php if (!empty($content['deal.image'])): ?>
-          <img src="../<?= e($content['deal.image']) ?>" alt="Aperçu" style="width:min(100%,520px);max-height:320px;object-fit:cover;border-radius:16px;margin-bottom:12px">
-          <label style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input type="checkbox" name="remove_image" value="1"> Supprimer l’image actuelle</label>
-        <?php endif; ?>
-        <input type="file" name="image" accept="image/jpeg,image/png,image/webp">
-        <p style="color:#777;font-size:12px">JPG, PNG ou WEBP — 5 Mo maximum.</p>
+      <h2>Visibilité</h2>
+      <div class="fields">
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+            <input type="checkbox" name="enabled" value="1" <?= ($content['deal.enabled'] ?? '0') === '1' ? 'checked' : '' ?> style="width:auto">
+            <span style="font-size:13px;font-weight:700;color:inherit">Afficher le bon plan sur le site</span>
+          </label>
+        </div>
       </div>
     </section>
 
-    <div class="form-actions"><button class="btn btn--primary" type="submit">Enregistrer le bon plan</button></div>
-  </form>
-</section>
+    <section class="form-card">
+      <h2>Contenu de l’offre</h2>
+      <div class="fields">
+        <div class="form-grid">
+          <div class="field">
+            <label for="deal-badge">Accroche</label>
+            <input id="deal-badge" type="text" name="badge" value="<?= e($content['deal.badge'] ?? '') ?>" placeholder="Offre dernière minute">
+          </div>
+
+          <div class="field">
+            <label for="deal-date">Date / disponibilité</label>
+            <input id="deal-date" type="text" name="date" value="<?= e($content['deal.date'] ?? '') ?>" placeholder="Samedi 19 septembre">
+          </div>
+
+          <div class="field form-grid__full">
+            <label for="deal-title">Titre</label>
+            <input id="deal-title" type="text" name="title" value="<?= e($content['deal.title'] ?? '') ?>" placeholder="Une date vient de se libérer.">
+          </div>
+
+          <div class="field form-grid__full">
+            <label for="deal-text">Texte</label>
+            <textarea id="deal-text" name="text" rows="5" placeholder="Présente ici les conditions ou l’avantage proposé."><?= e($content['deal.text'] ?? '') ?></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-card">
+      <h2>Visuel</h2>
+      <div class="content-images">
+        <div class="content-image-editor">
+          <div class="content-image-editor__preview <?= !empty($content['deal.image']) ? 'has-image' : '' ?>"<?= !empty($content['deal.image']) ? ' style="background-image:url(../' . e($content['deal.image']) . ')"' : '' ?>>
+            <?php if (empty($content['deal.image'])): ?><span>Aucune image personnalisée</span><?php endif; ?>
+          </div>
+
+          <div class="content-image-editor__controls">
+            <strong>Image du bon plan</strong>
+            <div class="field">
+              <label for="deal-image">Remplacer ou ajouter une image</label>
+              <input id="deal-image" type="file" name="image" accept="image/jpeg,image/png,image/webp">
+            </div>
+            <?php if (!empty($content['deal.image'])): ?>
+              <label class="content-image-remove">
+                <input type="checkbox" name="remove_image" value="1"> Supprimer l’image actuelle
+              </label>
+            <?php endif; ?>
+            <span style="color:#777;font-size:11px">JPG, PNG ou WEBP — 5 Mo maximum.</span>
+          </div>
+        </div>
+      </div>
+      <div style="height:22px"></div>
+    </section>
+  </div>
+
+  <div class="form-actions admin-actions--sticky">
+    <button class="btn btn--primary" type="submit">Enregistrer le bon plan</button>
+  </div>
+</form>
+
 <?php admin_footer(); ?>
