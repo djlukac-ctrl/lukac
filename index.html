@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="assets/css/modern-dark.css?v=20260909-2">
   <link rel="stylesheet" href="assets/css/availability-visibility.css?v=20260910-2">
   <link rel="stylesheet" href="assets/css/prestations.css?v=20260910-1">
+  <link rel="stylesheet" href="assets/css/formules.css?v=20260910-1">
   <link rel="stylesheet" href="assets/css/site-light.css?v=20260910-3">
 </head>
 <body>
@@ -18,8 +19,8 @@
     </a>
 
     <nav class="desktop-nav" aria-label="Navigation principale">
-      <a href="prestations.html">Prestations</a>
-      <a href="formules.html">Formules</a>
+      <a href="#prestations">Prestations</a>
+      <a href="#formules">Formules</a>
       <a href="#disponibilites">Disponibilités</a>
       <a href="#avis">Avis clients</a>
     </nav>
@@ -32,8 +33,8 @@
   </header>
 
   <nav class="mobile-nav" aria-label="Navigation mobile" hidden>
-    <a href="prestations.html">Prestations</a>
-    <a href="formules.html">Formules</a>
+    <a href="#prestations">Prestations</a>
+    <a href="#formules">Formules</a>
     <a href="#disponibilites">Disponibilités</a>
     <a href="#avis">Avis clients</a>
     <a class="mobile-nav__cta" href="devis.php">Demander un devis</a>
@@ -47,7 +48,7 @@
         <p class="hero-modern__lead" data-cms="home.hero_lead">Mariages, anniversaires, soirées privées et événements professionnels : une prestation construite autour de vos invités, de votre lieu et de l’énergie du moment.</p>
         <div class="hero-modern__actions">
           <a class="btn-modern btn-modern--primary" href="devis.php">Demander un devis <span>→</span></a>
-          <a class="btn-modern btn-modern--secondary" href="prestations.html">Découvrir les prestations <span>→</span></a>
+          <a class="btn-modern btn-modern--secondary" href="#prestations">Découvrir les prestations <span>→</span></a>
         </div>
       </div>
 
@@ -161,14 +162,59 @@
         </article>
       </section>
 
-      <section class="prestations-cta reveal"><div><strong>Découvrir toutes les prestations</strong><p>Retrouvez le détail de chaque prestation et choisissez ce qui correspond le mieux à votre événement.</p></div><a class="prestations-cta__button" href="prestations.html">Voir les prestations <span>→</span></a></section>
+      <section class="prestations-cta reveal"><div><strong>Une prestation vous intéresse ?</strong><p>Parlez-moi de votre événement et je vous proposerai une solution adaptée à vos besoins.</p></div><a class="prestations-cta__button" href="devis.php">Demander un devis <span>→</span></a></section>
+    </section>
+
+    <section class="formules-page home-formules" id="formules">
+      <section class="formules-hero reveal">
+        <p class="formules-kicker">Formules</p>
+        <h1><span data-cms="formules.hero_title" style="color:inherit">Des formules sur mesure</span><br><span data-cms="formules.hero_highlight">pour votre événement.</span></h1>
+        <p data-cms="formules.hero_intro">Que ce soit pour une petite soirée ou un événement plus important, je vous propose des solutions complètes et personnalisées.</p>
+      </section>
+
+      <section class="formules-grid">
+        <article class="formule-card reveal">
+          <div class="formule-card__visual formule-card__visual--essentiel" data-cms-image="formules.essentiel.image"><span data-cms="formules.essentiel.title">Essentiel</span></div>
+          <div class="formule-card__body"><h2 data-cms="formules.essentiel.title">Essentiel</h2><p class="formule-card__intro" data-cms="formules.essentiel.intro">L’essentiel pour une soirée réussie.</p><ul data-cms-list="formules.essentiel.items"><li>Sonorisation professionnelle adaptée</li><li>Espace DJ élégant avec façade blanche</li><li>Éclairage dynamique de la piste de danse</li><li>Micros sans fil à disposition</li></ul></div>
+        </article>
+
+        <article class="formule-card formule-card--featured reveal reveal--delay-small">
+          <div class="formule-card__visual formule-card__visual--ambiance" data-cms-image="formules.ambiance.image"><span data-cms="formules.ambiance.title">Ambiance</span></div>
+          <div class="formule-card__body"><h2 data-cms="formules.ambiance.title">Ambiance</h2><p class="formule-card__intro" data-cms="formules.ambiance.intro">Plus de lumière, plus de dynamisme, plus d’ambiance.</p><ul data-cms-list="formules.ambiance.items"><li>Sonorisation professionnelle</li><li>Espace DJ élégant avec façade blanche</li><li>Mise en lumière renforcée de la piste de danse</li><li>Éclairages mobiles et dynamiques au rythme de la musique</li><li>Totems lumineux pour une installation plus immersive</li><li>Effet de fumée pour sublimer les jeux de lumière</li><li>Micros sans fil à disposition</li></ul></div>
+        </article>
+
+        <article class="formule-card reveal reveal--delay">
+          <div class="formule-card__visual formule-card__visual--experience" data-cms-image="formules.experience.image"><span data-cms="formules.experience.title">Expérience</span></div>
+          <div class="formule-card__body"><h2 data-cms="formules.experience.title">Expérience</h2><p class="formule-card__intro" data-cms="formules.experience.intro">Une mise en scène lumineuse complète pour une soirée inoubliable.</p><ul data-cms-list="formules.experience.items"><li>Sonorisation professionnelle</li><li>Espace DJ élégant avec façade blanche</li><li>Mise en lumière complète de la piste de danse</li><li>Éclairages mobiles et effets dynamiques</li><li>Totems lumineux pour une installation immersive</li><li>Effets de fumée verticaux pour les moments forts</li><li>Effets LED supplémentaires pour enrichir l’ambiance lumineuse</li><li>Micros sans fil à disposition</li></ul></div>
+        </article>
+      </section>
+
+      <section class="extras-section reveal">
+        <div class="section-title"><p class="formules-kicker">Options signature</p><h2>Personnalisez votre prestation selon vos envies.</h2><p>Ajoutez à votre formule les options qui correspondent à votre événement pour créer des moments encore plus marquants.</p></div>
+        <div class="signature-grid">
+          <article class="signature-card"><div class="signature-card__image" data-cms-image="formules.signature1.image"></div><div class="signature-card__visual">02</div><h3 data-cms="formules.signature1.title">Pack Instant Magique</h3><p data-cms="formules.signature1.desc">Sublimez votre ouverture de bal avec une mise en scène élégante et spectaculaire.</p><ul data-cms-list="formules.signature1.items"><li>Fumée lourde au sol</li><li>2 fontaines d’étincelles froides</li><li>Déclenchement synchronisé au moment choisi</li></ul></article>
+          <article class="signature-card"><div class="signature-card__image" data-cms-image="formules.signature2.image"></div><div class="signature-card__visual">04</div><h3 data-cms="formules.signature2.title">Pack Instant Magique Signature</h3><p data-cms="formules.signature2.desc">Pour celles et ceux qui veulent aller encore plus loin et créer un véritable moment “waouh”.</p><ul data-cms-list="formules.signature2.items"><li>Fumée lourde au sol</li><li>4 fontaines d’étincelles froides</li><li>Mise en scène renforcée autour de la piste</li><li>Déclenchement synchronisé au moment choisi</li></ul></article>
+        </div>
+      </section>
+
+      <section class="options-section reveal">
+        <div class="section-title"><p class="formules-kicker">À la carte</p><h2>Les options à la carte.</h2></div>
+        <div class="options-grid">
+          <article class="option-card"><div class="option-card__image" data-cms-image="options.fumee.image"></div><span class="option-card__mark">01</span><h3 data-cms="options.fumee.title">Fumée lourde</h3><p data-cms="options.fumee.desc">Un nuage au sol élégant pour sublimer votre ouverture de bal et créer un moment encore plus magique.</p></article>
+          <article class="option-card"><div class="option-card__image" data-cms-image="options.etincelles.image"></div><span class="option-card__mark">02</span><h3 data-cms="options.etincelles.title">Étincelles froides</h3><p data-cms="options.etincelles.desc">Des gerbes d’étincelles spectaculaires pour accompagner votre entrée, votre ouverture de bal ou un temps fort.</p></article>
+          <article class="option-card"><div class="option-card__image" data-cms-image="options.eclairage.image"></div><span class="option-card__mark">03</span><h3 data-cms="options.eclairage.title">Éclairage mural</h3><p data-cms="options.eclairage.desc">Donnez une nouvelle dimension à votre salle grâce à un éclairage d’ambiance réparti autour de l’espace.</p></article>
+          <article class="option-card"><div class="option-card__image" data-cms-image="options.ecran.image"></div><span class="option-card__mark">04</span><h3 data-cms="options.ecran.title">Écran & projecteur</h3><p data-cms="options.ecran.desc">Diffusez vos vidéos, diaporamas, surprises ou souvenirs directement pendant votre événement.</p></article>
+        </div>
+      </section>
+
+      <section class="formules-cta reveal"><div><strong>Une idée particulière ?</strong><p>Parlez-moi de votre projet. Je vous conseillerai les options les plus adaptées à votre événement et à votre lieu de réception.</p></div><a href="devis.php">Demander un devis <span>→</span></a></section>
     </section>
   </main>
 
   <footer class="site-footer">
     <a class="brand brand--footer" href="#top"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo brand__logo--footer"></a>
     <p>DJ & animateur événementiel</p>
-    <div class="site-footer__links"><a href="prestations.html">Prestations</a><a href="formules.html">Formules</a><a href="#disponibilites">Disponibilités</a><a href="#avis">Avis clients</a><a href="devis.php">Demander un devis</a></div>
+    <div class="site-footer__links"><a href="#prestations">Prestations</a><a href="#formules">Formules</a><a href="#disponibilites">Disponibilités</a><a href="#avis">Avis clients</a><a href="devis.php">Demander un devis</a></div>
     <small>© 2026 Luka C • Tous droits réservés</small>
   </footer>
 
