@@ -89,6 +89,14 @@ $imageSlots = [
     ],
 ];
 
+$imagePositions = [
+    'center' => 'Centre',
+    'top' => 'Haut',
+    'bottom' => 'Bas',
+    'left' => 'Gauche',
+    'right' => 'Droite',
+];
+
 $pages = [
     'accueil' => [
         'label' => 'Accueil',
@@ -178,6 +186,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         foreach ($visibleGroups as $groupTitle) {
             foreach ($imageSlots[$groupTitle] ?? [] as $token => [$key, $label]) {
+                $position = (string)($_POST['image_position'][$token] ?? 'center');
+                if (!isset($imagePositions[$position])) $position = 'center';
+                $stmt->execute([':k' => $key . '.position', ':v' => $position]);
+                $current[$key . '.position'] = $position;
+
                 if (!empty($_POST['remove_image'][$token])) {
                     delete_content_image($current[$key] ?? null);
                     $stmt->execute([':k' => $key, ':v' => '']);
@@ -208,7 +221,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $content = site_content();
 admin_header('Contenu du site', 'contenu');
 ?>
-<?php if ($saved): ?><div class="flash flash--success">Le contenu et les images ont été enregistrés. Recharge le site pour voir les modifications.</div><?php endif; ?>
+<?php if ($saved): ?><div class="flash flash--success">Le contenu, les images et leur cadrage ont été enregistrés. Recharge le site pour voir les modifications.</div><?php endif; ?>
 <?php if ($error): ?><div class="flash flash--error"><?= e($error) ?></div><?php endif; ?>
 
 <nav class="content-page-nav" aria-label="Pages du contenu">
@@ -225,10 +238,10 @@ admin_header('Contenu du site', 'contenu');
     <h2><?= e($pages[$page]['label']) ?></h2>
     <p><?= e($pages[$page]['description']) ?></p>
   </div>
-  <a class="btn" href="<?= $page === 'accueil' ? '../index.html' : ($page === 'prestations' ? '../prestations.html' : '../formules.html') ?>" target="_blank" rel="noopener">Voir la page ↗</a>
+  <a class="btn" href="../index.html" target="_blank" rel="noopener">Voir la page ↗</a>
 </div>
 
-<p class="content-help">Modifie uniquement le contenu de cette page. Les images acceptées sont JPG, PNG et WEBP, jusqu’à 5 Mo.</p>
+<p class="content-help">Modifie uniquement le contenu de cette page. Les images acceptées sont JPG, PNG et WEBP, jusqu’à 5 Mo. Tu peux aussi ajuster leur cadrage.</p>
 <form method="post" enctype="multipart/form-data" class="admin-form">
   <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
   <input type="hidden" name="page" value="<?= e($page) ?>">
@@ -238,14 +251,26 @@ admin_header('Contenu du site', 'contenu');
         <h2><?= e($groupTitle) ?></h2>
         <?php if (!empty($imageSlots[$groupTitle])): ?>
           <div class="content-images">
-            <?php foreach ($imageSlots[$groupTitle] as $token => [$imageKey, $imageLabel]): $currentImage = trim((string)($content[$imageKey] ?? '')); ?>
+            <?php foreach ($imageSlots[$groupTitle] as $token => [$imageKey, $imageLabel]):
+              $currentImage = trim((string)($content[$imageKey] ?? ''));
+              $currentPosition = (string)($content[$imageKey . '.position'] ?? 'center');
+              if (!isset($imagePositions[$currentPosition])) $currentPosition = 'center';
+            ?>
               <div class="content-image-editor">
-                <div class="content-image-editor__preview <?= $currentImage ? 'has-image' : '' ?>"<?= $currentImage ? ' style="background-image:url(../' . e($currentImage) . ')"' : '' ?>>
+                <div class="content-image-editor__preview <?= $currentImage ? 'has-image' : '' ?>"<?= $currentImage ? ' style="background-image:url(../' . e($currentImage) . ');background-position:' . e($currentPosition) . '"' : '' ?>>
                   <?php if (!$currentImage): ?><span>Aucune image personnalisée</span><?php endif; ?>
                 </div>
                 <div class="content-image-editor__controls">
                   <strong><?= e($imageLabel) ?></strong>
                   <label class="field"><span>Choisir / remplacer l’image</span><input type="file" name="images[<?= e($token) ?>]" accept="image/jpeg,image/png,image/webp"></label>
+                  <label class="field">
+                    <span>Cadrage de l’image</span>
+                    <select name="image_position[<?= e($token) ?>]">
+                      <?php foreach ($imagePositions as $positionValue => $positionLabel): ?>
+                        <option value="<?= e($positionValue) ?>" <?= $currentPosition === $positionValue ? 'selected' : '' ?>><?= e($positionLabel) ?></option>
+                      <?php endforeach; ?>
+                    </select>
+                  </label>
                   <?php if ($currentImage): ?><label class="content-image-remove"><input type="checkbox" name="remove_image[<?= e($token) ?>]" value="1"> Supprimer l’image actuelle</label><?php endif; ?>
                 </div>
               </div>
