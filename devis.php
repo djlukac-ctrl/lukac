@@ -31,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($honeypot !== '') {
         $success = true;
-    } elseif ($values['name'] === '' || $values['event_type'] === '' || $values['phone'] === '' || $values['event_date'] === '') {
-        $error = 'Merci de renseigner votre nom, votre téléphone, le type d’événement et sa date.';
+    } elseif ($values['name'] === '' || $values['event_type'] === '' || $values['phone'] === '' || $values['event_date'] === '' || $values['venue'] === '') {
+        $error = 'Merci de renseigner votre nom, votre téléphone, le type d’événement, sa date et le lieu de réception.';
     } elseif ($values['address_number'] === '' || $values['address_street'] === '' || $values['address_city'] === '' || $values['address_postcode'] === '') {
         $error = 'Merci de renseigner votre adresse postale complète : numéro, rue, ville et code postal.';
     } elseif (!preg_match('/^[0-9A-Za-zÀ-ÿ -]{1,12}$/u', $values['address_number'])) {
@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':name'=>$values['name'], ':email'=>$values['email'], ':phone'=>$values['phone'],
             ':postal_address'=>$postalAddress, ':referral'=>$values['referral'] ?: null,
             ':event_type'=>$values['event_type'], ':event_date'=>$values['event_date'],
-            ':venue'=>$values['venue'] ?: null, ':guest_count'=>$values['guest_count'] !== '' ? (int)$values['guest_count'] : null,
+            ':venue'=>$values['venue'], ':guest_count'=>$values['guest_count'] !== '' ? (int)$values['guest_count'] : null,
             ':budget'=>$values['budget'] ?: null, ':start_time'=>$values['start_time'], ':end_time'=>$values['end_time'],
             ':services'=>implode(' | ', $selectedServices), ':selections'=>implode(' | ', $selectedSelections),
             ':message'=>$values['message'] ?: null,
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="quote-field"><label for="event_type">Type d’événement *</label><select id="event_type" name="event_type" required><option value=""></option><?php foreach($eventOptions as $option): ?><option value="<?= e($option) ?>" <?= $values['event_type']===$option?'selected':'' ?>><?= e($option) ?></option><?php endforeach; ?></select></div>
         <div class="quote-field"><label for="event_date">Date de l’événement *</label><input id="event_date" name="event_date" type="date" value="<?= e($values['event_date']) ?>" required></div>
-        <div class="quote-field"><label for="venue">Lieu de réception / commune</label><input id="venue" name="venue" value="<?= e($values['venue']) ?>"></div>
+        <div class="quote-field"><label for="venue">Lieu de réception / commune *</label><input id="venue" name="venue" value="<?= e($values['venue']) ?>" required></div>
         <div class="quote-field"><label for="guest_count">Nombre d’invités</label><input id="guest_count" name="guest_count" type="number" min="1" max="5000" value="<?= e($values['guest_count']) ?>"></div>
 
         <div class="quote-field"><label for="start_time">Arrivée des invités *</label><input id="start_time" name="start_time" type="time" value="<?= e($values['start_time']) ?>" required></div>
