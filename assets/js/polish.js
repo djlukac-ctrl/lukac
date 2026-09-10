@@ -104,6 +104,42 @@
     prepareRevealElements().forEach((el) => el.classList.add('is-visible'));
   }
 
+  // Correctif ciblé : les visuels des packs/options sont masqués tant que
+  // la classe has-cms-image n'est pas présente. Le lazy-loading du CMS pouvait
+  // donc empêcher leur chargement. On restaure ici uniquement ces images.
+  const restorePackOptionImages = async () => {
+    const targets = [...document.querySelectorAll('.signature-card__image[data-cms-image], .option-card__image[data-cms-image]')];
+    if (!targets.length) return;
+
+    try {
+      const response = await fetch('api/site-data.php?t=' + Date.now(), {
+        credentials: 'same-origin',
+        cache: 'no-store'
+      });
+      if (!response.ok) return;
+      const data = await response.json();
+      const content = data && data.content ? data.content : {};
+
+      targets.forEach((el) => {
+        const key = el.dataset.cmsImage;
+        const path = key && content[key] ? String(content[key]).trim() : '';
+        if (!path) return;
+
+        const x = Math.max(0, Math.min(100, Number(content[`${key}.position_x`] ?? 50) || 50));
+        const y = Math.max(0, Math.min(100, Number(content[`${key}.position_y`] ?? 50) || 50));
+
+        el.style.backgroundImage = `url("${path.replace(/"/g, '%22')}")`;
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = `${x}% ${y}%`;
+        el.classList.add('has-cms-image');
+      });
+    } catch (_) {
+      // Le site reste utilisable même si l'API CMS est momentanément indisponible.
+    }
+  };
+
+  restorePackOptionImages();
+
   // Petit bouton retour en haut, visible uniquement après avoir descendu la page.
   const backToTop = document.createElement('button');
   backToTop.type = 'button';
