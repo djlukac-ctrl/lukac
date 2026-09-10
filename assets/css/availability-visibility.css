@@ -1,0 +1,48 @@
+.availability{position:relative}
+.availability:before{content:"";position:absolute;inset:38px 20px auto;height:360px;background:radial-gradient(circle at 50% 0,rgba(207,49,47,.08),transparent 68%);pointer-events:none;z-index:-1}
+.availability__head{margin-bottom:38px}
+.availability__head h2 em{color:#d9d4ce}
+.availability__head p:last-child{color:#aaa49d}
+.availability__cta{background:#111;border-color:rgba(255,255,255,.2);padding:14px 19px}
+.availability__cta:hover{background:#f4f1ec;color:#111}
+
+.availability__grid{gap:22px}
+.availability__year{padding:30px 30px 26px;border-color:rgba(255,255,255,.14);background:linear-gradient(145deg,#151515,#0d0d0d);box-shadow:0 18px 55px rgba(0,0,0,.22)}
+.availability__year-head{padding-bottom:20px;margin-bottom:8px}
+.availability__year-number{font-size:46px;color:#fff}
+.availability__year-title{color:#8b8580;font-size:10px}
+
+.availability__month{position:relative;grid-template-columns:34px 1fr auto;gap:12px;min-height:54px;padding:9px 12px;margin:4px 0;border:1px solid transparent;border-radius:12px;transition:.2s}
+.availability__month:hover{transform:translateX(3px)}
+.availability__icon{width:27px;height:27px;font-size:12px;background:#0a0a0a}
+.availability__month-name{font-size:14px!important;color:#f4f1ec!important}
+.availability__status{font-size:9px;letter-spacing:.09em;padding:7px 10px;border-radius:999px;white-space:nowrap}
+
+.availability__month--open{background:rgba(119,157,92,.055);border-color:rgba(158,180,135,.10)}
+.availability__month--open .availability__icon{background:rgba(158,180,135,.10);box-shadow:0 0 0 4px rgba(158,180,135,.035)}
+.availability__month--open .availability__status{color:#b9cf9f;background:rgba(158,180,135,.10);border:1px solid rgba(158,180,135,.18)}
+
+.availability__month--limited{background:rgba(201,168,115,.085);border-color:rgba(201,168,115,.17)}
+.availability__month--limited .availability__icon{background:rgba(201,168,115,.13);box-shadow:0 0 0 4px rgba(201,168,115,.04)}
+.availability__month--limited .availability__status{color:#e3be7f;background:rgba(201,168,115,.13);border:1px solid rgba(201,168,115,.24)}
+
+.availability__month--closed{background:rgba(184,115,112,.07);border-color:rgba(184,115,112,.13)}
+.availability__month--closed .availability__icon{background:rgba(184,115,112,.11);box-shadow:0 0 0 4px rgba(184,115,112,.035)}
+.availability__month--closed .availability__status{color:#d58d89;background:rgba(184,115,112,.11);border:1px solid rgba(184,115,112,.20)}
+
+.availability__legend{margin-top:26px;gap:10px}
+.availability__legend span{padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:#0e0e0e;color:#aaa49d;font-size:9px;font-weight:600}
+.availability__legend i{width:8px;height:8px}
+.availability__updated{margin-top:12px;color:#716d68}
+.availability__foot{margin-top:28px;padding:26px;border:1px solid rgba(255,255,255,.11);border-radius:18px;background:linear-gradient(135deg,#111,#0c0c0c)}
+.availability__foot strong{font-size:24px}
+.availability__foot p{font-size:11px;color:#918c86}
+
+@media(max-width:620px){
+  .availability__year{padding:20px 16px}
+  .availability__month{grid-template-columns:32px 1fr;padding:10px;margin:5px 0}
+  .availability__status{grid-column:2;text-align:left;width:max-content;margin:2px 0 0;padding:6px 9px}
+  .availability__month-name{font-size:13px!important}
+  .availability__legend span{width:100%;justify-content:flex-start}
+  .availability__foot{padding:20px}
+}
