@@ -18,6 +18,23 @@
     right: [100, 50]
   };
 
+  const lazyBackgrounds = new Map();
+  const backgroundObserver = 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const config = lazyBackgrounds.get(entry.target);
+          if (!config) return;
+          entry.target.style.backgroundImage = `url("${config.path.replace(/"/g, '%22')}")`;
+          entry.target.style.backgroundSize = 'cover';
+          entry.target.style.backgroundPosition = config.position;
+          entry.target.classList.add('has-cms-image');
+          lazyBackgrounds.delete(entry.target);
+          observer.unobserve(entry.target);
+        });
+      }, { rootMargin: '500px 0px' })
+    : null;
+
   function normalize(value) {
     return value.trim().toLowerCase();
   }
@@ -26,6 +43,19 @@
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) return fallback;
     return Math.max(0, Math.min(100, parsed));
+  }
+
+  function queueBackgroundImage(el, path, position) {
+    if (!backgroundObserver) {
+      el.style.backgroundImage = `url("${path.replace(/"/g, '%22')}")`;
+      el.style.backgroundSize = 'cover';
+      el.style.backgroundPosition = position;
+      el.classList.add('has-cms-image');
+      return;
+    }
+
+    lazyBackgrounds.set(el, { path, position });
+    backgroundObserver.observe(el);
   }
 
   function applyContent(content) {
@@ -62,10 +92,7 @@
         el.style.objectFit = 'cover';
         el.style.objectPosition = position;
       } else {
-        el.style.backgroundImage = `url("${path.replace(/"/g, '%22')}")`;
-        el.style.backgroundSize = 'cover';
-        el.style.backgroundPosition = position;
-        el.classList.add('has-cms-image');
+        queueBackgroundImage(el, path, position);
       }
     });
   }
@@ -131,7 +158,7 @@
     grid.replaceChildren(...cards);
   }
 
-  fetch('api/site-data.php?t=' + Date.now(), { credentials: 'same-origin' })
+  fetch('api/site-data.php?t=' + Date.now(), { credentials: 'same-origin', cache: 'no-store' })
     .then((response) => {
       if (!response.ok) throw new Error('CMS unavailable');
       return response.json();
