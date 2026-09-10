@@ -85,22 +85,23 @@
       const blockquote = document.createElement('blockquote');
       blockquote.className = 'review';
 
-      const stars = document.createElement('div');
-      stars.className = 'stars';
-      const rating = Math.max(1, Math.min(5, Number(review.rating) || 5));
-      stars.textContent = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+      const fullName = String(review.client_name || 'Client').trim();
+      const firstName = fullName.split(/\s+/)[0] || 'Client';
+
+      const recommendation = document.createElement('div');
+      recommendation.className = 'review__recommendation';
+      recommendation.innerHTML = `${firstName} recommande <span>Luka C.</span>`;
+
+      const date = document.createElement('div');
+      date.className = 'review__date';
+      date.textContent = formatReviewDate(review.review_date);
 
       const text = document.createElement('p');
       text.textContent = review.review_text || '';
 
-      const footer = document.createElement('footer');
-      const name = document.createElement('strong');
-      name.textContent = review.client_name || 'Client';
-      footer.append(name);
-      const date = formatReviewDate(review.review_date);
-      if (date) footer.append(document.createElement('br'), document.createTextNode(date));
-
-      blockquote.append(stars, text, footer);
+      blockquote.append(recommendation);
+      if (date.textContent) blockquote.append(date);
+      blockquote.append(text);
       return blockquote;
     });
 
