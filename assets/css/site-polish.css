@@ -103,19 +103,41 @@
 .back-to-top:hover{background:#c93431;color:#fff;border-color:#c93431}
 .back-to-top svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-/* Header mobile/tablette : garder une barre légère et lisible */
+/* Header mobile/tablette : logo + réseaux + menu sur une seule ligne */
 @media(max-width:1180px){
-  .site-header{gap:14px}
+  .site-header{
+    display:grid;
+    grid-template-columns:auto 1fr auto auto;
+    align-items:center;
+    gap:10px;
+  }
+  .brand{grid-column:1;grid-row:1;justify-self:start}
   .desktop-nav{display:none}
-  .menu-toggle{display:flex}
-  .header-socials{display:flex!important;margin-left:auto!important;margin-right:0!important}
+  .header-cta{display:none!important}
+  .header-socials{
+    display:flex!important;
+    grid-column:3;
+    grid-row:1;
+    justify-self:end;
+    margin:0!important;
+  }
+  .menu-toggle{
+    display:flex;
+    grid-column:4;
+    grid-row:1;
+    position:static!important;
+    inset:auto!important;
+    justify-self:end;
+    margin:0!important;
+  }
 }
 
 @media(max-width:720px){
-  .site-header{padding-left:18px;padding-right:18px}
+  .site-header{padding-left:18px;padding-right:18px;gap:8px}
   .header-socials{gap:4px!important}
   .header-socials a{width:31px!important;height:31px!important}
   .header-socials svg{width:14px!important;height:14px!important}
+  .menu-toggle{width:38px;height:38px}
   .brand__logo{max-width:82px}
   .back-to-top{right:16px;bottom:16px;width:42px;height:42px}
   .section--reviews{padding-bottom:62px}
@@ -124,8 +146,10 @@
 }
 
 @media(max-width:420px){
+  .site-header{gap:6px}
   .header-socials a{width:29px!important;height:29px!important}
   .header-socials svg{width:13px!important;height:13px!important}
+  .menu-toggle{width:36px;height:36px}
 }
 
 @media(prefers-reduced-motion:reduce){
