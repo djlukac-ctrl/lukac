@@ -6,6 +6,15 @@ $pdo = db();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf($_POST['csrf'] ?? null);
     $id = (int) ($_POST['id'] ?? 0);
+    $action = (string) ($_POST['action'] ?? 'update_status');
+
+    if ($action === 'delete' && $id > 0) {
+        $stmt = $pdo->prepare('DELETE FROM quotes WHERE id=:id');
+        $stmt->execute([':id' => $id]);
+        header('Location: devis.php?deleted=1');
+        exit;
+    }
+
     $status = (string) ($_POST['status'] ?? '');
     $allowed = ['new','read','contacted','booked','archived'];
     if ($id > 0 && in_array($status, $allowed, true)) {
@@ -101,9 +110,10 @@ if ($id > 0) {
           <div class="field"><label for="status">Statut</label><select id="status" name="status">
             <?php foreach (['new','read','contacted','booked','archived'] as $status): ?><option value="<?= e($status) ?>" <?= $quote['status'] === $status ? 'selected' : '' ?>><?= e(quote_status_label($status)) ?></option><?php endforeach; ?>
           </select></div>
-          <button class="btn btn--primary" type="submit">Enregistrer le statut</button>
+          <button class="btn btn--primary" type="submit" name="action" value="update_status">Enregistrer le statut</button>
           <a class="btn" href="mailto:<?= e($quote['email']) ?>?subject=Votre%20demande%20de%20devis%20-%20Luka%20C">Répondre par e-mail</a>
           <?php if ($quote['phone']): ?><a class="btn" href="tel:<?= e($quote['phone']) ?>">Appeler le client</a><?php endif; ?>
+          <button class="btn btn--danger" type="submit" name="action" value="delete" onclick="return confirm('Supprimer définitivement cette demande de devis ? Cette action est irréversible.');">Supprimer la demande</button>
           <a class="admin-link" href="devis.php">← Retour aux demandes</a>
         </form>
       </aside>
@@ -123,7 +133,7 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $quotes = $stmt->fetchAll();
 admin_header('Demandes de devis', 'devis');
-?>
+if (isset($_GET['deleted'])): ?><div class="flash flash--success">Demande de devis supprimée.</div><?php endif; ?>
 <div class="admin-section__head">
   <div style="display:flex;gap:8px;flex-wrap:wrap">
     <a class="btn" href="devis.php">Toutes</a>
