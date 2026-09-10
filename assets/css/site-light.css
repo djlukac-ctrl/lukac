@@ -50,16 +50,23 @@ body{background:#f5f2ed;color:#181716}
 .availability:before{content:"";position:absolute;left:50%;top:20px;width:100vw;height:calc(100% - 40px);transform:translateX(-50%);background:#ece7df;z-index:-1;border-top:1px solid rgba(24,23,22,.06);border-bottom:1px solid rgba(24,23,22,.06)}
 .availability__kicker,.reviews-kicker{color:#c93431}
 .availability__head h2,.section--reviews h2{color:#181716}.availability__head h2 em{color:#c93431}.availability__head p:last-child{color:#6f6862}
-.availability__year{background:#fff;border-color:rgba(24,23,22,.10);box-shadow:0 14px 34px rgba(50,38,28,.06)}
+.availability__year{background:#fff;border-color:rgba(24,23,22,.12);box-shadow:0 14px 34px rgba(50,38,28,.07)}
 .availability__year-head{border-color:rgba(24,23,22,.10)}.availability__year-number{color:#181716}.availability__year-title{color:#817a73}
-.availability__month{border-color:rgba(24,23,22,.06);background:#faf8f5;color:#181716}
-.availability__month:hover{transform:translateX(2px)}
-.availability__month-name,.availability__month .availability__month-name{color:#272421}
-.availability__month--open{background:#f5f8f1!important;color:#60804b!important;border-color:rgba(96,128,75,.18)!important}
-.availability__month--limited{background:#fff8eb!important;color:#a3732e!important;border-color:rgba(163,115,46,.20)!important}
-.availability__month--closed{background:#fff1f0!important;color:#a84c47!important;border-color:rgba(168,76,71,.20)!important}
-.availability__status{background:rgba(255,255,255,.70)!important;border-color:currentColor!important}
-.availability__legend{color:#655f59}.availability__updated{color:#8b847d}
+.availability__month{border:1px solid rgba(24,23,22,.08);background:#faf8f5;color:#181716;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.availability__month:hover{transform:translateX(3px);box-shadow:0 7px 16px rgba(24,23,22,.06)}
+.availability__month-name,.availability__month .availability__month-name{color:#181716;font-weight:700}
+.availability__icon{display:inline-flex!important;align-items:center;justify-content:center;flex:0 0 30px!important;width:30px!important;height:30px!important;border-radius:50%!important;font-family:Arial,sans-serif!important;font-size:18px!important;line-height:1!important;font-weight:900!important;color:#fff!important;box-shadow:0 3px 9px rgba(24,23,22,.14)}
+.availability__month--open{background:#e8f8ec!important;color:#087a35!important;border-color:#69cf88!important}
+.availability__month--open .availability__icon{background:#12a84f!important;color:#fff!important}
+.availability__month--open .availability__status{background:#12a84f!important;color:#fff!important;border-color:#12a84f!important}
+.availability__month--limited{background:#fff3d6!important;color:#9a5c00!important;border-color:#f0b63f!important}
+.availability__month--limited .availability__icon{background:#f0a000!important;color:#fff!important}
+.availability__month--limited .availability__status{background:#f0a000!important;color:#fff!important;border-color:#f0a000!important}
+.availability__month--closed{background:#ffe7e5!important;color:#a9221d!important;border-color:#eb7770!important}
+.availability__month--closed .availability__icon{background:#d93b35!important;color:#fff!important}
+.availability__month--closed .availability__status{background:#d93b35!important;color:#fff!important;border-color:#d93b35!important}
+.availability__status{font-weight:700!important;letter-spacing:.01em!important;border:1px solid transparent!important;box-shadow:none!important}
+.availability__legend{color:#4d4843;font-weight:600}.availability__legend i{width:11px!important;height:11px!important;border-radius:50%!important}.availability__legend .open i{background:#12a84f!important}.availability__legend .limited i{background:#f0a000!important}.availability__legend .closed i{background:#d93b35!important}.availability__updated{color:#8b847d}
 .availability__foot{border-color:rgba(24,23,22,.10);background:#fff;border-radius:18px;padding:24px 26px;box-shadow:0 10px 30px rgba(50,38,28,.05)}
 .availability__foot strong{color:#181716}.availability__foot p{color:#746d66}.availability__foot .btn--primary{background:#c93431;color:#fff}
 
@@ -99,4 +106,4 @@ body{background:#f5f2ed;color:#181716}
 .site-footer p,.site-footer a{color:#b7b1aa}.site-footer a:hover{color:#fff}.site-footer small{color:#6f6a64;border-color:rgba(255,255,255,.08)}
 
 @media(max-width:980px){.site-header{background:rgba(245,242,237,.96)}.availability:before{top:0;height:100%}}
-@media(max-width:620px){.site-footer{padding-left:18px;padding-right:18px}.availability__foot{padding:20px}}
+@media(max-width:620px){.site-footer{padding-left:18px;padding-right:18px}.availability__foot{padding:20px}.availability__icon{flex-basis:28px!important;width:28px!important;height:28px!important;font-size:17px!important}}
