@@ -114,17 +114,19 @@
     const availability = document.querySelector('#disponibilites');
     if (!availability) return;
 
+    const dateText = String(content['deal.date'] || '').trim();
     const section = document.createElement('section');
     section.className = 'home-deal';
     section.id = 'bon-plan';
     section.innerHTML = `
       <div class="home-deal__inner">
         <div class="home-deal__content">
-          <div class="home-deal__badge">${escapeHtml(content['deal.badge'] || 'Offre dernière minute')}</div>
-          ${content['deal.date'] ? `<div class="home-deal__date">${escapeHtml(content['deal.date'])}</div>` : ''}
+          <div class="home-deal__badge">${escapeHtml(content['deal.badge'] || 'Bon plan — dernière minute')}</div>
+          <div class="home-deal__availability-line">Je suis disponible le</div>
+          ${dateText ? `<div class="home-deal__date">${escapeHtml(dateText)}</div>` : ''}
           <h2>${escapeHtml(content['deal.title'] || 'Une date vient de se libérer.')}</h2>
           <p>${escapeHtml(content['deal.text'] || '')}</p>
-          <a href="#devis" class="home-deal__cta">Profiter de l’offre <span>→</span></a>
+          <a href="#devis" class="home-deal__cta">Profiter de cette disponibilité <span>→</span></a>
         </div>
         ${content['deal.image'] ? `<div class="home-deal__visual"><img src="${escapeAttribute(content['deal.image'])}" alt="Bon plan Luka C" loading="lazy" decoding="async"></div>` : ''}
       </div>`;
@@ -141,16 +143,17 @@
       .home-deal{order:4!important;max-width:1420px;width:100%;margin:0 auto;padding:34px 34px 84px;scroll-margin-top:96px}
       .home-deal__inner{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);overflow:hidden;border-radius:26px;background:#181716;color:#fff;box-shadow:0 20px 55px rgba(24,23,22,.14)}
       .home-deal__content{padding:46px 48px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:360px}
-      .home-deal__badge{display:inline-flex;padding:7px 10px;border-radius:999px;background:#c93431;color:#fff;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
-      .home-deal__date{font-size:12px;font-weight:700;color:#d7d1cb;margin-bottom:12px}
-      .home-deal h2{font:600 clamp(34px,4vw,58px)/1.02 'Space Grotesk',sans-serif;letter-spacing:-.04em;margin:0 0 18px;max-width:700px}
+      .home-deal__badge{display:inline-flex;padding:7px 10px;border-radius:999px;background:#c93431;color:#fff;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:26px}
+      .home-deal__availability-line{font:600 18px/1.2 'Space Grotesk',sans-serif;color:#f3efeb;margin:0 0 6px}
+      .home-deal__date{font:700 clamp(38px,5vw,70px)/.95 'Space Grotesk',sans-serif;letter-spacing:-.045em;color:#fff;margin:0 0 24px;text-transform:uppercase}
+      .home-deal h2{font:600 clamp(24px,2.6vw,38px)/1.08 'Space Grotesk',sans-serif;letter-spacing:-.03em;margin:0 0 14px;max-width:700px;color:#fff}
       .home-deal p{margin:0 0 26px;max-width:660px;color:#c6c0ba;font-size:14px;line-height:1.7}
       .home-deal__cta{display:inline-flex;align-items:center;gap:12px;padding:14px 19px;border-radius:999px;background:#fff;color:#181716;font-size:12px;font-weight:800;transition:.2s}
       .home-deal__cta:hover{background:#c93431;color:#fff;transform:translateY(-2px)}
       .home-deal__visual{min-height:360px;background:#2a2826}
       .home-deal__visual img{width:100%;height:100%;min-height:360px;object-fit:cover;display:block}
       .home-prestations{order:5!important}.home-formules{order:6!important}.home-quote{order:7!important}
-      @media(max-width:820px){.home-deal{padding:24px 18px 64px}.home-deal__inner{grid-template-columns:1fr}.home-deal__content{padding:32px 26px;min-height:auto}.home-deal__visual,.home-deal__visual img{min-height:260px;max-height:360px}.home-deal__visual{order:-1}}
+      @media(max-width:820px){.home-deal{padding:24px 18px 64px}.home-deal__inner{grid-template-columns:1fr}.home-deal__content{padding:32px 26px;min-height:auto}.home-deal__badge{margin-bottom:20px}.home-deal__availability-line{font-size:16px}.home-deal__date{font-size:clamp(38px,11vw,56px);margin-bottom:20px}.home-deal__visual,.home-deal__visual img{min-height:260px;max-height:360px}.home-deal__visual{order:-1}}
     `;
   }
 
