@@ -171,4 +171,12 @@
     .catch(() => {
       // Le site garde son contenu HTML par défaut si l'administration n'est pas disponible.
     });
+
+  // Statistiques anonymes : une même personne n'est comptée qu'une fois par jour.
+  fetch('api/visit.php', {
+    method: 'POST',
+    credentials: 'same-origin',
+    cache: 'no-store',
+    keepalive: true
+  }).catch(() => {});
 })();
