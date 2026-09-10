@@ -16,7 +16,12 @@
 
   function upgradeHomeForm() {
     const form = document.querySelector('.home-quote__form');
-    if (!form || form.dataset.selectionGuardReady === '1') return;
+    if (!form) return;
+
+    const budget = form.querySelector('select[name="budget"]');
+    if (budget) budget.closest('.home-quote__field')?.remove();
+
+    if (form.dataset.selectionGuardReady === '1') return;
 
     const existingGroup = [...form.querySelectorAll('.home-quote__group')].find(group =>
       group.querySelector('input[name="selections[]"]')
