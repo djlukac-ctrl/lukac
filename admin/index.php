@@ -14,19 +14,6 @@ $yesterdayVisitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE
 $last7Visitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE visit_date >= date('now','localtime','-6 day')")->fetchColumn();
 $last30Visitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE visit_date >= date('now','localtime','-29 day')")->fetchColumn();
 
-$visitorRows = $pdo->query("
-    WITH RECURSIVE days(day) AS (
-        SELECT date('now','localtime','-29 day')
-        UNION ALL
-        SELECT date(day,'+1 day') FROM days WHERE day < date('now','localtime')
-    )
-    SELECT days.day AS visit_date, COUNT(site_visitors.visitor_hash) AS visitors
-    FROM days
-    LEFT JOIN site_visitors ON site_visitors.visit_date = days.day
-    GROUP BY days.day
-    ORDER BY days.day DESC
-")->fetchAll();
-
 admin_header('Tableau de bord', 'dashboard');
 ?>
 <div class="admin-grid">
@@ -43,20 +30,6 @@ admin_header('Tableau de bord', 'dashboard');
     <section class="admin-card"><div class="admin-card__label">Hier</div><div class="admin-card__value"><?= $yesterdayVisitors ?></div></section>
     <section class="admin-card"><div class="admin-card__label">7 derniers jours</div><div class="admin-card__value"><?= $last7Visitors ?></div></section>
     <section class="admin-card"><div class="admin-card__label">30 derniers jours</div><div class="admin-card__value"><?= $last30Visitors ?></div></section>
-  </div>
-
-  <div class="admin-table-wrap" style="margin-top:18px">
-    <table>
-      <thead><tr><th>Jour</th><th>Visiteurs</th></tr></thead>
-      <tbody>
-      <?php foreach ($visitorRows as $row): ?>
-        <tr>
-          <td><?= e(date('d/m/Y', strtotime((string) $row['visit_date']))) ?></td>
-          <td><strong><?= (int) $row['visitors'] ?></strong></td>
-        </tr>
-      <?php endforeach; ?>
-      </tbody>
-    </table>
   </div>
 </section>
 
