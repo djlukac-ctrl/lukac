@@ -1,42 +1,42 @@
 .availability{position:relative}
-.availability:before{content:"";position:absolute;inset:38px 20px auto;height:360px;background:radial-gradient(circle at 50% 0,rgba(207,49,47,.08),transparent 68%);pointer-events:none;z-index:-1}
+.availability:before{content:"";position:absolute;inset:38px 20px auto;height:360px;background:radial-gradient(circle at 50% 0,rgba(207,49,47,.05),transparent 68%);pointer-events:none;z-index:-1}
 .availability__head{margin-bottom:38px}
-.availability__head h2 em{color:#d9d4ce}
-.availability__head p:last-child{color:#aaa49d}
-.availability__cta{background:#111;border-color:rgba(255,255,255,.2);padding:14px 19px}
-.availability__cta:hover{background:#f4f1ec;color:#111}
+.availability__head h2 em{color:#7d7770}
+.availability__head p:last-child{color:#6f6861}
+.availability__cta{background:#fff;border-color:rgba(20,20,20,.14);padding:14px 19px;color:#141414;box-shadow:0 8px 24px rgba(20,20,20,.05)}
+.availability__cta:hover{background:#171717;color:#fff;border-color:#171717}
 
 .availability__grid{gap:22px}
-.availability__year{padding:30px 30px 26px;border-color:rgba(255,255,255,.14);background:linear-gradient(145deg,#151515,#0d0d0d);box-shadow:0 18px 55px rgba(0,0,0,.22)}
-.availability__year-head{padding-bottom:20px;margin-bottom:8px}
-.availability__year-number{font-size:46px;color:#fff}
-.availability__year-title{color:#8b8580;font-size:10px}
+.availability__year{padding:30px 30px 26px;border-color:rgba(20,20,20,.10);background:#fff;box-shadow:0 18px 55px rgba(42,34,28,.07)}
+.availability__year-head{padding-bottom:20px;margin-bottom:8px;border-bottom-color:rgba(20,20,20,.10)}
+.availability__year-number{font-size:46px;color:#171717}
+.availability__year-title{color:#8a8179;font-size:10px}
 
 .availability__month{position:relative;grid-template-columns:34px 1fr auto;gap:12px;min-height:54px;padding:9px 12px;margin:4px 0;border:1px solid transparent;border-radius:12px;transition:.2s}
 .availability__month:hover{transform:translateX(3px)}
-.availability__icon{width:27px;height:27px;font-size:12px;background:#0a0a0a}
-.availability__month-name{font-size:14px!important;color:#f4f1ec!important}
-.availability__status{font-size:9px;letter-spacing:.09em;padding:7px 10px;border-radius:999px;white-space:nowrap}
+.availability__icon{width:27px;height:27px;font-size:12px;background:rgba(255,255,255,.72)}
+.availability__month-name{font-size:14px!important;color:#231f1b!important;font-weight:700!important}
+.availability__status{font-size:9px;font-weight:800;letter-spacing:.09em;padding:7px 10px;border-radius:999px;white-space:nowrap}
 
-.availability__month--open{background:rgba(119,157,92,.055);border-color:rgba(158,180,135,.10)}
-.availability__month--open .availability__icon{background:rgba(158,180,135,.10);box-shadow:0 0 0 4px rgba(158,180,135,.035)}
-.availability__month--open .availability__status{color:#b9cf9f;background:rgba(158,180,135,.10);border:1px solid rgba(158,180,135,.18)}
+.availability__month--open{color:#5f7d45;background:#f4f8ef;border-color:#cfddc3}
+.availability__month--open .availability__icon{color:#5f7d45;background:#edf5e7;box-shadow:0 0 0 4px rgba(95,125,69,.04)}
+.availability__month--open .availability__status{color:#4f7135;background:#eef6e7;border:1px solid #bfd1ae}
 
-.availability__month--limited{background:rgba(201,168,115,.085);border-color:rgba(201,168,115,.17)}
-.availability__month--limited .availability__icon{background:rgba(201,168,115,.13);box-shadow:0 0 0 4px rgba(201,168,115,.04)}
-.availability__month--limited .availability__status{color:#e3be7f;background:rgba(201,168,115,.13);border:1px solid rgba(201,168,115,.24)}
+.availability__month--limited{color:#b57b1e;background:#fff8eb;border-color:#edd6aa}
+.availability__month--limited .availability__icon{color:#ad741a;background:#fff2d8;box-shadow:0 0 0 4px rgba(181,123,30,.04)}
+.availability__month--limited .availability__status{color:#9c6818;background:#fff3da;border:1px solid #e6c783}
 
-.availability__month--closed{background:rgba(184,115,112,.07);border-color:rgba(184,115,112,.13)}
-.availability__month--closed .availability__icon{background:rgba(184,115,112,.11);box-shadow:0 0 0 4px rgba(184,115,112,.035)}
-.availability__month--closed .availability__status{color:#d58d89;background:rgba(184,115,112,.11);border:1px solid rgba(184,115,112,.20)}
+.availability__month--closed{color:#ba5752;background:#fff0ef;border-color:#efc1be}
+.availability__month--closed .availability__icon{color:#ad4d48;background:#ffe5e3;box-shadow:0 0 0 4px rgba(186,87,82,.04)}
+.availability__month--closed .availability__status{color:#a74440;background:#ffe8e6;border:1px solid #e9aaa6}
 
 .availability__legend{margin-top:26px;gap:10px}
-.availability__legend span{padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:#0e0e0e;color:#aaa49d;font-size:9px;font-weight:600}
+.availability__legend span{padding:9px 12px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:#171717;color:#f0ece7;font-size:9px;font-weight:600}
 .availability__legend i{width:8px;height:8px}
-.availability__updated{margin-top:12px;color:#716d68}
-.availability__foot{margin-top:28px;padding:26px;border:1px solid rgba(255,255,255,.11);border-radius:18px;background:linear-gradient(135deg,#111,#0c0c0c)}
-.availability__foot strong{font-size:24px}
-.availability__foot p{font-size:11px;color:#918c86}
+.availability__updated{margin-top:12px;color:#81786f}
+.availability__foot{margin-top:28px;padding:26px;border:1px solid rgba(20,20,20,.10);border-radius:18px;background:#fff;box-shadow:0 14px 36px rgba(42,34,28,.05)}
+.availability__foot strong{font-size:24px;color:#171717}
+.availability__foot p{font-size:11px;color:#746c65}
 
 @media(max-width:620px){
   .availability__year{padding:20px 16px}
