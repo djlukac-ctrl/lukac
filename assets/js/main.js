@@ -78,19 +78,19 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
         <div class="home-quote__field"><label>Nom et prénom *</label><input name="name" required autocomplete="name"></div>
         <div class="home-quote__field"><label>E-mail *</label><input name="email" type="email" required autocomplete="email"></div>
         <div class="home-quote__field"><label>Téléphone *</label><input name="phone" type="tel" required autocomplete="tel"></div>
-        <div class="home-quote__field"><label>Quelqu’un vous a parlé de moi ?</label><input name="referral" placeholder="Ex. DUPONT Marie"></div>
+        <div class="home-quote__field"><label>Quelqu’un vous a parlé de moi ?</label><input name="referral"></div>
 
         <fieldset class="home-quote__group home-quote__group--full">
           <legend>Adresse postale *</legend>
           <div class="home-quote__address">
-            <div class="home-quote__field"><label>N° *</label><input name="address_number" required placeholder="12"></div>
-            <div class="home-quote__field"><label>Rue *</label><input name="address_street" required placeholder="Rue du Lac"></div>
-            <div class="home-quote__field"><label>Ville *</label><input name="address_city" required placeholder="Saint-Dizier"></div>
-            <div class="home-quote__field"><label>Code postal *</label><input name="address_postcode" required inputmode="numeric" maxlength="5" pattern="[0-9]{5}" placeholder="52100"></div>
+            <div class="home-quote__field"><label>N° *</label><input name="address_number" required></div>
+            <div class="home-quote__field"><label>Rue *</label><input name="address_street" required></div>
+            <div class="home-quote__field"><label>Ville *</label><input name="address_city" required></div>
+            <div class="home-quote__field"><label>Code postal *</label><input name="address_postcode" required inputmode="numeric" maxlength="5" pattern="[0-9]{5}"></div>
           </div>
         </fieldset>
 
-        <div class="home-quote__field"><label>Type d’événement *</label><select name="event_type" required><option value="">Choisir…</option><option>Mariage</option><option>Anniversaire</option><option>Baptême</option><option>Retraite</option><option>Autre</option></select></div>
+        <div class="home-quote__field"><label>Type d’événement *</label><select name="event_type" required><option value=""></option><option>Mariage</option><option>Anniversaire</option><option>Baptême</option><option>Retraite</option><option>Autre</option></select></div>
         <div class="home-quote__field"><label>Date de l’événement *</label><input name="event_date" type="date" required></div>
         <div class="home-quote__field"><label>Lieu de réception / commune</label><input name="venue"></div>
         <div class="home-quote__field"><label>Nombre d’invités</label><input name="guest_count" type="number" min="1" max="5000"></div>
@@ -114,8 +114,8 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
           </div>
         </fieldset>
 
-        <div class="home-quote__field home-quote__field--full"><label>Budget indicatif</label><select name="budget"><option value="">Non défini</option><option>Moins de 800 €</option><option>800 à 1 200 €</option><option>1 200 à 1 800 €</option><option>Plus de 1 800 €</option></select></div>
-        <div class="home-quote__field home-quote__field--full"><label>Parlez-moi de votre projet</label><textarea name="message" placeholder="Ambiance souhaitée, déroulement de la journée ou de la soirée, attentes particulières, informations utiles…"></textarea></div>
+        <div class="home-quote__field home-quote__field--full"><label>Budget indicatif</label><select name="budget"><option value=""></option><option>Moins de 800 €</option><option>800 à 1 200 €</option><option>1 200 à 1 800 €</option><option>Plus de 1 800 €</option></select></div>
+        <div class="home-quote__field home-quote__field--full"><label>Parlez-moi de votre projet</label><textarea name="message"></textarea></div>
       </div>
 
       <div class="home-quote__actions">
