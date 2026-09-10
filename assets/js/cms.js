@@ -70,6 +70,43 @@
     });
   }
 
+  function formatReviewDate(value) {
+    if (!value) return '';
+    const date = new Date(`${value}T12:00:00`);
+    if (Number.isNaN(date.getTime())) return value;
+    return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+  }
+
+  function applyReviews(reviews) {
+    const grid = document.querySelector('.reviews-grid');
+    if (!grid || !Array.isArray(reviews) || reviews.length === 0) return;
+
+    const cards = reviews.slice(0, 3).map((review, index) => {
+      const blockquote = document.createElement('blockquote');
+      blockquote.className = `review reveal${index === 1 ? ' reveal--delay-small' : index === 2 ? ' reveal--delay' : ''}`;
+
+      const stars = document.createElement('div');
+      stars.className = 'stars';
+      const rating = Math.max(1, Math.min(5, Number(review.rating) || 5));
+      stars.textContent = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+
+      const text = document.createElement('p');
+      text.textContent = review.review_text || '';
+
+      const footer = document.createElement('footer');
+      const name = document.createElement('strong');
+      name.textContent = review.client_name || 'Client';
+      footer.append(name);
+      const date = formatReviewDate(review.review_date);
+      if (date) footer.append(document.createElement('br'), document.createTextNode(date));
+
+      blockquote.append(stars, text, footer);
+      return blockquote;
+    });
+
+    grid.replaceChildren(...cards);
+  }
+
   fetch('api/site-data.php?t=' + Date.now(), { credentials: 'same-origin' })
     .then((response) => {
       if (!response.ok) throw new Error('CMS unavailable');
@@ -78,6 +115,7 @@
     .then((data) => {
       if (data && data.content) applyContent(data.content);
       if (data && data.availability) applyAvailability(data.availability);
+      if (data && data.reviews) applyReviews(data.reviews);
     })
     .catch(() => {
       // Le site garde son contenu HTML par défaut si l'administration n'est pas disponible.
