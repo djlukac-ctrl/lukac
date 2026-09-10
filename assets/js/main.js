@@ -294,10 +294,37 @@ if (footer && !footer.querySelector('.site-footer__socials')) {
   else footer.appendChild(socials);
 }
 
+// Réseaux sociaux dans le header, sous forme d'icônes discrètes.
+const siteHeader = document.querySelector('.site-header');
+if (siteHeader && !siteHeader.querySelector('.header-socials')) {
+  const headerSocials = document.createElement('div');
+  headerSocials.className = 'header-socials';
+  headerSocials.setAttribute('aria-label', 'Réseaux sociaux');
+  headerSocials.innerHTML = `
+    <a href="https://www.facebook.com/profile.php?id=100093212362664" target="_blank" rel="noopener noreferrer" aria-label="Facebook" title="Facebook">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-9h3l.45-3.5H13.5V7.25c0-1.01.28-1.7 1.73-1.7H17V2.42c-.31-.04-1.38-.13-2.62-.13-2.6 0-4.38 1.59-4.38 4.5V9.5H7v3.5h3v9h3.5z"/></svg>
+    </a>
+    <a href="https://www.instagram.com/djlukac" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3H7zm5 3.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 0 1 12 7.5zm0 2A2.5 2.5 0 1 0 14.5 12 2.5 2.5 0 0 0 12 9.5zm5.25-3.2a1.05 1.05 0 1 1-1.05 1.05 1.05 1.05 0 0 1 1.05-1.05z"/></svg>
+    </a>
+    <a href="https://www.tiktok.com/@djluka.c" target="_blank" rel="noopener noreferrer" aria-label="TikTok" title="TikTok">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.2 2h3.1c.2 1.6 1.1 2.9 2.7 3.7v3.1a7.8 7.8 0 0 1-2.8-.8v6.4a6.4 6.4 0 1 1-5.5-6.3v3.2a3.3 3.3 0 1 0 2.5 3.1V2z"/></svg>
+    </a>
+  `;
+  const headerCta = siteHeader.querySelector('.header-cta');
+  if (headerCta) siteHeader.insertBefore(headerSocials, headerCta);
+  else siteHeader.appendChild(headerSocials);
+}
+
 const socialStyles = document.createElement('style');
 socialStyles.textContent = `
   .site-footer__socials{display:flex;flex-wrap:wrap;gap:10px 18px;margin:18px 0 22px}
   .site-footer__socials a{font-size:12px;font-weight:600;color:#d4cec7!important}
   .site-footer__socials a:hover{color:#fff!important}
+  .header-socials{display:flex;align-items:center;gap:6px;margin-left:auto;margin-right:10px}
+  .header-socials a{display:grid;place-items:center;width:34px;height:34px;border:1px solid rgba(24,23,22,.12);border-radius:50%;background:rgba(255,255,255,.58);color:#181716;transition:background .18s ease,color .18s ease,border-color .18s ease,transform .18s ease}
+  .header-socials a:hover{background:#c93431;color:#fff;border-color:#c93431;transform:translateY(-1px)}
+  .header-socials svg{width:16px;height:16px;fill:currentColor}
+  @media(max-width:1180px){.header-socials{display:none}}
 `;
 document.head.appendChild(socialStyles);
