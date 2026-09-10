@@ -253,3 +253,51 @@ const observer = new IntersectionObserver(
 );
 
 document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+// Navigation dans l'ordre réel des blocs de la page.
+const navItems = [
+  ['Accueil', '#top'],
+  ['Avis clients', '#avis'],
+  ['Disponibilités', '#disponibilites'],
+  ['Prestations', '#prestations'],
+  ['Formules', '#formules']
+];
+
+const desktopNav = document.querySelector('.desktop-nav');
+if (desktopNav) {
+  desktopNav.innerHTML = navItems.map(([label, href]) => `<a href="${href}">${label}</a>`).join('');
+}
+
+if (mobileNav) {
+  mobileNav.innerHTML = navItems.map(([label, href]) => `<a href="${href}">${label}</a>`).join('') + '<a class="mobile-nav__cta" href="#devis">Demander un devis</a>';
+  mobileNav.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
+      mobileNav.hidden = true;
+    });
+  });
+}
+
+// Réseaux sociaux Luka C dans le pied de page.
+const footer = document.querySelector('.site-footer');
+if (footer && !footer.querySelector('.site-footer__socials')) {
+  const socials = document.createElement('div');
+  socials.className = 'site-footer__socials';
+  socials.setAttribute('aria-label', 'Réseaux sociaux');
+  socials.innerHTML = `
+    <a href="https://www.facebook.com/profile.php?id=100093212362664" target="_blank" rel="noopener noreferrer">Facebook</a>
+    <a href="https://www.instagram.com/djlukac" target="_blank" rel="noopener noreferrer">Instagram</a>
+    <a href="https://www.tiktok.com/@djluka.c" target="_blank" rel="noopener noreferrer">TikTok</a>
+  `;
+  const footerSmall = footer.querySelector('small');
+  if (footerSmall) footer.insertBefore(socials, footerSmall);
+  else footer.appendChild(socials);
+}
+
+const socialStyles = document.createElement('style');
+socialStyles.textContent = `
+  .site-footer__socials{display:flex;flex-wrap:wrap;gap:10px 18px;margin:18px 0 22px}
+  .site-footer__socials a{font-size:12px;font-weight:600;color:#d4cec7!important}
+  .site-footer__socials a:hover{color:#fff!important}
+`;
+document.head.appendChild(socialStyles);
