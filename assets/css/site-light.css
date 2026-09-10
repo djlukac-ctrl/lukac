@@ -66,9 +66,9 @@ body{background:#f5f2ed;color:#181716}
 .availability__month--closed .availability__icon{background:#d93b35!important;color:#fff!important}
 .availability__month--closed .availability__status{background:#d93b35!important;color:#fff!important;border-color:#d93b35!important}
 .availability__status{font-weight:700!important;letter-spacing:.01em!important;border:1px solid transparent!important;box-shadow:none!important}
-.availability__legend{color:#4d4843;font-weight:600}.availability__legend i{width:11px!important;height:11px!important;border-radius:50%!important}.availability__legend .open i{background:#12a84f!important}.availability__legend .limited i{background:#f0a000!important}.availability__legend .closed i{background:#d93b35!important}.availability__updated{color:#8b847d}
+.availability__legend{display:none!important}.availability__updated{color:#8b847d}
 .availability__foot{border-color:rgba(24,23,22,.10);background:#fff;border-radius:18px;padding:24px 26px;box-shadow:0 10px 30px rgba(50,38,28,.05)}
-.availability__foot strong{color:#181716}.availability__foot p{color:#746d66}.availability__foot .btn--primary{background:#c93431;color:#fff}
+.availability__foot strong{color:#181716}.availability__foot p{color:#746d66}.availability__foot .btn--primary{background:#181716!important;color:#fff!important;border-color:#181716!important}.availability__foot .btn--primary:hover{background:#c93431!important;color:#fff!important;border-color:#c93431!important}
 
 /* Prestations */
 .prestations-page{color:#181716}.prestations-hero{border-color:rgba(24,23,22,.10)}
