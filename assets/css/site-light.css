@@ -72,7 +72,7 @@ body{background:#f5f2ed;color:#181716}
 
 /* Prestations */
 .prestations-page{color:#181716}.prestations-hero{border-color:rgba(24,23,22,.10)}
-.prestations-kicker,.prestation-card__kicker{color:#b77f39}.prestations-hero h1,.prestation-card h2{color:#181716}
+.prestations-kicker,.prestation-card__kicker{color:#c93431!important}.prestations-hero h1,.prestation-card h2{color:#181716}
 .prestations-hero h1 span:last-child{color:#c93431}.prestations-hero>p:last-child,.prestation-card__content>p{color:#69635d}
 .prestation-card{background:#fff!important;border-color:rgba(24,23,22,.10)!important;box-shadow:0 14px 36px rgba(50,38,28,.06)}
 .prestation-card__content{background:#fff!important}.prestation-card__content li{color:#4e4944}
