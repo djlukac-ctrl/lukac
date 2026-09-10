@@ -81,9 +81,9 @@
     const grid = document.querySelector('.reviews-grid');
     if (!grid || !Array.isArray(reviews) || reviews.length === 0) return;
 
-    const cards = reviews.slice(0, 3).map((review, index) => {
+    const cards = reviews.slice(0, 3).map((review) => {
       const blockquote = document.createElement('blockquote');
-      blockquote.className = `review reveal${index === 1 ? ' reveal--delay-small' : index === 2 ? ' reveal--delay' : ''}`;
+      blockquote.className = 'review';
 
       const stars = document.createElement('div');
       stars.className = 'stars';
