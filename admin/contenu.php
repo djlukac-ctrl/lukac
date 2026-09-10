@@ -89,12 +89,12 @@ $imageSlots = [
     ],
 ];
 
-$imagePositions = [
-    'center' => 'Centre',
-    'top' => 'Haut',
-    'bottom' => 'Bas',
-    'left' => 'Gauche',
-    'right' => 'Droite',
+$legacyPositions = [
+    'center' => [50, 50],
+    'top' => [50, 0],
+    'bottom' => [50, 100],
+    'left' => [0, 50],
+    'right' => [100, 50],
 ];
 
 $pages = [
@@ -165,6 +165,12 @@ function store_content_image(array $file): string
     return 'uploads/contenu/' . $filename;
 }
 
+function clamp_percent($value, int $default = 50): int
+{
+    if ($value === null || $value === '' || !is_numeric($value)) return $default;
+    return max(0, min(100, (int)$value));
+}
+
 $saved = false;
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -186,10 +192,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         foreach ($visibleGroups as $groupTitle) {
             foreach ($imageSlots[$groupTitle] ?? [] as $token => [$key, $label]) {
-                $position = (string)($_POST['image_position'][$token] ?? 'center');
-                if (!isset($imagePositions[$position])) $position = 'center';
-                $stmt->execute([':k' => $key . '.position', ':v' => $position]);
-                $current[$key . '.position'] = $position;
+                $x = clamp_percent($_POST['image_x'][$token] ?? 50);
+                $y = clamp_percent($_POST['image_y'][$token] ?? 50);
+                $stmt->execute([':k' => $key . '.position_x', ':v' => (string)$x]);
+                $stmt->execute([':k' => $key . '.position_y', ':v' => (string)$y]);
+                $current[$key . '.position_x'] = (string)$x;
+                $current[$key . '.position_y'] = (string)$y;
 
                 if (!empty($_POST['remove_image'][$token])) {
                     delete_content_image($current[$key] ?? null);
@@ -221,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $content = site_content();
 admin_header('Contenu du site', 'contenu');
 ?>
-<?php if ($saved): ?><div class="flash flash--success">Le contenu, les images et leur cadrage ont été enregistrés. Recharge le site pour voir les modifications.</div><?php endif; ?>
+<?php if ($saved): ?><div class="flash flash--success">Le contenu, les images et leur cadrage précis ont été enregistrés. Recharge le site pour voir les modifications.</div><?php endif; ?>
 <?php if ($error): ?><div class="flash flash--error"><?= e($error) ?></div><?php endif; ?>
 
 <nav class="content-page-nav" aria-label="Pages du contenu">
@@ -241,7 +249,7 @@ admin_header('Contenu du site', 'contenu');
   <a class="btn" href="../index.html" target="_blank" rel="noopener">Voir la page ↗</a>
 </div>
 
-<p class="content-help">Modifie uniquement le contenu de cette page. Les images acceptées sont JPG, PNG et WEBP, jusqu’à 5 Mo. Tu peux aussi ajuster leur cadrage.</p>
+<p class="content-help">Modifie uniquement le contenu de cette page. Les images acceptées sont JPG, PNG et WEBP, jusqu’à 5 Mo. Les deux curseurs permettent d’ajuster précisément le cadrage.</p>
 <form method="post" enctype="multipart/form-data" class="admin-form">
   <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
   <input type="hidden" name="page" value="<?= e($page) ?>">
@@ -253,24 +261,27 @@ admin_header('Contenu du site', 'contenu');
           <div class="content-images">
             <?php foreach ($imageSlots[$groupTitle] as $token => [$imageKey, $imageLabel]):
               $currentImage = trim((string)($content[$imageKey] ?? ''));
-              $currentPosition = (string)($content[$imageKey . '.position'] ?? 'center');
-              if (!isset($imagePositions[$currentPosition])) $currentPosition = 'center';
+              $legacy = (string)($content[$imageKey . '.position'] ?? 'center');
+              [$legacyX, $legacyY] = $legacyPositions[$legacy] ?? [50, 50];
+              $currentX = clamp_percent($content[$imageKey . '.position_x'] ?? null, $legacyX);
+              $currentY = clamp_percent($content[$imageKey . '.position_y'] ?? null, $legacyY);
             ?>
-              <div class="content-image-editor">
-                <div class="content-image-editor__preview <?= $currentImage ? 'has-image' : '' ?>"<?= $currentImage ? ' style="background-image:url(../' . e($currentImage) . ');background-position:' . e($currentPosition) . '"' : '' ?>>
+              <div class="content-image-editor" data-image-editor>
+                <div class="content-image-editor__preview <?= $currentImage ? 'has-image' : '' ?>" data-image-preview<?= $currentImage ? ' style="background-image:url(../' . e($currentImage) . ');background-position:' . e((string)$currentX) . '% ' . e((string)$currentY) . '%"' : '' ?>>
                   <?php if (!$currentImage): ?><span>Aucune image personnalisée</span><?php endif; ?>
                 </div>
                 <div class="content-image-editor__controls">
                   <strong><?= e($imageLabel) ?></strong>
                   <label class="field"><span>Choisir / remplacer l’image</span><input type="file" name="images[<?= e($token) ?>]" accept="image/jpeg,image/png,image/webp"></label>
                   <label class="field">
-                    <span>Cadrage de l’image</span>
-                    <select name="image_position[<?= e($token) ?>]">
-                      <?php foreach ($imagePositions as $positionValue => $positionLabel): ?>
-                        <option value="<?= e($positionValue) ?>" <?= $currentPosition === $positionValue ? 'selected' : '' ?>><?= e($positionLabel) ?></option>
-                      <?php endforeach; ?>
-                    </select>
+                    <span>Position horizontale : <b data-x-value><?= e((string)$currentX) ?>%</b></span>
+                    <input type="range" min="0" max="100" step="1" value="<?= e((string)$currentX) ?>" name="image_x[<?= e($token) ?>]" data-image-x>
                   </label>
+                  <label class="field">
+                    <span>Position verticale : <b data-y-value><?= e((string)$currentY) ?>%</b></span>
+                    <input type="range" min="0" max="100" step="1" value="<?= e((string)$currentY) ?>" name="image_y[<?= e($token) ?>]" data-image-y>
+                  </label>
+                  <button class="btn" type="button" data-image-center>Recentrer l’image</button>
                   <?php if ($currentImage): ?><label class="content-image-remove"><input type="checkbox" name="remove_image[<?= e($token) ?>]" value="1"> Supprimer l’image actuelle</label><?php endif; ?>
                 </div>
               </div>
@@ -294,4 +305,22 @@ admin_header('Contenu du site', 'contenu');
   </div>
   <div class="admin-actions admin-actions--sticky"><button class="btn btn--primary" type="submit">Enregistrer <?= e(strtolower($pages[$page]['label'])) ?></button></div>
 </form>
+<script>
+document.querySelectorAll('[data-image-editor]').forEach((editor) => {
+  const preview = editor.querySelector('[data-image-preview]');
+  const x = editor.querySelector('[data-image-x]');
+  const y = editor.querySelector('[data-image-y]');
+  const xv = editor.querySelector('[data-x-value]');
+  const yv = editor.querySelector('[data-y-value]');
+  const center = editor.querySelector('[data-image-center]');
+  const update = () => {
+    if (preview) preview.style.backgroundPosition = `${x.value}% ${y.value}%`;
+    if (xv) xv.textContent = `${x.value}%`;
+    if (yv) yv.textContent = `${y.value}%`;
+  };
+  x?.addEventListener('input', update);
+  y?.addEventListener('input', update);
+  center?.addEventListener('click', () => { x.value = 50; y.value = 50; update(); });
+});
+</script>
 <?php admin_footer(); ?>
