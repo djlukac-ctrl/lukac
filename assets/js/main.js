@@ -22,6 +22,12 @@ ensureFormulesLink(document.querySelector('.desktop-nav'));
 ensureFormulesLink(document.querySelector('.mobile-nav'));
 ensureFormulesLink(document.querySelector('.site-footer__links'));
 
+const homePrestations = document.querySelector('main > .home-prestations');
+const availabilitySection = document.querySelector('main > #disponibilites');
+if (homePrestations && availabilitySection) {
+  availabilitySection.insertAdjacentElement('afterend', homePrestations);
+}
+
 const menuToggle = document.querySelector('.menu-toggle');
 const mobileNav = document.querySelector('.mobile-nav');
 
