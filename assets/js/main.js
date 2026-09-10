@@ -3,6 +3,39 @@ finalPolishStyles.rel = 'stylesheet';
 finalPolishStyles.href = 'assets/css/final-polish.css?v=20260909-1';
 document.head.appendChild(finalPolishStyles);
 
+const reviewStyles = document.createElement('style');
+reviewStyles.textContent = `
+  .review__recommendation{font:600 18px 'Space Grotesk',sans-serif;color:#181716;margin-bottom:7px}
+  .review__recommendation span{color:#c93431}
+  .review__date{font-size:10px;color:#8b847d;margin-bottom:22px}
+  .review>p{margin-top:0}
+`;
+document.head.appendChild(reviewStyles);
+
+document.querySelectorAll('.review').forEach((review) => {
+  const stars = review.querySelector('.stars');
+  const footer = review.querySelector('footer');
+  const text = review.querySelector(':scope > p');
+  if (!footer || !text) return;
+
+  const fullName = footer.querySelector('strong')?.textContent?.trim() || 'Un client';
+  const firstName = fullName.split(/\s+/)[0];
+  const footerText = footer.textContent.replace(fullName, '').trim();
+
+  const recommendation = document.createElement('div');
+  recommendation.className = 'review__recommendation';
+  recommendation.innerHTML = `${firstName} recommande <span>Luka C.</span>`;
+
+  const date = document.createElement('div');
+  date.className = 'review__date';
+  date.textContent = footerText;
+
+  if (stars) stars.remove();
+  footer.remove();
+  review.insertBefore(recommendation, text);
+  review.insertBefore(date, text);
+});
+
 const homeMain = document.querySelector('body > main');
 const homeHero = document.querySelector('main > .hero-modern');
 const reviewsSection = document.querySelector('main > #avis');
