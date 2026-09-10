@@ -37,6 +37,73 @@
   window.addEventListener('scroll', updateActiveNav, { passive: true });
   window.addEventListener('resize', updateActiveNav);
 
+  // Apparitions discrètes au scroll, une seule fois par élément.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const revealSelectors = [
+    '.section-heading',
+    '.review',
+    '.availability__year',
+    '.prestations-section__head',
+    '.prestation-card',
+    '.formules-section__head',
+    '.formule-card',
+    '.signature-card',
+    '.option-card',
+    '.home-quote__intro',
+    '.home-quote__form'
+  ].join(',');
+
+  const prepareRevealElements = () => {
+    const elements = [...document.querySelectorAll(revealSelectors)]
+      .filter((el) => !el.dataset.scrollRevealReady);
+
+    elements.forEach((el, index) => {
+      el.dataset.scrollRevealReady = '1';
+      el.classList.add('scroll-reveal');
+      el.classList.add(`scroll-reveal--delay-${(index % 4) + 1}`);
+
+      if (reduceMotion) {
+        el.classList.add('is-visible');
+      }
+    });
+
+    return elements;
+  };
+
+  const initialHeroReveals = [...document.querySelectorAll('.hero-modern .reveal')];
+  if (reduceMotion) {
+    initialHeroReveals.forEach((el) => el.classList.add('is-visible'));
+  } else {
+    requestAnimationFrame(() => {
+      initialHeroReveals.forEach((el) => el.classList.add('is-visible'));
+    });
+  }
+
+  if (!reduceMotion && 'IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      });
+    }, {
+      threshold: 0.12,
+      rootMargin: '0px 0px -7% 0px'
+    });
+
+    const observePrepared = () => {
+      prepareRevealElements().forEach((el) => revealObserver.observe(el));
+    };
+
+    observePrepared();
+
+    // Certaines zones (formules/devis) sont injectées dynamiquement par main.js.
+    const mutationObserver = new MutationObserver(() => observePrepared());
+    mutationObserver.observe(document.body, { childList: true, subtree: true });
+  } else {
+    prepareRevealElements().forEach((el) => el.classList.add('is-visible'));
+  }
+
   // Petit bouton retour en haut, visible uniquement après avoir descendu la page.
   const backToTop = document.createElement('button');
   backToTop.type = 'button';
