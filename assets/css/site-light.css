@@ -52,7 +52,8 @@ body{background:#f5f2ed;color:#181716}
 .availability:before{content:"";position:absolute;left:50%;top:20px;width:100vw;height:calc(100% - 40px);transform:translateX(-50%);background:#ece7df;z-index:-1;border-top:1px solid rgba(24,23,22,.06);border-bottom:1px solid rgba(24,23,22,.06)}
 .availability__kicker,.reviews-kicker{color:#c93431}
 .availability__head h2,.section--reviews h2{color:#181716}
-.availability__head h2 em,.section--reviews h2 em{color:#7a736d}
+.availability__head h2 em{color:#c93431}
+.section--reviews h2 em{color:#7a736d}
 .availability__head p:last-child{color:#6f6862}
 .availability__cta{color:#181716;border-color:rgba(24,23,22,.18);background:#fff}
 .availability__cta:hover{border-color:#181716}
