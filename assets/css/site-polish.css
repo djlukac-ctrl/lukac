@@ -17,6 +17,16 @@
 .desktop-nav a.is-active{color:#181716;font-weight:700}
 .desktop-nav a.is-active:after{transform:scaleX(1)}
 
+/* Hero : simplification du libellé */
+.hero-modern__eyebrow{display:none!important}
+.hero-modern__label{font-size:0!important}
+.hero-modern__label::after{
+  content:"Luka C - Dj & Animateur";
+  font-size:9px;
+  letter-spacing:.13em;
+  text-transform:none;
+}
+
 /* Micro-interactions cohérentes */
 .review,
 .availability__year,
