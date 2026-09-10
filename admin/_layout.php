@@ -8,6 +8,7 @@ function admin_header(string $title, string $active = ''): void
         'devis' => ['Demandes de devis', 'devis.php'],
         'disponibilites' => ['Disponibilités', 'disponibilites.php'],
         'avis' => ['Avis clients', 'avis.php'],
+        'bon-plan' => ['Bon plan', 'bon-plan.php'],
         'contenu' => ['Contenu du site', 'contenu.php'],
     ];
     ?>
