@@ -10,10 +10,22 @@
     juillet: 7, aout: 8, août: 8, septembre: 9, octobre: 10, novembre: 11, decembre: 12, décembre: 12
   };
 
-  const allowedImagePositions = new Set(['center', 'top', 'bottom', 'left', 'right']);
+  const legacyImagePositions = {
+    center: [50, 50],
+    top: [50, 0],
+    bottom: [50, 100],
+    left: [0, 50],
+    right: [100, 50]
+  };
 
   function normalize(value) {
     return value.trim().toLowerCase();
+  }
+
+  function clampPercent(value, fallback = 50) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return fallback;
+    return Math.max(0, Math.min(100, parsed));
   }
 
   function applyContent(content) {
@@ -39,8 +51,11 @@
       const path = key && content[key] ? String(content[key]).trim() : '';
       if (!path) return;
 
-      const savedPosition = key && content[`${key}.position`] ? String(content[`${key}.position`]).trim().toLowerCase() : 'center';
-      const position = allowedImagePositions.has(savedPosition) ? savedPosition : 'center';
+      const legacy = key && content[`${key}.position`] ? String(content[`${key}.position`]).trim().toLowerCase() : 'center';
+      const legacyPair = legacyImagePositions[legacy] || [50, 50];
+      const x = clampPercent(content[`${key}.position_x`], legacyPair[0]);
+      const y = clampPercent(content[`${key}.position_y`], legacyPair[1]);
+      const position = `${x}% ${y}%`;
 
       if (el.tagName === 'IMG') {
         el.src = path;
