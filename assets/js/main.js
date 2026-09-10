@@ -92,7 +92,7 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
 
         <div class="home-quote__field"><label>Type d’événement *</label><select name="event_type" required><option value=""></option><option>Mariage</option><option>Anniversaire</option><option>Baptême</option><option>Retraite</option><option>Autre</option></select></div>
         <div class="home-quote__field"><label>Date de l’événement *</label><input name="event_date" type="date" required></div>
-        <div class="home-quote__field"><label>Lieu de réception / commune</label><input name="venue"></div>
+        <div class="home-quote__field"><label>Lieu de réception / commune *</label><input name="venue" required></div>
         <div class="home-quote__field"><label>Nombre d’invités</label><input name="guest_count" type="number" min="1" max="5000"></div>
         <div class="home-quote__field"><label>Arrivée des invités *</label><input name="start_time" type="time" required></div>
         <div class="home-quote__field"><label>Fin de soirée *</label><input name="end_time" type="time" required></div>
