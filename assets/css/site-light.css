@@ -85,6 +85,8 @@ body{background:#f5f2ed;color:#181716}
 .formules-page{color:#181716}.formules-hero{border-color:rgba(24,23,22,.10)}.formules-kicker{color:#c93431!important}
 .formules-hero h1,.section-title h2{color:#181716}.formules-hero h1 span:last-child{color:#c93431}.formules-hero>p:last-child,.section-title>p:last-child{color:#6b645e}
 .formule-card,.signature-card,.option-card{background:#fff!important;border-color:rgba(24,23,22,.10)!important;box-shadow:0 12px 32px rgba(50,38,28,.055)}
+.option-card{border-radius:24px!important;overflow:hidden}
+.option-card__image{border-radius:24px 24px 0 0!important}
 .formule-card__body{background:#fff!important;color:#181716!important}.formule-card__body h2,.signature-card h3,.option-card h3{color:#181716!important}
 .formule-card__intro,.signature-card p,.option-card p{color:#6b645e!important}.formule-card li,.signature-card li{color:#4e4944!important}
 .formule-card__visual{background-color:#ded8d0!important}.formule-card__visual>span{display:none!important}.extras-section{background:#eee9e2!important;border-color:rgba(24,23,22,.08)!important}.options-section{background:#f7f4ef!important}
