@@ -102,6 +102,14 @@ function db(): PDO
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )');
 
+    $pdo->exec('CREATE TABLE IF NOT EXISTS site_visitors (
+        visit_date TEXT NOT NULL,
+        visitor_hash TEXT NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (visit_date, visitor_hash)
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_site_visitors_date ON site_visitors(visit_date)');
+
     seed_defaults($pdo);
     seed_reviews($pdo);
     return $pdo;
