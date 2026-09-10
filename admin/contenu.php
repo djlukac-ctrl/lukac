@@ -89,6 +89,38 @@ $imageSlots = [
     ],
 ];
 
+$pages = [
+    'accueil' => [
+        'label' => 'Accueil',
+        'description' => 'Photo principale et textes d’introduction de la page d’accueil.',
+        'groups' => ['Accueil'],
+    ],
+    'prestations' => [
+        'label' => 'Prestations',
+        'description' => 'Introduction et contenu des prestations DJ, animations et vin d’honneur.',
+        'groups' => ['Prestations — introduction', 'Prestations — DJ', 'Prestations — Animations interactives', 'Prestations — Vin d’honneur'],
+    ],
+    'formules' => [
+        'label' => 'Formules',
+        'description' => 'Introduction et contenu des formules Essentiel, Ambiance et Expérience.',
+        'groups' => ['Formules — introduction', 'Formule Essentiel', 'Formule Ambiance', 'Formule Expérience'],
+    ],
+    'packs' => [
+        'label' => 'Packs',
+        'description' => 'Contenu et visuels des packs Instant Magique.',
+        'groups' => ['Pack Instant Magique', 'Pack Instant Magique Signature'],
+    ],
+    'options' => [
+        'label' => 'Options à la carte',
+        'description' => 'Contenu et visuels des options proposées à la carte.',
+        'groups' => ['Options à la carte'],
+    ],
+];
+
+$page = (string)($_GET['page'] ?? $_POST['page'] ?? 'accueil');
+if (!isset($pages[$page])) $page = 'accueil';
+$visibleGroups = $pages[$page]['groups'];
+
 function delete_content_image(?string $path): void
 {
     if (!$path || !str_starts_with($path, 'uploads/contenu/')) return;
@@ -131,7 +163,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf($_POST['csrf'] ?? null);
     $posted = $_POST['content'] ?? [];
     $allowedKeys = [];
-    foreach ($definitions as $group) $allowedKeys = array_merge($allowedKeys, array_keys($group));
+    foreach ($visibleGroups as $groupTitle) {
+        foreach ($definitions[$groupTitle] ?? [] as $key => $_) $allowedKeys[] = $key;
+    }
 
     $stmt = $pdo->prepare('INSERT INTO content(content_key,value,updated_at) VALUES(:k,:v,CURRENT_TIMESTAMP) ON CONFLICT(content_key) DO UPDATE SET value=excluded.value, updated_at=CURRENT_TIMESTAMP');
     foreach ($allowedKeys as $key) {
@@ -142,8 +176,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $current = site_content();
     try {
-        foreach ($imageSlots as $slots) {
-            foreach ($slots as $token => [$key, $label]) {
+        foreach ($visibleGroups as $groupTitle) {
+            foreach ($imageSlots[$groupTitle] ?? [] as $token => [$key, $label]) {
                 if (!empty($_POST['remove_image'][$token])) {
                     delete_content_image($current[$key] ?? null);
                     $stmt->execute([':k' => $key, ':v' => '']);
@@ -176,11 +210,30 @@ admin_header('Contenu du site', 'contenu');
 ?>
 <?php if ($saved): ?><div class="flash flash--success">Le contenu et les images ont été enregistrés. Recharge le site pour voir les modifications.</div><?php endif; ?>
 <?php if ($error): ?><div class="flash flash--error"><?= e($error) ?></div><?php endif; ?>
-<p class="content-help">Tu peux modifier ici les textes et les visuels du site. Les images acceptées sont JPG, PNG et WEBP, jusqu’à 5 Mo.</p>
+
+<nav class="content-page-nav" aria-label="Pages du contenu">
+  <?php foreach ($pages as $slug => $meta): ?>
+    <a href="contenu.php?page=<?= e($slug) ?>" class="content-page-nav__item <?= $page === $slug ? 'is-active' : '' ?>">
+      <span><?= e($meta['label']) ?></span>
+    </a>
+  <?php endforeach; ?>
+</nav>
+
+<div class="content-page-heading">
+  <div>
+    <span class="content-page-heading__eyebrow">Page du site</span>
+    <h2><?= e($pages[$page]['label']) ?></h2>
+    <p><?= e($pages[$page]['description']) ?></p>
+  </div>
+  <a class="btn" href="<?= $page === 'accueil' ? '../index.html' : ($page === 'prestations' ? '../prestations.html' : '../formules.html') ?>" target="_blank" rel="noopener">Voir la page ↗</a>
+</div>
+
+<p class="content-help">Modifie uniquement le contenu de cette page. Les images acceptées sont JPG, PNG et WEBP, jusqu’à 5 Mo.</p>
 <form method="post" enctype="multipart/form-data" class="admin-form">
   <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+  <input type="hidden" name="page" value="<?= e($page) ?>">
   <div class="content-groups">
-    <?php foreach ($definitions as $groupTitle => $fields): ?>
+    <?php foreach ($visibleGroups as $groupTitle): $fields = $definitions[$groupTitle] ?? []; ?>
       <section class="form-card">
         <h2><?= e($groupTitle) ?></h2>
         <?php if (!empty($imageSlots[$groupTitle])): ?>
@@ -214,6 +267,6 @@ admin_header('Contenu du site', 'contenu');
       </section>
     <?php endforeach; ?>
   </div>
-  <div class="admin-actions"><button class="btn btn--primary" type="submit">Enregistrer le contenu</button></div>
+  <div class="admin-actions admin-actions--sticky"><button class="btn btn--primary" type="submit">Enregistrer <?= e(strtolower($pages[$page]['label'])) ?></button></div>
 </form>
 <?php admin_footer(); ?>
