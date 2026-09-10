@@ -104,19 +104,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="quote-field"><label for="name">Nom et prénom *</label><input id="name" name="name" value="<?= e($values['name']) ?>" required autocomplete="name"></div>
         <div class="quote-field"><label for="email">E-mail *</label><input id="email" name="email" type="email" value="<?= e($values['email']) ?>" required autocomplete="email"></div>
         <div class="quote-field"><label for="phone">Téléphone *</label><input id="phone" name="phone" type="tel" value="<?= e($values['phone']) ?>" required autocomplete="tel"></div>
-        <div class="quote-field quote-field--full"><label for="referral">Quelqu’un vous a parlé de moi ? <span>(Si oui, NOM Prénom)</span></label><input id="referral" name="referral" value="<?= e($values['referral']) ?>" placeholder="Ex. DUPONT Marie"></div>
+        <div class="quote-field quote-field--full"><label for="referral">Quelqu’un vous a parlé de moi ? <span>(Si oui, NOM Prénom)</span></label><input id="referral" name="referral" value="<?= e($values['referral']) ?>"></div>
 
         <fieldset class="quote-address">
           <legend>Adresse postale *</legend>
           <div class="quote-address-grid">
-            <div class="quote-field"><label for="address_number">N° *</label><input id="address_number" name="address_number" value="<?= e($values['address_number']) ?>" required autocomplete="address-line1" placeholder="12"></div>
-            <div class="quote-field"><label for="address_street">Rue *</label><input id="address_street" name="address_street" value="<?= e($values['address_street']) ?>" required placeholder="Rue du Lac"></div>
-            <div class="quote-field"><label for="address_city">Ville *</label><input id="address_city" name="address_city" value="<?= e($values['address_city']) ?>" required autocomplete="address-level2" placeholder="Saint-Dizier"></div>
-            <div class="quote-field"><label for="address_postcode">Code postal *</label><input id="address_postcode" name="address_postcode" value="<?= e($values['address_postcode']) ?>" required inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="postal-code" placeholder="52100"></div>
+            <div class="quote-field"><label for="address_number">N° *</label><input id="address_number" name="address_number" value="<?= e($values['address_number']) ?>" required autocomplete="address-line1"></div>
+            <div class="quote-field"><label for="address_street">Rue *</label><input id="address_street" name="address_street" value="<?= e($values['address_street']) ?>" required></div>
+            <div class="quote-field"><label for="address_city">Ville *</label><input id="address_city" name="address_city" value="<?= e($values['address_city']) ?>" required autocomplete="address-level2"></div>
+            <div class="quote-field"><label for="address_postcode">Code postal *</label><input id="address_postcode" name="address_postcode" value="<?= e($values['address_postcode']) ?>" required inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="postal-code"></div>
           </div>
         </fieldset>
 
-        <div class="quote-field"><label for="event_type">Type d’événement *</label><select id="event_type" name="event_type" required><option value="">Choisir…</option><?php foreach($eventOptions as $option): ?><option value="<?= e($option) ?>" <?= $values['event_type']===$option?'selected':'' ?>><?= e($option) ?></option><?php endforeach; ?></select></div>
+        <div class="quote-field"><label for="event_type">Type d’événement *</label><select id="event_type" name="event_type" required><option value=""></option><?php foreach($eventOptions as $option): ?><option value="<?= e($option) ?>" <?= $values['event_type']===$option?'selected':'' ?>><?= e($option) ?></option><?php endforeach; ?></select></div>
         <div class="quote-field"><label for="event_date">Date de l’événement *</label><input id="event_date" name="event_date" type="date" value="<?= e($values['event_date']) ?>" required></div>
         <div class="quote-field"><label for="venue">Lieu de réception / commune</label><input id="venue" name="venue" value="<?= e($values['venue']) ?>"></div>
         <div class="quote-field"><label for="guest_count">Nombre d’invités</label><input id="guest_count" name="guest_count" type="number" min="1" max="5000" value="<?= e($values['guest_count']) ?>"></div>
@@ -138,8 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
         </fieldset>
 
-        <div class="quote-field quote-field--full"><label for="budget">Budget indicatif</label><select id="budget" name="budget"><option value="">Non défini</option><?php foreach(['Moins de 800 €','800 à 1 200 €','1 200 à 1 800 €','Plus de 1 800 €'] as $option): ?><option value="<?= e($option) ?>" <?= $values['budget']===$option?'selected':'' ?>><?= e($option) ?></option><?php endforeach; ?></select></div>
-        <div class="quote-field quote-field--full"><label for="message">Parlez-moi de votre projet :</label><textarea id="message" name="message" placeholder="Ambiance souhaitée, déroulement de la journée ou de la soirée, attentes particulières, informations utiles…"><?= e($values['message']) ?></textarea></div>
+        <div class="quote-field quote-field--full"><label for="budget">Budget indicatif</label><select id="budget" name="budget"><option value=""></option><?php foreach(['Moins de 800 €','800 à 1 200 €','1 200 à 1 800 €','Plus de 1 800 €'] as $option): ?><option value="<?= e($option) ?>" <?= $values['budget']===$option?'selected':'' ?>><?= e($option) ?></option><?php endforeach; ?></select></div>
+        <div class="quote-field quote-field--full"><label for="message">Parlez-moi de votre projet :</label><textarea id="message" name="message"><?= e($values['message']) ?></textarea></div>
       </div>
       <div class="quote-actions"><p>* Champs obligatoires afin que je puisse étudier votre demande dans les meilleures conditions.</p><button class="quote-submit" type="submit">Envoyer ma demande →</button></div>
     </form>
