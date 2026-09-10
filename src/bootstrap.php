@@ -90,7 +90,20 @@ function db(): PDO
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )');
 
+    $pdo->exec('CREATE TABLE IF NOT EXISTS reviews (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        client_name TEXT NOT NULL,
+        review_text TEXT NOT NULL,
+        rating INTEGER NOT NULL DEFAULT 5,
+        review_date TEXT,
+        published INTEGER NOT NULL DEFAULT 1,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+
     seed_defaults($pdo);
+    seed_reviews($pdo);
     return $pdo;
 }
 
@@ -159,6 +172,24 @@ function seed_defaults(PDO $pdo): void
         foreach ($months as $month => $status) {
             $stmt->execute([':y' => $year, ':m' => $month, ':s' => $status]);
         }
+    }
+}
+
+function seed_reviews(PDO $pdo): void
+{
+    if ((int)$pdo->query('SELECT COUNT(*) FROM reviews')->fetchColumn() > 0) {
+        return;
+    }
+
+    $reviews = [
+        ['Charlotte Targa', 'Une ambiance qui a mis tout le monde d’accord, beaucoup d’énergie et des transitions impeccables. Une soirée inoubliable, avec une recommandation à 200 %.', 5, '2025-09-22', 1],
+        ['Laura Derancy', 'Une prestation de mariage dynamique, à l’écoute des demandes et avec une excellente animation. Une recommandation à 100 %.', 5, '2025-05-25', 2],
+        ['Cyrille Lemarquis', 'Une très bonne soirée, parfaitement animée, avec une musique au top. Une prestation chaleureusement recommandée pour de futurs événements.', 5, '2025-03-10', 3],
+    ];
+
+    $stmt = $pdo->prepare('INSERT INTO reviews(client_name, review_text, rating, review_date, published, display_order) VALUES(:name,:text,:rating,:date,1,:sort)');
+    foreach ($reviews as [$name, $text, $rating, $date, $sort]) {
+        $stmt->execute([':name'=>$name, ':text'=>$text, ':rating'=>$rating, ':date'=>$date, ':sort'=>$sort]);
     }
 }
 
