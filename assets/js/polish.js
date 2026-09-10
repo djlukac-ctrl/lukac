@@ -55,4 +55,10 @@
   backToTop.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
+
+  // Le formulaire de devis de l'accueil est injecté par main.js : charge le correctif après lui.
+  const quoteGuard = document.createElement('script');
+  quoteGuard.src = 'assets/js/quote-selection-guard.js?v=20260910-1';
+  quoteGuard.defer = true;
+  document.body.appendChild(quoteGuard);
 })();
