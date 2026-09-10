@@ -31,6 +31,20 @@
         return li;
       }));
     });
+
+    document.querySelectorAll('[data-cms-image]').forEach((el) => {
+      const key = el.dataset.cmsImage;
+      const path = key && content[key] ? String(content[key]).trim() : '';
+      if (!path) return;
+      if (el.tagName === 'IMG') {
+        el.src = path;
+      } else {
+        el.style.backgroundImage = `url("${path.replace(/"/g, '%22')}")`;
+        el.style.backgroundSize = 'cover';
+        el.style.backgroundPosition = 'center';
+        el.classList.add('has-cms-image');
+      }
+    });
   }
 
   function applyAvailability(availability) {
