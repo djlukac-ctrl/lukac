@@ -97,6 +97,63 @@
     });
   }
 
+  function escapeHtml(value) {
+    const div = document.createElement('div');
+    div.textContent = String(value ?? '');
+    return div.innerHTML;
+  }
+
+  function escapeAttribute(value) {
+    return String(value ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function renderDeal(content) {
+    document.querySelector('.home-deal')?.remove();
+    if (!content || String(content['deal.enabled'] || '0') !== '1') return;
+
+    const availability = document.querySelector('#disponibilites');
+    if (!availability) return;
+
+    const section = document.createElement('section');
+    section.className = 'home-deal';
+    section.id = 'bon-plan';
+    section.innerHTML = `
+      <div class="home-deal__inner">
+        <div class="home-deal__content">
+          <div class="home-deal__badge">${escapeHtml(content['deal.badge'] || 'Offre dernière minute')}</div>
+          ${content['deal.date'] ? `<div class="home-deal__date">${escapeHtml(content['deal.date'])}</div>` : ''}
+          <h2>${escapeHtml(content['deal.title'] || 'Une date vient de se libérer.')}</h2>
+          <p>${escapeHtml(content['deal.text'] || '')}</p>
+          <a href="#devis" class="home-deal__cta">Profiter de l’offre <span>→</span></a>
+        </div>
+        ${content['deal.image'] ? `<div class="home-deal__visual"><img src="${escapeAttribute(content['deal.image'])}" alt="Bon plan Luka C" loading="lazy" decoding="async"></div>` : ''}
+      </div>`;
+
+    availability.insertAdjacentElement('afterend', section);
+
+    let style = document.getElementById('home-deal-styles');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'home-deal-styles';
+      document.head.appendChild(style);
+    }
+    style.textContent = `
+      .home-deal{order:4!important;max-width:1420px;width:100%;margin:0 auto;padding:34px 34px 84px;scroll-margin-top:96px}
+      .home-deal__inner{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);overflow:hidden;border-radius:26px;background:#181716;color:#fff;box-shadow:0 20px 55px rgba(24,23,22,.14)}
+      .home-deal__content{padding:46px 48px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:360px}
+      .home-deal__badge{display:inline-flex;padding:7px 10px;border-radius:999px;background:#c93431;color:#fff;font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:16px}
+      .home-deal__date{font-size:12px;font-weight:700;color:#d7d1cb;margin-bottom:12px}
+      .home-deal h2{font:600 clamp(34px,4vw,58px)/1.02 'Space Grotesk',sans-serif;letter-spacing:-.04em;margin:0 0 18px;max-width:700px}
+      .home-deal p{margin:0 0 26px;max-width:660px;color:#c6c0ba;font-size:14px;line-height:1.7}
+      .home-deal__cta{display:inline-flex;align-items:center;gap:12px;padding:14px 19px;border-radius:999px;background:#fff;color:#181716;font-size:12px;font-weight:800;transition:.2s}
+      .home-deal__cta:hover{background:#c93431;color:#fff;transform:translateY(-2px)}
+      .home-deal__visual{min-height:360px;background:#2a2826}
+      .home-deal__visual img{width:100%;height:100%;min-height:360px;object-fit:cover;display:block}
+      .home-prestations{order:5!important}.home-formules{order:6!important}.home-quote{order:7!important}
+      @media(max-width:820px){.home-deal{padding:24px 18px 64px}.home-deal__inner{grid-template-columns:1fr}.home-deal__content{padding:32px 26px;min-height:auto}.home-deal__visual,.home-deal__visual img{min-height:260px;max-height:360px}.home-deal__visual{order:-1}}
+    `;
+  }
+
   function applyAvailability(availability) {
     document.querySelectorAll('.availability__year').forEach((yearBlock) => {
       const yearText = yearBlock.querySelector('.availability__year-number')?.textContent?.trim();
@@ -164,7 +221,10 @@
       return response.json();
     })
     .then((data) => {
-      if (data && data.content) applyContent(data.content);
+      if (data && data.content) {
+        applyContent(data.content);
+        renderDeal(data.content);
+      }
       if (data && data.availability) applyAvailability(data.availability);
       if (data && data.reviews) applyReviews(data.reviews);
     })
