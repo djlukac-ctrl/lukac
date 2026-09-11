@@ -3,14 +3,18 @@ require_once __DIR__ . '/../src/bootstrap.php';
 
 function admin_header(string $title, string $active = ''): void
 {
-    $items = [
-        'dashboard' => ['Tableau de bord', 'index.php'],
-        'devis' => ['Demandes de devis', 'devis.php'],
-        'disponibilites' => ['Disponibilités', 'disponibilites.php'],
-        'avis' => ['Avis clients', 'avis.php'],
-        'bon-plan' => ['Bon plan', 'bon-plan.php'],
-        'options' => ['Options', 'options.php'],
-        'contenu' => ['Contenu du site', 'contenu.php'],
+    $groups = [
+        'Gestion' => [
+            'dashboard' => ['Tableau de bord', 'index.php'],
+            'devis' => ['Demandes de devis', 'devis.php'],
+        ],
+        'Site' => [
+            'contenu' => ['Contenu du site', 'contenu.php'],
+            'disponibilites' => ['Disponibilités', 'disponibilites.php'],
+            'avis' => ['Avis clients', 'avis.php'],
+            'options' => ['Options', 'options.php'],
+            'bon-plan' => ['Bon plan', 'bon-plan.php'],
+        ],
     ];
     ?>
 <!doctype html>
@@ -21,15 +25,20 @@ function admin_header(string $title, string $active = ''): void
   <title><?= e($title) ?> — Administration Luka C</title>
   <link rel="stylesheet" href="../assets/css/admin.css?v=20260910-2">
   <link rel="stylesheet" href="../assets/css/admin-content.css?v=20260910-1">
-  <link rel="stylesheet" href="../assets/css/admin-light.css?v=20260910-1">
+  <link rel="stylesheet" href="../assets/css/admin-light.css?v=20260911-2">
 </head>
 <body>
 <div class="admin-shell">
   <aside class="admin-sidebar">
     <a class="admin-brand" href="index.php"><img src="../assets/img/logo-lukac.png" alt="Luka C"><span>Administration</span></a>
-    <nav>
-      <?php foreach ($items as $key => [$label, $href]): ?>
-        <a class="<?= $active === $key ? 'is-active' : '' ?>" href="<?= e($href) ?>"><?= e($label) ?></a>
+    <nav class="admin-nav">
+      <?php foreach ($groups as $groupLabel => $items): ?>
+        <div class="admin-nav__group">
+          <span class="admin-nav__label"><?= e($groupLabel) ?></span>
+          <?php foreach ($items as $key => [$label, $href]): ?>
+            <a class="<?= $active === $key ? 'is-active' : '' ?>" href="<?= e($href) ?>"><?= e($label) ?></a>
+          <?php endforeach; ?>
+        </div>
       <?php endforeach; ?>
     </nav>
     <div class="admin-sidebar__bottom">
