@@ -140,6 +140,50 @@
 
   restorePackOptionImages();
 
+  // Le Photobooth est présenté comme une seule carte sur le site mais doit proposer
+  // deux choix distincts dans le formulaire de devis.
+  const ensurePhotoboothQuoteOptions = () => {
+    const form = document.querySelector('.home-quote__form');
+    if (!form) return false;
+
+    const selections = [...form.querySelectorAll('input[name="selections[]"]')];
+    if (!selections.length) return false;
+
+    const container = selections[0].closest('.home-quote__checks');
+    if (!container) return false;
+
+    [...container.querySelectorAll('label')].forEach((label) => {
+      const input = label.querySelector('input[name="selections[]"]');
+      if (input && input.value.trim().toLowerCase() === 'photobooth') label.remove();
+    });
+
+    ['Photobooth 150 tirages', 'Photobooth 300 tirages'].forEach((title) => {
+      if (form.querySelector(`input[name="selections[]"][value="${title}"]`)) return;
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      const span = document.createElement('span');
+      input.type = 'checkbox';
+      input.name = 'selections[]';
+      input.value = title;
+      span.textContent = title;
+      label.append(input, span);
+      container.appendChild(label);
+    });
+
+    return true;
+  };
+
+  ensurePhotoboothQuoteOptions();
+  setTimeout(ensurePhotoboothQuoteOptions, 250);
+  setTimeout(ensurePhotoboothQuoteOptions, 800);
+  setTimeout(ensurePhotoboothQuoteOptions, 1600);
+
+  const quoteOptionsObserver = new MutationObserver(() => {
+    ensurePhotoboothQuoteOptions();
+  });
+  const quoteRoot = document.querySelector('#devis') || document.body;
+  quoteOptionsObserver.observe(quoteRoot, { childList: true, subtree: true });
+
   // Petit bouton retour en haut, visible uniquement après avoir descendu la page.
   const backToTop = document.createElement('button');
   backToTop.type = 'button';
