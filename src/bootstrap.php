@@ -256,6 +256,7 @@ function quote_status_label(string $status): string
         'new' => 'Nouveau',
         'read' => 'Lu',
         'contacted' => 'Contacté',
+        'quote_sent' => 'Devis envoyé',
         'booked' => 'Réservé',
         'archived' => 'Archivé',
     ][$status] ?? $status;
