@@ -103,7 +103,7 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
             <label><input type="checkbox" name="services[]" value="DJ"><span>DJ</span></label>
             <label><input type="checkbox" name="services[]" value="Animations"><span>Animations</span></label>
             <label><input type="checkbox" name="services[]" value="Karaoké"><span>Karaoké</span></label>
-            <label><input type="checkbox" name="services[]" value="Sonorisation de vin d’honneur"><span>Sonorisation de vin d’honneur</span></label>
+            <label><input type="checkbox" name="services[]" value="Sonorisation de vin d’honneur et cérémonie laïque"><span>Sonorisation de vin d’honneur et cérémonie laïque</span></label>
           </div>
         </fieldset>
 
