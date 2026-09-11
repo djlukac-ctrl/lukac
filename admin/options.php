@@ -33,12 +33,37 @@ function options_store_image(array $file): string
     return 'uploads/contenu/' . $filename;
 }
 
+function options_normalize_order(array $options): array
+{
+    foreach ($options as $index => &$option) {
+        if (!isset($option['order']) || !is_numeric($option['order'])) {
+            $option['order'] = $index + 1;
+        }
+        $option['order'] = max(1, (int)$option['order']);
+        $option['_original_index'] = $index;
+    }
+    unset($option);
+
+    usort($options, static function (array $a, array $b): int {
+        $orderCompare = ((int)$a['order']) <=> ((int)$b['order']);
+        if ($orderCompare !== 0) return $orderCompare;
+        return ((int)$a['_original_index']) <=> ((int)$b['_original_index'];
+    });
+
+    foreach ($options as &$option) {
+        unset($option['_original_index']);
+    }
+    unset($option);
+
+    return array_values($options);
+}
+
 function options_load(array $content): array
 {
     $raw = trim((string)($content['options.dynamic'] ?? ''));
     if ($raw !== '') {
         $decoded = json_decode($raw, true);
-        if (is_array($decoded)) return array_values($decoded);
+        if (is_array($decoded)) return options_normalize_order(array_values($decoded));
     }
 
     $legacy = [
@@ -48,7 +73,7 @@ function options_load(array $content): array
         ['ecran', 'Écran & projecteur'],
     ];
     $options = [];
-    foreach ($legacy as [$slug, $fallback]) {
+    foreach ($legacy as $index => [$slug, $fallback]) {
         $options[] = [
             'id' => $slug,
             'title' => (string)($content["options.$slug.title"] ?? $fallback),
@@ -56,6 +81,7 @@ function options_load(array $content): array
             'image' => (string)($content["options.$slug.image"] ?? ''),
             'x' => (int)($content["options.$slug.image.position_x"] ?? 50),
             'y' => (int)($content["options.$slug.image.position_y"] ?? 50),
+            'order' => $index + 1,
         ];
     }
     return $options;
@@ -63,6 +89,7 @@ function options_load(array $content): array
 
 function options_save(PDO $pdo, array $options): void
 {
+    $options = options_normalize_order($options);
     $json = json_encode(array_values($options), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if ($json === false) throw new RuntimeException('Impossible d’enregistrer les options.');
     $stmt = $pdo->prepare('INSERT INTO content(content_key,value,updated_at) VALUES(:k,:v,CURRENT_TIMESTAMP) ON CONFLICT(content_key) DO UPDATE SET value=excluded.value, updated_at=CURRENT_TIMESTAMP');
@@ -101,6 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($title === '') throw new RuntimeException('Le nom de l’option est obligatoire.');
                 $option['title'] = $title;
                 $option['desc'] = trim((string)($_POST['desc'] ?? ''));
+                $option['order'] = max(1, (int)($_POST['order'] ?? 1));
                 $option['x'] = max(0, min(100, (int)($_POST['x'] ?? 50)));
                 $option['y'] = max(0, min(100, (int)($_POST['y'] ?? 50)));
 
@@ -131,6 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'image' => $image,
                 'x' => 50,
                 'y' => 50,
+                'order' => max(1, (int)($_POST['order'] ?? (count($options) + 1))),
             ];
             options_save($pdo, $options);
             $saved = true;
@@ -152,10 +181,12 @@ admin_header('Options', 'options');
   <div>
     <span class="content-page-heading__eyebrow">Formules</span>
     <h2>Options à la carte</h2>
-    <p>Ajoute, modifie ou supprime les options visibles sur le site. Les changements sont automatiquement repris dans la partie Formules.</p>
+    <p>Ajoute, modifie, supprime ou change l’ordre des options visibles sur le site. L’ordre est également repris dans le formulaire de devis.</p>
   </div>
   <a class="btn" href="../index.html#formules" target="_blank" rel="noopener">Voir le site ↗</a>
 </div>
+
+<p class="content-help">Pour changer l’ordre, indique simplement 1 pour la première option, 2 pour la deuxième, etc., puis enregistre l’option.</p>
 
 <div class="content-groups">
   <?php foreach ($options as $index => $option): ?>
@@ -178,7 +209,10 @@ admin_header('Options', 'options');
           </div>
         </div>
 
-        <div class="field"><label>Nom de l’option</label><input type="text" name="title" required value="<?= e((string)($option['title'] ?? '')) ?>"></div>
+        <div class="form-grid">
+          <div class="field"><label>Nom de l’option</label><input type="text" name="title" required value="<?= e((string)($option['title'] ?? '')) ?>"></div>
+          <div class="field"><label>Ordre d’affichage</label><input type="number" name="order" min="1" step="1" required value="<?= (int)($option['order'] ?? ($index + 1)) ?>"></div>
+        </div>
         <div class="field"><label>Description</label><textarea name="desc" rows="4"><?= e((string)($option['desc'] ?? '')) ?></textarea></div>
         <div class="form-grid">
           <label>Position horizontale de l’image
@@ -204,7 +238,10 @@ admin_header('Options', 'options');
     <form method="post" enctype="multipart/form-data" class="fields admin-form">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="add">
-      <div class="field"><label>Nom de l’option</label><input type="text" name="title" required placeholder="Ex. Livre d’or audio"></div>
+      <div class="form-grid">
+        <div class="field"><label>Nom de l’option</label><input type="text" name="title" required placeholder="Ex. Livre d’or audio"></div>
+        <div class="field"><label>Ordre d’affichage</label><input type="number" name="order" min="1" step="1" value="<?= count($options) + 1 ?>"></div>
+      </div>
       <div class="field"><label>Description</label><textarea name="desc" rows="4" placeholder="Décris brièvement l’option..."></textarea></div>
       <div class="field"><label>Image</label><input type="file" name="image" accept="image/jpeg,image/png,image/webp"></div>
       <div class="form-actions"><button class="btn btn--primary" type="submit">Ajouter l’option</button></div>
