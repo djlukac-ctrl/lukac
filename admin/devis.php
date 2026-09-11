@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $status = (string) ($_POST['status'] ?? '');
-    $allowed = ['new','read','contacted','booked','archived'];
+    $allowed = ['new','read','contacted','quote_sent','booked','archived'];
     if ($id > 0 && in_array($status, $allowed, true)) {
         $stmt = $pdo->prepare('UPDATE quotes SET status=:status, updated_at=CURRENT_TIMESTAMP WHERE id=:id');
         $stmt->execute([':status' => $status, ':id' => $id]);
@@ -108,7 +108,7 @@ if ($id > 0) {
           <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
           <input type="hidden" name="id" value="<?= $id ?>">
           <div class="field"><label for="status">Statut</label><select id="status" name="status">
-            <?php foreach (['new','read','contacted','booked','archived'] as $status): ?><option value="<?= e($status) ?>" <?= $quote['status'] === $status ? 'selected' : '' ?>><?= e(quote_status_label($status)) ?></option><?php endforeach; ?>
+            <?php foreach (['new','read','contacted','quote_sent','booked','archived'] as $status): ?><option value="<?= e($status) ?>" <?= $quote['status'] === $status ? 'selected' : '' ?>><?= e(quote_status_label($status)) ?></option><?php endforeach; ?>
           </select></div>
           <button class="btn btn--primary" type="submit" name="action" value="update_status">Enregistrer le statut</button>
           <a class="btn" href="mailto:<?= e($quote['email']) ?>?subject=Votre%20demande%20de%20devis%20-%20Luka%20C">Répondre par e-mail</a>
@@ -124,7 +124,7 @@ if ($id > 0) {
 $statusFilter = (string) ($_GET['status'] ?? '');
 $params = [];
 $sql = 'SELECT * FROM quotes';
-if (in_array($statusFilter, ['new','read','contacted','booked','archived'], true)) {
+if (in_array($statusFilter, ['new','read','contacted','quote_sent','booked','archived'], true)) {
     $sql .= ' WHERE status=:status';
     $params[':status'] = $statusFilter;
 }
@@ -137,7 +137,7 @@ if (isset($_GET['deleted'])): ?><div class="flash flash--success">Demande de dev
 <div class="admin-section__head">
   <div style="display:flex;gap:8px;flex-wrap:wrap">
     <a class="btn" href="devis.php">Toutes</a>
-    <?php foreach (['new','contacted','booked','archived'] as $status): ?><a class="btn" href="devis.php?status=<?= e($status) ?>"><?= e(quote_status_label($status)) ?></a><?php endforeach; ?>
+    <?php foreach (['new','contacted','quote_sent','booked','archived'] as $status): ?><a class="btn" href="devis.php?status=<?= e($status) ?>"><?= e(quote_status_label($status)) ?></a><?php endforeach; ?>
   </div>
 </div>
 <div class="admin-table-wrap">
