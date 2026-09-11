@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </header>
 <nav class="mobile-nav" hidden><a href="index.html">Accueil</a><a href="index.html#prestations">Prestations</a><a href="index.html#formules">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a></nav>
 <main class="quote-page">
-  <section class="quote-head"><p>Demande de devis</p><h1>Parlons de <span>votre événement.</span></h1><p>Merci de me transmettre les premières informations concernant votre événement. Elles me permettront d’étudier votre demande et de vous proposer une prestation adaptée à votre date, votre lieu et vos attentes.</p></section>
+  <section class="quote-head"><p>Demande de devis</p><h1>Créons une soirée <span>qui vous ressemble.</span></h1><p>Parlez-moi de votre date, de votre lieu et de vos envies. Je vous proposerai une prestation pensée pour votre événement et l’ambiance que vous souhaitez créer.</p></section>
   <?php if ($success): ?>
     <section class="quote-success"><h2>Demande envoyée ✓</h2><p>Merci pour votre demande. Celle-ci a bien été enregistrée et je reviendrai vers vous dès que possible.</p></section>
   <?php else: ?>
