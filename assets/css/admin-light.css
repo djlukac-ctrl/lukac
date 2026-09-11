@@ -49,6 +49,13 @@ th,td{border-bottom-color:rgba(24,23,22,.07)}
 .quote-choice p{color:#7b746e}
 .availability-row{border-bottom-color:rgba(24,23,22,.07)}
 
+/* Navigation administration */
+.admin-nav{display:flex;flex-direction:column;gap:22px}
+.admin-nav__group{display:flex;flex-direction:column;gap:4px}
+.admin-nav__label{display:block;padding:0 12px 7px;font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#9b938b}
+.admin-nav__group+ .admin-nav__group{padding-top:18px;border-top:1px solid rgba(24,23,22,.08)}
+.admin-nav__group a{border-radius:10px}
+
 /* Gestion du contenu */
 .content-page-nav__item{border-color:rgba(24,23,22,.10);background:linear-gradient(145deg,#fff,#f7f3ee);color:#6f6862;box-shadow:0 8px 22px rgba(50,38,28,.035)}
 .content-page-nav__item:before{color:#aaa29a}
