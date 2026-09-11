@@ -97,6 +97,94 @@
     });
   }
 
+  function parseDynamicOptions(content) {
+    const raw = String(content?.['options.dynamic'] || '').trim();
+    if (!raw) return null;
+    try {
+      const options = JSON.parse(raw);
+      return Array.isArray(options) ? options : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function syncQuoteOptions(options) {
+    const apply = () => {
+      const form = document.querySelector('.home-quote__form');
+      if (!form) return false;
+      const inputs = [...form.querySelectorAll('input[name="selections[]"]')];
+      if (!inputs.length) return false;
+
+      const baseValues = new Set(['Essentiel', 'Ambiance', 'Expérience', 'Pack Instant Magique', 'Pack Instant Magique Signature']);
+      const container = inputs[0].closest('.home-quote__checks');
+      if (!container) return false;
+
+      [...container.querySelectorAll('label')].forEach((label) => {
+        const input = label.querySelector('input[name="selections[]"]');
+        if (input && !baseValues.has(input.value)) label.remove();
+      });
+
+      options.forEach((option) => {
+        const title = String(option?.title || '').trim();
+        if (!title) return;
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+        const span = document.createElement('span');
+        input.type = 'checkbox';
+        input.name = 'selections[]';
+        input.value = title;
+        span.textContent = title;
+        label.append(input, span);
+        container.appendChild(label);
+      });
+      return true;
+    };
+
+    if (apply()) return;
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts += 1;
+      if (apply() || attempts >= 20) clearInterval(timer);
+    }, 100);
+  }
+
+  function renderDynamicOptions(content) {
+    const options = parseDynamicOptions(content);
+    if (!options) return;
+
+    const grid = document.querySelector('.options-grid');
+    if (grid) {
+      const cards = options.map((option) => {
+        const title = String(option?.title || '').trim();
+        if (!title) return null;
+
+        const card = document.createElement('article');
+        card.className = 'option-card';
+
+        const image = String(option?.image || '').trim();
+        if (image) {
+          const visual = document.createElement('div');
+          visual.className = 'option-card__image has-cms-image';
+          const x = clampPercent(option?.x, 50);
+          const y = clampPercent(option?.y, 50);
+          queueBackgroundImage(visual, image, `${x}% ${y}%`);
+          card.appendChild(visual);
+        }
+
+        const heading = document.createElement('h3');
+        heading.textContent = title;
+        const text = document.createElement('p');
+        text.textContent = String(option?.desc || '').trim();
+        card.append(heading, text);
+        return card;
+      }).filter(Boolean);
+
+      grid.replaceChildren(...cards);
+    }
+
+    syncQuoteOptions(options);
+  }
+
   function escapeHtml(value) {
     const div = document.createElement('div');
     div.textContent = String(value ?? '');
@@ -226,6 +314,7 @@
     .then((data) => {
       if (data && data.content) {
         applyContent(data.content);
+        renderDynamicOptions(data.content);
         renderDeal(data.content);
       }
       if (data && data.availability) applyAvailability(data.availability);
@@ -240,6 +329,6 @@
     method: 'POST',
     credentials: 'same-origin',
     cache: 'no-store',
-    keepalive: true
+    keepalive:true
   }).catch(() => {});
 })();
