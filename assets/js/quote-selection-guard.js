@@ -5,6 +5,7 @@
     'Pack Instant Magique Signature',
     'Photobooth 150 tirages',
     'Photobooth 300 tirages',
+    "Livre d'or audio",
     'Fumée lourde',
     'Étincelles froides',
     'Éclairage mural',
@@ -75,8 +76,6 @@
         optionGroup.querySelectorAll('input').forEach(input => { input.checked = checked.has(input.value); });
         existingGroup.replaceWith(formulaGroup, optionGroup);
       } else {
-        // Le CMS peut mettre à jour les options après coup : on rétablit toujours
-        // une séparation stricte entre formules et packs/options.
         syncGroup(formulaGroup, FORMULAS);
         syncGroup(optionGroup, OPTIONS);
       }
