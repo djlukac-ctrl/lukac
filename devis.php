@@ -12,7 +12,7 @@ $values = [
 $selectedServices = [];
 $selectedSelections = [];
 
-$serviceOptions = ['DJ', 'Animations', 'Karaoké', "Sonorisation de vin d’honneur"];
+$serviceOptions = ['DJ', 'Animations', 'Karaoké', "Sonorisation de vin d’honneur et cérémonie laïque"];
 $formulaOptions = ['Essentiel', 'Ambiance', 'Expérience'];
 $extraOptions = [
     'Pack Instant Magique', 'Pack Instant Magique Signature',
