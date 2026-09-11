@@ -22,9 +22,59 @@
 .hero-modern__label{font-size:0!important}
 .hero-modern__label::after{
   content:"Luka C - Dj & Animateur";
-  font-size:9px;
-  letter-spacing:.13em;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.08em;
   text-transform:none;
+}
+
+/* Lisibilité des petits textes, notamment sous Windows/Chrome */
+body{
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:auto;
+  -moz-osx-font-smoothing:auto;
+}
+.reviews-kicker,
+.availability__kicker,
+.prestations-kicker,
+.prestation-card__kicker,
+.formules-kicker,
+.home-quote__kicker{
+  font-size:11px!important;
+  font-weight:700!important;
+  letter-spacing:.13em!important;
+}
+.review__date,
+.availability__year-title,
+.availability__updated,
+.site-footer small,
+.home-quote__actions p{
+  font-size:12px!important;
+  font-weight:500!important;
+  line-height:1.5!important;
+}
+.review p,
+.prestation-card__content>p,
+.prestation-card__content li,
+.formule-card__intro,
+.formule-card li,
+.signature-card p,
+.signature-card li,
+.option-card p,
+.section--reviews .section-heading>p:last-child,
+.availability__head p:last-child,
+.formules-hero>p:last-child,
+.section-title>p:last-child,
+.home-quote__head>p:last-child{
+  font-size:13px!important;
+  font-weight:500!important;
+  line-height:1.7!important;
+}
+.home-quote__field label,
+.home-quote__group legend,
+.home-quote__checks label{
+  font-size:12px!important;
+  font-weight:500!important;
 }
 
 /* Micro-interactions cohérentes */
