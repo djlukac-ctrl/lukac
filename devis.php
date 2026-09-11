@@ -16,6 +16,7 @@ $serviceOptions = ['DJ', 'Animations', 'Karaoké', "Sonorisation de vin d’honn
 $formulaOptions = ['Essentiel', 'Ambiance', 'Expérience'];
 $extraOptions = [
     'Pack Instant Magique', 'Pack Instant Magique Signature',
+    'Photobooth 150 tirages', 'Photobooth 300 tirages',
     'Fumée lourde', 'Étincelles froides', 'Éclairage mural', 'Écran & projecteur'
 ];
 $selectionOptions = array_merge($formulaOptions, $extraOptions);
@@ -117,7 +118,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="quote-field"><label for="address_postcode">Code postal *</label><input id="address_postcode" name="address_postcode" value="<?= e($values['address_postcode']) ?>" required inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="postal-code"></div>
           </div>
         </fieldset>
-
         <div class="quote-field"><label for="event_type">Type d’événement *</label><select id="event_type" name="event_type" required><option value=""></option><?php foreach($eventOptions as $option): ?><option value="<?= e($option) ?>" <?= $values['event_type']===$option?'selected':'' ?>><?= e($option) ?></option><?php endforeach; ?></select></div>
         <div class="quote-field"><label for="event_date">Date de l’événement *</label><input id="event_date" name="event_date" type="date" value="<?= e($values['event_date']) ?>" required></div>
         <div class="quote-field"><label for="venue">Lieu de réception / commune *</label><input id="venue" name="venue" value="<?= e($values['venue']) ?>" required></div>
