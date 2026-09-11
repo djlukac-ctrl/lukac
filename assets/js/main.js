@@ -64,8 +64,8 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
   quoteSection.innerHTML = `
     <div class="home-quote__head">
       <p class="home-quote__kicker">Demande de devis</p>
-      <h2>Parlons de <em>votre événement.</em></h2>
-      <p>Transmettez-moi les premières informations concernant votre événement. Elles me permettront d’étudier votre demande et de vous proposer une prestation adaptée à votre date, votre lieu et vos attentes.</p>
+      <h2>Créons une soirée <em>qui vous ressemble.</em></h2>
+      <p>Parlez-moi de votre date, de votre lieu et de vos envies. Je vous proposerai une prestation pensée pour votre événement et l’ambiance que vous souhaitez créer.</p>
     </div>
 
     <div class="home-quote__message" aria-live="polite"></div>
