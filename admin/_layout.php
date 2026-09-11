@@ -9,6 +9,7 @@ function admin_header(string $title, string $active = ''): void
         'disponibilites' => ['Disponibilités', 'disponibilites.php'],
         'avis' => ['Avis clients', 'avis.php'],
         'bon-plan' => ['Bon plan', 'bon-plan.php'],
+        'options' => ['Options', 'options.php'],
         'contenu' => ['Contenu du site', 'contenu.php'],
     ];
     ?>
