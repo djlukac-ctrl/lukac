@@ -124,25 +124,31 @@
         if (input && !baseValues.has(input.value)) label.remove();
       });
 
+      const quoteValues = [];
       options.forEach((option) => {
         const title = String(option?.title || '').trim();
         if (!title) return;
+        const normalized = title.toLowerCase().replace(/\s+/g, ' ').trim();
+        if (normalized === 'photobooth') {
+          quoteValues.push('Photobooth 150 tirages', 'Photobooth 300 tirages');
+        } else if (normalized !== 'photobooth 150 tirages' && normalized !== 'photobooth 300 tirages') {
+          quoteValues.push(title);
+        }
+      });
 
-        const quoteTitles = title.toLowerCase() === 'photobooth'
-          ? ['Photobooth 150 tirages', 'Photobooth 300 tirages']
-          : [title];
+      // Ces deux choix doivent toujours rester disponibles dans le formulaire.
+      quoteValues.push('Photobooth 150 tirages', 'Photobooth 300 tirages');
 
-        quoteTitles.forEach((quoteTitle) => {
-          const label = document.createElement('label');
-          const input = document.createElement('input');
-          const span = document.createElement('span');
-          input.type = 'checkbox';
-          input.name = 'selections[]';
-          input.value = quoteTitle;
-          span.textContent = quoteTitle;
-          label.append(input, span);
-          container.appendChild(label);
-        });
+      [...new Set(quoteValues)].forEach((quoteTitle) => {
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+        const span = document.createElement('span');
+        input.type = 'checkbox';
+        input.name = 'selections[]';
+        input.value = quoteTitle;
+        span.textContent = quoteTitle;
+        label.append(input, span);
+        container.appendChild(label);
       });
       return true;
     };
