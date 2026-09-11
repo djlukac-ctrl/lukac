@@ -59,16 +59,6 @@ $definitions = [
         'formules.signature2.desc' => ['Description', 'textarea'],
         'formules.signature2.items' => ['Éléments inclus — 1 ligne par point', 'textarea'],
     ],
-    'Options à la carte' => [
-        'options.fumee.title' => ['Fumée lourde — titre', 'text'],
-        'options.fumee.desc' => ['Fumée lourde — description', 'textarea'],
-        'options.etincelles.title' => ['Étincelles froides — titre', 'text'],
-        'options.etincelles.desc' => ['Étincelles froides — description', 'textarea'],
-        'options.eclairage.title' => ['Éclairage mural — titre', 'text'],
-        'options.eclairage.desc' => ['Éclairage mural — description', 'textarea'],
-        'options.ecran.title' => ['Écran & projecteur — titre', 'text'],
-        'options.ecran.desc' => ['Écran & projecteur — description', 'textarea'],
-    ],
 ];
 
 $imageSlots = [
@@ -81,12 +71,6 @@ $imageSlots = [
     'Formule Expérience' => ['formules_experience' => ['formules.experience.image', 'Image de la formule Expérience']],
     'Pack Instant Magique' => ['signature_1' => ['formules.signature1.image', 'Image du Pack Instant Magique']],
     'Pack Instant Magique Signature' => ['signature_2' => ['formules.signature2.image', 'Image du Pack Instant Magique Signature']],
-    'Options à la carte' => [
-        'option_fumee' => ['options.fumee.image', 'Image — Fumée lourde'],
-        'option_etincelles' => ['options.etincelles.image', 'Image — Étincelles froides'],
-        'option_eclairage' => ['options.eclairage.image', 'Image — Éclairage mural'],
-        'option_ecran' => ['options.ecran.image', 'Image — Écran & projecteur'],
-    ],
 ];
 
 $legacyPositions = [
@@ -117,11 +101,6 @@ $pages = [
         'label' => 'Packs',
         'description' => 'Contenu et visuels des packs Instant Magique.',
         'groups' => ['Pack Instant Magique', 'Pack Instant Magique Signature'],
-    ],
-    'options' => [
-        'label' => 'Options à la carte',
-        'description' => 'Contenu et visuels des options proposées à la carte.',
-        'groups' => ['Options à la carte'],
     ],
 ];
 
