@@ -127,15 +127,22 @@
       options.forEach((option) => {
         const title = String(option?.title || '').trim();
         if (!title) return;
-        const label = document.createElement('label');
-        const input = document.createElement('input');
-        const span = document.createElement('span');
-        input.type = 'checkbox';
-        input.name = 'selections[]';
-        input.value = title;
-        span.textContent = title;
-        label.append(input, span);
-        container.appendChild(label);
+
+        const quoteTitles = title.toLowerCase() === 'photobooth'
+          ? ['Photobooth 150 tirages', 'Photobooth 300 tirages']
+          : [title];
+
+        quoteTitles.forEach((quoteTitle) => {
+          const label = document.createElement('label');
+          const input = document.createElement('input');
+          const span = document.createElement('span');
+          input.type = 'checkbox';
+          input.name = 'selections[]';
+          input.value = quoteTitle;
+          span.textContent = quoteTitle;
+          label.append(input, span);
+          container.appendChild(label);
+        });
       });
       return true;
     };
