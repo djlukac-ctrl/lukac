@@ -17,6 +17,7 @@ $formulaOptions = ['Essentiel', 'Ambiance', 'Expérience'];
 $extraOptions = [
     'Pack Instant Magique', 'Pack Instant Magique Signature',
     'Photobooth 150 tirages', 'Photobooth 300 tirages',
+    "Livre d'or audio",
     'Fumée lourde', 'Étincelles froides', 'Éclairage mural', 'Écran & projecteur'
 ];
 $selectionOptions = array_merge($formulaOptions, $extraOptions);
