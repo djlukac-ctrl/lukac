@@ -47,7 +47,7 @@ function options_normalize_order(array $options): array
     usort($options, static function (array $a, array $b): int {
         $orderCompare = ((int)$a['order']) <=> ((int)$b['order']);
         if ($orderCompare !== 0) return $orderCompare;
-        return ((int)$a['_original_index']) <=> ((int)$b['_original_index'];
+        return ((int)$a['_original_index']) <=> ((int)$b['_original_index']);
     });
 
     foreach ($options as &$option) {
@@ -99,7 +99,6 @@ function options_save(PDO $pdo, array $options): void
 $content = site_content();
 $options = options_load($content);
 
-// Initialise la gestion dynamique avec les options actuelles, sans rien perdre.
 if (empty($content['options.dynamic'])) {
     options_save($pdo, $options);
     $content = site_content();
