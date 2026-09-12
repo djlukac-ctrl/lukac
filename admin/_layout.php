@@ -13,6 +13,7 @@ function admin_header(string $title, string $active = ''): void
             'disponibilites' => ['Disponibilités', 'disponibilites.php'],
             'avis' => ['Avis clients', 'avis.php'],
             'options' => ['Options', 'options.php'],
+            'partenaires' => ['Prestataires partenaires', 'partenaires.php'],
             'bon-plan' => ['Bon plan', 'bon-plan.php'],
         ],
     ];
