@@ -37,6 +37,26 @@
     return fieldset;
   }
 
+  function moveMisplacedOptions(form) {
+    const formulaChecks = form.querySelector('.home-quote__group--formulas .home-quote__checks');
+    const optionChecks = form.querySelector('.home-quote__group--options .home-quote__checks');
+    if (!formulaChecks || !optionChecks) return;
+
+    [...formulaChecks.querySelectorAll('label')].forEach((label) => {
+      const input = label.querySelector('input[name="selections[]"]');
+      if (!input || FORMULAS.includes(input.value)) return;
+
+      const duplicate = [...optionChecks.querySelectorAll('input[name="selections[]"]')]
+        .find((existing) => existing.value === input.value);
+      if (duplicate) {
+        if (input.checked) duplicate.checked = true;
+        label.remove();
+      } else {
+        optionChecks.appendChild(label);
+      }
+    });
+  }
+
   function prepareHomeForm() {
     const form = document.querySelector('.home-quote__form');
     if (!form) return false;
@@ -57,6 +77,8 @@
       const optionGroup = buildGroup('Packs & options complémentaires', OPTIONS, 'home-quote__group--options', checkedValues);
       existingGroup.replaceWith(formulaGroup, optionGroup);
     }
+
+    moveMisplacedOptions(form);
 
     if (form.dataset.selectionGuardReady !== '1') {
       form.dataset.selectionGuardReady = '1';
@@ -80,11 +102,15 @@
     return true;
   }
 
-  if (prepareHomeForm()) return;
-
   const observer = new MutationObserver(() => {
-    if (!prepareHomeForm()) return;
-    observer.disconnect();
+    const form = document.querySelector('.home-quote__form');
+    if (!form) {
+      prepareHomeForm();
+      return;
+    }
+    moveMisplacedOptions(form);
   });
+
   observer.observe(document.documentElement, { childList: true, subtree: true });
+  prepareHomeForm();
 })();
