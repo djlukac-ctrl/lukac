@@ -3,6 +3,13 @@ require_once __DIR__ . '/../src/bootstrap.php';
 
 function admin_header(string $title, string $active = ''): void
 {
+    $newQuoteCount = 0;
+    try {
+        $newQuoteCount = (int) db()->query("SELECT COUNT(*) FROM quotes WHERE status='new'")->fetchColumn();
+    } catch (Throwable $e) {
+        $newQuoteCount = 0;
+    }
+
     $groups = [
         'Gestion' => [
             'dashboard' => ['Tableau de bord', 'index.php'],
@@ -23,10 +30,10 @@ function admin_header(string $title, string $active = ''): void
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title><?= e($title) ?> — Administration Luka C</title>
+  <title><?= $newQuoteCount > 0 ? '(' . $newQuoteCount . ') ' : '' ?><?= e($title) ?> — Administration Luka C</title>
   <link rel="stylesheet" href="../assets/css/admin.css?v=20260910-2">
   <link rel="stylesheet" href="../assets/css/admin-content.css?v=20260910-1">
-  <link rel="stylesheet" href="../assets/css/admin-light.css?v=20260911-2">
+  <link rel="stylesheet" href="../assets/css/admin-light.css?v=20260914-1">
 </head>
 <body>
 <div class="admin-shell">
@@ -37,7 +44,10 @@ function admin_header(string $title, string $active = ''): void
         <div class="admin-nav__group">
           <span class="admin-nav__label"><?= e($groupLabel) ?></span>
           <?php foreach ($items as $key => [$label, $href]): ?>
-            <a class="<?= $active === $key ? 'is-active' : '' ?>" href="<?= e($href) ?>"><?= e($label) ?></a>
+            <a class="<?= $active === $key ? 'is-active' : '' ?>" href="<?= e($href) ?>">
+              <span><?= e($label) ?></span>
+              <?php if ($key === 'devis' && $newQuoteCount > 0): ?><span class="admin-nav__badge"><?= $newQuoteCount ?></span><?php endif; ?>
+            </a>
           <?php endforeach; ?>
         </div>
       <?php endforeach; ?>
@@ -51,7 +61,13 @@ function admin_header(string $title, string $active = ''): void
     </div>
   </aside>
   <main class="admin-main">
-    <header class="admin-topbar"><div><span>Administration</span><h1><?= e($title) ?></h1></div></header>
+    <header class="admin-topbar">
+      <div><span>Administration</span><h1><?= e($title) ?></h1></div>
+      <a class="admin-notification <?= $newQuoteCount > 0 ? 'has-alert' : '' ?>" href="devis.php?status=new" aria-label="<?= $newQuoteCount > 0 ? e($newQuoteCount . ' nouvelle(s) demande(s) de devis') : 'Aucune nouvelle demande' ?>" title="Nouvelles demandes de devis">
+        <span class="admin-notification__icon" aria-hidden="true">🔔</span>
+        <?php if ($newQuoteCount > 0): ?><span class="admin-notification__count"><?= $newQuoteCount ?></span><?php endif; ?>
+      </a>
+    </header>
 <?php
 }
 
