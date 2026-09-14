@@ -12,100 +12,79 @@
     'Écran & projecteur'
   ];
 
-  function buildGroup(title, items, className) {
+  function createChoice(value, checked = false) {
+    const label = document.createElement('label');
+    const input = document.createElement('input');
+    const span = document.createElement('span');
+    input.type = 'checkbox';
+    input.name = 'selections[]';
+    input.value = value;
+    input.checked = checked;
+    span.textContent = value;
+    label.append(input, span);
+    return label;
+  }
+
+  function buildGroup(title, items, className, checkedValues) {
     const fieldset = document.createElement('fieldset');
     fieldset.className = `home-quote__group home-quote__group--full ${className}`;
-    fieldset.innerHTML = `
-      <legend>${title}</legend>
-      <div class="home-quote__checks">
-        ${items.map(item => `<label><input type="checkbox" name="selections[]" value="${item}"><span>${item}</span></label>`).join('')}
-      </div>
-    `;
+    const legend = document.createElement('legend');
+    legend.textContent = title;
+    const checks = document.createElement('div');
+    checks.className = 'home-quote__checks';
+    items.forEach((item) => checks.appendChild(createChoice(item, checkedValues.has(item))));
+    fieldset.append(legend, checks);
     return fieldset;
   }
 
-  function syncGroup(group, allowedValues) {
-    if (!group) return;
-    const checked = new Set(
-      [...document.querySelectorAll('.home-quote__form input[name="selections[]"]:checked')]
-        .map(input => input.value)
-    );
-
-    const checks = group.querySelector('.home-quote__checks');
-    if (!checks) return;
-
-    checks.replaceChildren(...allowedValues.map((value) => {
-      const label = document.createElement('label');
-      const input = document.createElement('input');
-      const span = document.createElement('span');
-      input.type = 'checkbox';
-      input.name = 'selections[]';
-      input.value = value;
-      input.checked = checked.has(value);
-      span.textContent = value;
-      label.append(input, span);
-      return label;
-    }));
-  }
-
-  let syncing = false;
-
-  function upgradeHomeForm() {
-    if (syncing) return;
+  function prepareHomeForm() {
     const form = document.querySelector('.home-quote__form');
-    if (!form) return;
+    if (!form) return false;
 
     const budget = form.querySelector('select[name="budget"]');
     if (budget) budget.closest('.home-quote__field')?.remove();
 
-    syncing = true;
-    try {
-      let formulaGroup = form.querySelector('.home-quote__group--formulas');
-      let optionGroup = form.querySelector('.home-quote__group--options');
+    if (!form.querySelector('.home-quote__group--formulas') || !form.querySelector('.home-quote__group--options')) {
+      const existingGroup = [...form.querySelectorAll('.home-quote__group')].find((group) =>
+        group.querySelector('input[name="selections[]"]')
+      );
+      if (!existingGroup) return false;
 
-      if (!formulaGroup || !optionGroup) {
-        const existingGroup = [...form.querySelectorAll('.home-quote__group')].find(group =>
-          group.querySelector('input[name="selections[]"]')
-        );
-        if (!existingGroup) return;
-
-        const checked = new Set([...existingGroup.querySelectorAll('input[name="selections[]"]:checked')].map(input => input.value));
-        formulaGroup = buildGroup('Choisissez votre formule *', FORMULAS, 'home-quote__group--formulas');
-        optionGroup = buildGroup('Packs & options complémentaires', OPTIONS, 'home-quote__group--options');
-        formulaGroup.querySelectorAll('input').forEach(input => { input.checked = checked.has(input.value); });
-        optionGroup.querySelectorAll('input').forEach(input => { input.checked = checked.has(input.value); });
-        existingGroup.replaceWith(formulaGroup, optionGroup);
-      } else {
-        syncGroup(formulaGroup, FORMULAS);
-        syncGroup(optionGroup, OPTIONS);
-      }
-
-      if (form.dataset.selectionGuardReady !== '1') {
-        form.dataset.selectionGuardReady = '1';
-        form.addEventListener('submit', (event) => {
-          const formulaChecked = FORMULAS.some(value => form.querySelector(`.home-quote__group--formulas input[name="selections[]"][value="${value}"]:checked`));
-          if (formulaChecked) return;
-
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          const message = document.querySelector('.home-quote__message');
-          if (message) {
-            message.className = 'home-quote__message is-error';
-            message.textContent = 'Merci de choisir une formule : Essentiel, Ambiance ou Expérience.';
-            message.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-          form.querySelector('.home-quote__group--formulas')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, true);
-      }
-    } finally {
-      syncing = false;
+      const checkedValues = new Set(
+        [...existingGroup.querySelectorAll('input[name="selections[]"]:checked')].map((input) => input.value)
+      );
+      const formulaGroup = buildGroup('Choisissez votre formule *', FORMULAS, 'home-quote__group--formulas', checkedValues);
+      const optionGroup = buildGroup('Packs & options complémentaires', OPTIONS, 'home-quote__group--options', checkedValues);
+      existingGroup.replaceWith(formulaGroup, optionGroup);
     }
+
+    if (form.dataset.selectionGuardReady !== '1') {
+      form.dataset.selectionGuardReady = '1';
+      form.addEventListener('submit', (event) => {
+        const hasFormula = [...form.querySelectorAll('.home-quote__group--formulas input[name="selections[]"]:checked')]
+          .some((input) => FORMULAS.includes(input.value));
+        if (hasFormula) return;
+
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        const message = document.querySelector('.home-quote__message');
+        if (message) {
+          message.className = 'home-quote__message is-error';
+          message.textContent = 'Merci de choisir une formule : Essentiel, Ambiance ou Expérience.';
+          message.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        form.querySelector('.home-quote__group--formulas')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, true);
+    }
+
+    return true;
   }
 
+  if (prepareHomeForm()) return;
+
   const observer = new MutationObserver(() => {
-    window.clearTimeout(observer._timer);
-    observer._timer = window.setTimeout(upgradeHomeForm, 20);
+    if (!prepareHomeForm()) return;
+    observer.disconnect();
   });
   observer.observe(document.documentElement, { childList: true, subtree: true });
-  upgradeHomeForm();
 })();
