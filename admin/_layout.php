@@ -14,7 +14,6 @@ function admin_header(string $title, string $active = ''): void
         'Gestion' => [
             'dashboard' => ['Tableau de bord', 'index.php'],
             'devis' => ['Demandes de devis', 'devis.php'],
-            'finances' => ['Finances', 'finances.php'],
         ],
         'Site' => [
             'contenu' => ['Contenu du site', 'contenu.php'],
