@@ -136,7 +136,6 @@
         }
       });
 
-      // Ces deux choix doivent toujours rester disponibles dans le formulaire.
       quoteValues.push('Photobooth 150 tirages', 'Photobooth 300 tirages');
 
       [...new Set(quoteValues)].forEach((quoteTitle) => {
@@ -267,7 +266,10 @@
         const monthName = normalize(row.querySelector('.availability__month-name')?.textContent || '');
         const month = monthNumbers[monthName];
         if (!month) return;
-        const status = availability[yearText][String(month)];
+
+        const entry = availability[yearText][String(month)];
+        const status = typeof entry === 'string' ? entry : String(entry?.status || '');
+        const dates = typeof entry === 'object' && entry ? String(entry.dates || '').trim() : '';
         const meta = statusMeta[status];
         if (!meta) return;
 
@@ -277,6 +279,14 @@
         const label = row.querySelector('.availability__status');
         if (icon) icon.textContent = meta.icon;
         if (label) label.textContent = meta.label;
+
+        row.querySelector('.availability__dates')?.remove();
+        if (status === 'limited' && dates) {
+          const datesEl = document.createElement('span');
+          datesEl.className = 'availability__dates';
+          datesEl.textContent = dates;
+          row.appendChild(datesEl);
+        }
       });
     });
   }
@@ -337,7 +347,6 @@
       // Le site garde son contenu HTML par défaut si l'administration n'est pas disponible.
     });
 
-  // Statistiques anonymes : une même personne n'est comptée qu'une fois par jour.
   fetch('api/visit.php', {
     method: 'POST',
     credentials: 'same-origin',
