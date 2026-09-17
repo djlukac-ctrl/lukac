@@ -50,11 +50,30 @@ admin_header('Disponibilités', 'disponibilites');
 ?>
 <?php if ($saved): ?><div class="flash flash--success">Les disponibilités ont bien été mises à jour sur le site.</div><?php endif; ?>
 <style>
-.availability-row{grid-template-columns:minmax(110px,.7fr) minmax(190px,1fr) minmax(240px,1.4fr)!important;align-items:end}
-.availability-dates{display:grid;gap:6px}.availability-dates label{font-size:10px;color:#77706a}.availability-dates input{width:100%}
+.availability-row{
+  display:grid!important;
+  grid-template-columns:minmax(90px,120px) minmax(0,1fr)!important;
+  gap:10px 14px!important;
+  align-items:center!important;
+}
+.availability-row>label{margin:0!important}
+.availability-row>select{width:100%;min-width:0}
+.availability-dates{
+  grid-column:1/-1;
+  display:none;
+  grid-template-columns:1fr;
+  gap:6px;
+  padding:12px 0 2px;
+  border-top:1px dashed rgba(24,23,22,.10);
+}
+.availability-row.is-limited .availability-dates{display:grid}
+.availability-dates label{font-size:10px;color:#77706a;font-weight:600}
+.availability-dates input{width:100%;min-width:0;box-sizing:border-box}
 .availability-dates small{color:#8b847d;font-size:10px;line-height:1.35}
-.availability-row:not(.is-limited) .availability-dates{opacity:.48}.availability-row:not(.is-limited) .availability-dates input{pointer-events:none;background:#f3f1ee}
-@media(max-width:760px){.availability-row{grid-template-columns:1fr!important}.availability-dates{opacity:1!important}.availability-row:not(.is-limited) .availability-dates{display:none}}
+@media(max-width:760px){
+  .availability-row{grid-template-columns:1fr!important;gap:8px!important}
+  .availability-dates{grid-column:1}
+}
 </style>
 <form method="post" class="admin-form" id="availability-form">
   <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
@@ -73,7 +92,7 @@ admin_header('Disponibilités', 'disponibilites');
             <div class="availability-dates">
               <label for="d-<?= $year ?>-<?= $month ?>">Dates encore disponibles</label>
               <input id="d-<?= $year ?>-<?= $month ?>" name="dates[<?= $year ?>][<?= $month ?>]" maxlength="120" value="<?= e($currentDates[$year][$month] ?? '') ?>" placeholder="Ex. Samedis 3, 10 et 24">
-              <small>Affiché uniquement si le mois est en « Quelques disponibilités ».</small>
+              <small>Ce texte sera affiché sur le site uniquement pour ce mois.</small>
             </div>
           </div>
         <?php endforeach; ?>
