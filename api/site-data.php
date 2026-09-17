@@ -4,8 +4,11 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, max-age=0');
 
 $availability = [];
-foreach (db()->query('SELECT year, month, status FROM availability ORDER BY year, month')->fetchAll() as $row) {
-    $availability[(string)$row['year']][(string)$row['month']] = $row['status'];
+foreach (db()->query('SELECT year, month, status, note FROM availability ORDER BY year, month')->fetchAll() as $row) {
+    $availability[(string)$row['year']][(string)$row['month']] = [
+        'status' => $row['status'],
+        'dates' => $row['status'] === 'limited' ? trim((string)($row['note'] ?? '')) : '',
+    ];
 }
 
 $reviews = db()->query('SELECT id, client_name, review_text, rating, review_date FROM reviews WHERE published = 1 ORDER BY display_order ASC, review_date DESC, id DESC LIMIT 3')->fetchAll();
