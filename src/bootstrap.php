@@ -255,6 +255,10 @@ function quote_status_label(string $status): string
     return [
         'new' => 'Nouveau',
         'read' => 'Lu',
+        'sent' => 'Envoyé',
+        'accepted' => 'Accepté',
+        'refused' => 'Refusé',
+        // Compatibilité avec les anciens statuts déjà enregistrés.
         'contacted' => 'Contacté',
         'quote_sent' => 'Devis envoyé',
         'booked' => 'Réservé',
