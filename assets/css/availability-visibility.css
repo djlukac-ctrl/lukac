@@ -15,6 +15,7 @@
 .availability__icon{width:27px;height:27px;font-size:12px;background:rgba(255,255,255,.72)}
 .availability__month-name{font-size:14px!important;color:#231f1b!important;font-weight:700!important}
 .availability__status{font-size:9px;font-weight:800;letter-spacing:.09em;padding:7px 10px;border-radius:999px;white-space:nowrap}
+.availability__dates{grid-column:2/-1;display:block;margin-top:-4px;padding:0 2px 3px;color:#8e611b;font-size:10px;font-weight:700;line-height:1.45}
 
 .availability__month--open{color:#5f7d45;background:#f4f8ef;border-color:#cfddc3}
 .availability__month--open .availability__icon{color:#5f7d45;background:#edf5e7;box-shadow:0 0 0 4px rgba(95,125,69,.04)}
@@ -49,6 +50,7 @@ main{display:flex;flex-direction:column}
   .availability__year{padding:20px 16px}
   .availability__month{grid-template-columns:32px 1fr;padding:10px;margin:5px 0}
   .availability__status{grid-column:2;text-align:left;width:max-content;margin:2px 0 0;padding:6px 9px}
+  .availability__dates{grid-column:2;margin-top:0;padding:0 0 2px;font-size:10px}
   .availability__month-name{font-size:13px!important}
   .availability__legend{width:100%}
   .availability__legend span{width:100%;justify-content:flex-start}
