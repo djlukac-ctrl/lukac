@@ -30,8 +30,10 @@ th,td{border-bottom-color:rgba(24,23,22,.07)}
 .status{background:#eee9e2;color:#5f5953}
 .status--new{color:#a92725;background:rgba(201,52,49,.10)}
 .status--read{color:#69635d}
+.status--sent,.status--quote_sent{color:#7b684d;background:#f0ebe3}
+.status--accepted,.status--booked{color:#3f6f2d;background:#eaf5e4}
+.status--refused{color:#a93f3a;background:#fde9e7}
 .status--contacted{color:#9b650f;background:#fff4dd}
-.status--booked{color:#4f7d3d;background:#eef7e9}
 .status--archived{color:#817a73;background:#eeeae5}
 .field input,.field textarea,.field select,.availability-row select{background:#faf8f5;color:#181716;border-color:rgba(24,23,22,.12)}
 .field input:focus,.field textarea:focus,.field select:focus{border-color:rgba(201,52,49,.42);box-shadow:0 0 0 3px rgba(201,52,49,.06)}
