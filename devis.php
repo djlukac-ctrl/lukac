@@ -11,6 +11,7 @@ $values = [
 ];
 $selectedServices = [];
 $selectedSelections = [];
+$selectedSpark = '';
 
 $serviceOptions = ['DJ', 'Animations', 'Karaoké', "Sonorisation de vin d’honneur et cérémonie laïque"];
 $formulaOptions = ['Essentiel', 'Ambiance', 'Expérience'];
@@ -149,14 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <legend>Options complémentaires</legend>
           <div class="quote-checks">
             <?php foreach($extraOptions as $option): ?><label class="quote-check"><input type="checkbox" name="selections[]" value="<?= e($option) ?>" <?= in_array($option,$selectedSelections,true)?'checked':'' ?>><span><?= e($option) ?></span></label><?php endforeach; ?>
-          </div>
-        </fieldset>
-
-        <fieldset class="quote-group">
-          <legend>Étincelles froides</legend>
-          <div class="quote-checks">
-            <label class="quote-check"><input type="radio" name="spark_option" value="" <?= !isset($selectedSpark) || $selectedSpark===''?'checked':'' ?>><span>Sans étincelles froides</span></label>
-            <?php foreach($sparkOptions as $option): ?><label class="quote-check"><input type="radio" name="spark_option" value="<?= e($option) ?>" <?= isset($selectedSpark) && $selectedSpark===$option?'checked':'' ?>><span><?= e($option) ?></span></label><?php endforeach; ?>
+            <?php foreach($sparkOptions as $option): ?><label class="quote-check"><input type="radio" name="spark_option" value="<?= e($option) ?>" <?= $selectedSpark===$option?'checked':'' ?>><span><?= e($option) ?></span></label><?php endforeach; ?>
           </div>
         </fieldset>
 
