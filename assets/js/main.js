@@ -117,7 +117,13 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
         <fieldset class="home-quote__group home-quote__group--full home-quote__group--options">
           <legend>Options complémentaires</legend>
           <div class="home-quote__checks">
-            ${['Photobooth 150 tirages','Photobooth 300 tirages',"Livre d'or audio",'Fumée lourde','Étincelles froides','Éclairage mural','Écran & projecteur'].map(item => `<label><input type="checkbox" name="selections[]" value="${item}" ${item === 'Étincelles froides' ? 'id="home-spark-toggle"' : ''}><span>${item}</span></label>`).join('')}
+            <label><input type="checkbox" name="selections[]" value="Photobooth 150 tirages"><span>Photobooth 150 tirages</span></label>
+            <label><input type="checkbox" name="selections[]" value="Photobooth 300 tirages"><span>Photobooth 300 tirages</span></label>
+            <label><input type="checkbox" name="selections[]" value="Livre d'or audio"><span>Livre d'or audio</span></label>
+            <label><input type="checkbox" name="selections[]" value="Fumée lourde"><span>Fumée lourde</span></label>
+            <label><input type="checkbox" id="home-spark-toggle" name="selections[]" value="Étincelles froides"><span>Étincelles froides</span></label>
+            <label><input type="checkbox" name="selections[]" value="Éclairage mural"><span>Éclairage mural</span></label>
+            <label><input type="checkbox" name="selections[]" value="Écran & projecteur"><span>Écran & projecteur</span></label>
           </div>
           <div class="home-quote__spark-options" id="home-spark-options" hidden>
             <span>Nombre de jets souhaité</span>
