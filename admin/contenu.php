@@ -97,11 +97,6 @@ $pages = [
         'description' => 'Introduction et contenu des formules Essentiel, Ambiance et Expérience.',
         'groups' => ['Formules — introduction', 'Formule Essentiel', 'Formule Ambiance', 'Formule Expérience'],
     ],
-    'packs' => [
-        'label' => 'Packs',
-        'description' => 'Contenu et visuels des packs Instant Magique.',
-        'groups' => ['Pack Instant Magique', 'Pack Instant Magique Signature'],
-    ],
 ];
 
 $page = (string)($_GET['page'] ?? $_POST['page'] ?? 'accueil');
