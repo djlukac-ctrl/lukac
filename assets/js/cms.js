@@ -130,7 +130,7 @@
         if (!title) return;
         const normalized = title.toLowerCase().replace(/\s+/g, ' ').trim();
         if (normalized === 'photobooth') {
-          quoteValues.push('Photobooth 150 tirages', 'Photobooth 300 tirages');
+          quoteValues.push('Photobooth');
         } else if (
           normalized !== 'photobooth 150 tirages' &&
           normalized !== 'photobooth 300 tirages' &&
@@ -141,7 +141,7 @@
         }
       });
 
-      quoteValues.push('Photobooth 150 tirages', 'Photobooth 300 tirages');
+      quoteValues.push('Photobooth');
 
       [...new Set(quoteValues)].forEach((quoteTitle) => {
         const label = document.createElement('label');
