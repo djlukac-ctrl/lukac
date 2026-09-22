@@ -118,13 +118,6 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
           <legend>Options complémentaires</legend>
           <div class="home-quote__checks">
             ${['Photobooth 150 tirages','Photobooth 300 tirages',"Livre d'or audio",'Fumée lourde','Éclairage mural','Écran & projecteur'].map(item => `<label><input type="checkbox" name="selections[]" value="${item}"><span>${item}</span></label>`).join('')}
-          </div>
-        </fieldset>
-
-        <fieldset class="home-quote__group home-quote__group--full home-quote__group--sparks">
-          <legend>Étincelles froides</legend>
-          <div class="home-quote__checks">
-            <label><input type="radio" name="spark_option" value="" checked><span>Sans étincelles froides</span></label>
             <label><input type="radio" name="spark_option" value="Étincelles froides — 2 jets"><span>Étincelles froides — 2 jets</span></label>
             <label><input type="radio" name="spark_option" value="Étincelles froides — 4 jets"><span>Étincelles froides — 4 jets</span></label>
           </div>
