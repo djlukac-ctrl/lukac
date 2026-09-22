@@ -117,9 +117,14 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
         <fieldset class="home-quote__group home-quote__group--full home-quote__group--options">
           <legend>Options complémentaires</legend>
           <div class="home-quote__checks">
-            ${['Photobooth 150 tirages','Photobooth 300 tirages',"Livre d'or audio",'Fumée lourde','Éclairage mural','Écran & projecteur'].map(item => `<label><input type="checkbox" name="selections[]" value="${item}"><span>${item}</span></label>`).join('')}
-            <label><input type="radio" name="spark_option" value="Étincelles froides — 2 jets"><span>Étincelles froides — 2 jets</span></label>
-            <label><input type="radio" name="spark_option" value="Étincelles froides — 4 jets"><span>Étincelles froides — 4 jets</span></label>
+            ${['Photobooth 150 tirages','Photobooth 300 tirages',"Livre d'or audio",'Fumée lourde','Étincelles froides','Éclairage mural','Écran & projecteur'].map(item => `<label><input type="checkbox" name="selections[]" value="${item}" ${item === 'Étincelles froides' ? 'id="home-spark-toggle"' : ''}><span>${item}</span></label>`).join('')}
+          </div>
+          <div class="home-quote__spark-options" id="home-spark-options" hidden>
+            <span>Nombre de jets souhaité</span>
+            <div class="home-quote__spark-choices">
+              <label><input type="radio" name="spark_option" value="Étincelles froides — 2 jets"><span>2 jets</span></label>
+              <label><input type="radio" name="spark_option" value="Étincelles froides — 4 jets"><span>4 jets</span></label>
+            </div>
           </div>
         </fieldset>
 
@@ -161,6 +166,19 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
   const csrfInput = quoteForm.querySelector('input[name="csrf"]');
   const quoteMessage = quoteSection.querySelector('.home-quote__message');
   const quoteButton = quoteForm.querySelector('button[type="submit"]');
+  const sparkToggle = quoteForm.querySelector('#home-spark-toggle');
+  const sparkOptions = quoteForm.querySelector('#home-spark-options');
+
+  if (sparkToggle && sparkOptions) {
+    const updateSparkOptions = () => {
+      sparkOptions.hidden = !sparkToggle.checked;
+      if (!sparkToggle.checked) {
+        sparkOptions.querySelectorAll('input[type="radio"]').forEach(input => input.checked = false);
+      }
+    };
+    sparkToggle.addEventListener('change', updateSparkOptions);
+    updateSparkOptions();
+  }
 
   async function loadCsrfToken() {
     try {
