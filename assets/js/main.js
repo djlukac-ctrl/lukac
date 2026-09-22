@@ -117,8 +117,6 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
         <fieldset class="home-quote__group home-quote__group--full home-quote__group--options">
           <legend>Options complémentaires</legend>
           <div class="home-quote__checks">
-            <label><input type="checkbox" name="selections[]" value="Photobooth 150 tirages"><span>Photobooth 150 tirages</span></label>
-            <label><input type="checkbox" name="selections[]" value="Photobooth 300 tirages"><span>Photobooth 300 tirages</span></label>
             <label><input type="checkbox" name="selections[]" value="Livre d'or audio"><span>Livre d'or audio</span></label>
             <label><input type="checkbox" name="selections[]" value="Fumée lourde"><span>Fumée lourde</span></label>
             <label><input type="checkbox" name="selections[]" value="Étincelles froides — 2 jets"><span>Étincelles froides — 2 jets</span></label>
