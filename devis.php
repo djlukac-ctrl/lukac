@@ -15,11 +15,11 @@ $selectedSelections = [];
 $serviceOptions = ['DJ', 'Animations', 'Karaoké', "Sonorisation de vin d’honneur et cérémonie laïque"];
 $formulaOptions = ['Essentiel', 'Ambiance', 'Expérience'];
 $extraOptions = [
-    'Pack Instant Magique', 'Pack Instant Magique Signature',
     'Photobooth 150 tirages', 'Photobooth 300 tirages',
     "Livre d'or audio",
-    'Fumée lourde', 'Étincelles froides', 'Éclairage mural', 'Écran & projecteur'
+    'Fumée lourde', 'Éclairage mural', 'Écran & projecteur'
 ];
+$sparkOptions = ['Étincelles froides — 2 jets', 'Étincelles froides — 4 jets'];
 $selectionOptions = array_merge($formulaOptions, $extraOptions);
 $eventOptions = ['Mariage', 'Anniversaire', 'Baptême', 'Retraite', 'Autre'];
 
@@ -30,6 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $selectedServices = array_values(array_intersect($serviceOptions, array_map('strval', (array)($_POST['services'] ?? []))));
     $selectedSelections = array_values(array_intersect($selectionOptions, array_map('strval', (array)($_POST['selections'] ?? []))));
+    $selectedSpark = (string)($_POST['spark_option'] ?? '');
+    if (in_array($selectedSpark, $sparkOptions, true)) {
+        $selectedSelections[] = $selectedSpark;
+    }
     $selectedFormulas = array_values(array_intersect($formulaOptions, $selectedSelections));
     $honeypot = trim((string)($_POST['company'] ?? ''));
 
@@ -142,9 +146,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </fieldset>
 
         <fieldset class="quote-group">
-          <legend>Packs & options complémentaires</legend>
+          <legend>Options complémentaires</legend>
           <div class="quote-checks">
             <?php foreach($extraOptions as $option): ?><label class="quote-check"><input type="checkbox" name="selections[]" value="<?= e($option) ?>" <?= in_array($option,$selectedSelections,true)?'checked':'' ?>><span><?= e($option) ?></span></label><?php endforeach; ?>
+          </div>
+        </fieldset>
+
+        <fieldset class="quote-group">
+          <legend>Étincelles froides</legend>
+          <div class="quote-checks">
+            <label class="quote-check"><input type="radio" name="spark_option" value="" <?= !isset($selectedSpark) || $selectedSpark===''?'checked':'' ?>><span>Sans étincelles froides</span></label>
+            <?php foreach($sparkOptions as $option): ?><label class="quote-check"><input type="radio" name="spark_option" value="<?= e($option) ?>" <?= isset($selectedSpark) && $selectedSpark===$option?'checked':'' ?>><span><?= e($option) ?></span></label><?php endforeach; ?>
           </div>
         </fieldset>
 
