@@ -107,10 +107,26 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
           </div>
         </fieldset>
 
-        <fieldset class="home-quote__group home-quote__group--full">
-          <legend>Quelle formule, quel pack ou quelle option avez-vous choisi ? *</legend>
+        <fieldset class="home-quote__group home-quote__group--full home-quote__group--formulas">
+          <legend>Choisissez votre formule *</legend>
           <div class="home-quote__checks">
-            ${['Essentiel','Ambiance','Expérience','Pack Instant Magique','Pack Instant Magique Signature','Fumée lourde','Étincelles froides','Éclairage mural','Écran & projecteur'].map(item => `<label><input type="checkbox" name="selections[]" value="${item}"><span>${item}</span></label>`).join('')}
+            ${['Essentiel','Ambiance','Expérience'].map(item => `<label><input type="checkbox" name="selections[]" value="${item}"><span>${item}</span></label>`).join('')}
+          </div>
+        </fieldset>
+
+        <fieldset class="home-quote__group home-quote__group--full home-quote__group--options">
+          <legend>Options complémentaires</legend>
+          <div class="home-quote__checks">
+            ${['Photobooth 150 tirages','Photobooth 300 tirages',"Livre d'or audio",'Fumée lourde','Éclairage mural','Écran & projecteur'].map(item => `<label><input type="checkbox" name="selections[]" value="${item}"><span>${item}</span></label>`).join('')}
+          </div>
+        </fieldset>
+
+        <fieldset class="home-quote__group home-quote__group--full home-quote__group--sparks">
+          <legend>Étincelles froides</legend>
+          <div class="home-quote__checks">
+            <label><input type="radio" name="spark_option" value="" checked><span>Sans étincelles froides</span></label>
+            <label><input type="radio" name="spark_option" value="Étincelles froides — 2 jets"><span>Étincelles froides — 2 jets</span></label>
+            <label><input type="radio" name="spark_option" value="Étincelles froides — 4 jets"><span>Étincelles froides — 4 jets</span></label>
           </div>
         </fieldset>
 
@@ -177,7 +193,7 @@ if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestat
     const selectionsChecked = quoteForm.querySelectorAll('input[name="selections[]"]:checked').length;
     if (!servicesChecked || !selectionsChecked) {
       quoteMessage.className = 'home-quote__message is-error';
-      quoteMessage.textContent = 'Merci de sélectionner au moins une prestation et une formule, un pack ou une option.';
+      quoteMessage.textContent = 'Merci de sélectionner au moins une prestation et une formule.';
       quoteMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
