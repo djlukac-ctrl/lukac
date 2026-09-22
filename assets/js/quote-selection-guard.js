@@ -5,6 +5,7 @@
     'Photobooth 300 tirages',
     "Livre d'or audio",
     'Fumée lourde',
+    'Étincelles froides',
     'Éclairage mural',
     'Écran & projecteur'
   ];
