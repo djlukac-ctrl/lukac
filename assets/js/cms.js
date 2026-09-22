@@ -135,8 +135,7 @@
           normalized !== 'photobooth 150 tirages' &&
           normalized !== 'photobooth 300 tirages' &&
           normalized !== 'pack instant magique' &&
-          normalized !== 'pack instant magique signature' &&
-          normalized !== 'étincelles froides'
+          normalized !== 'pack instant magique signature'
         ) {
           quoteValues.push(title);
         }
