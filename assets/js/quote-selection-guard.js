@@ -1,8 +1,14 @@
 (() => {
+  if (!document.getElementById('quote-dependent-styles')) {
+    const style = document.createElement('style');
+    style.id = 'quote-dependent-styles';
+    style.textContent = '.home-quote__dependent{grid-column:1/-1;display:flex;gap:10px;margin:-2px 0 4px 22px;padding:10px 12px;border-left:2px solid #c93431}.home-quote__dependent[hidden]{display:none}.home-quote__dependent label{display:flex;align-items:center;gap:8px;padding:9px 13px;border:1px solid rgba(24,23,22,.10);border-radius:10px;background:#fff;font-size:12px;cursor:pointer}.home-quote__dependent input{width:16px;height:16px;margin:0;accent-color:#c93431}@media(max-width:700px){.home-quote__dependent{margin-left:10px;flex-direction:column}}';
+    document.head.appendChild(style);
+  }
+
   const FORMULAS = ['Essentiel', 'Ambiance', 'Expérience'];
   const OPTIONS = [
-    'Photobooth 150 tirages',
-    'Photobooth 300 tirages',
+    'Photobooth',
     "Livre d'or audio",
     'Fumée lourde',
     'Étincelles froides',
@@ -55,6 +61,68 @@
     });
   }
 
+  function ensureDependentChoices(form) {
+    const optionChecks = form.querySelector('.home-quote__group--options .home-quote__checks');
+    if (!optionChecks) return;
+
+    const configs = [
+      {
+        value: 'Étincelles froides',
+        name: 'spark_option',
+        choices: [
+          ['Étincelles froides — 2 jets', '2 jets'],
+          ['Étincelles froides — 4 jets', '4 jets']
+        ]
+      },
+      {
+        value: 'Photobooth',
+        name: 'photobooth_option',
+        choices: [
+          ['Photobooth 150 tirages', '150 tirages'],
+          ['Photobooth 300 tirages', '300 tirages']
+        ]
+      }
+    ];
+
+    configs.forEach((config) => {
+      const parent = [...optionChecks.querySelectorAll('input[name="selections[]"]')]
+        .find((input) => input.value === config.value);
+      if (!parent) return;
+
+      const parentLabel = parent.closest('label');
+      let choices = optionChecks.querySelector('[data-dependent-for="' + config.name + '"]');
+      if (!choices) {
+        choices = document.createElement('div');
+        choices.className = 'home-quote__dependent';
+        choices.dataset.dependentFor = config.name;
+        config.choices.forEach(([value, text]) => {
+          const label = document.createElement('label');
+          const input = document.createElement('input');
+          const span = document.createElement('span');
+          input.type = 'radio';
+          input.name = config.name;
+          input.value = value;
+          span.textContent = text;
+          label.append(input, span);
+          choices.appendChild(label);
+        });
+        parentLabel.insertAdjacentElement('afterend', choices);
+      }
+
+      const sync = () => {
+        choices.hidden = !parent.checked;
+        if (!parent.checked) {
+          choices.querySelectorAll('input[type="radio"]').forEach((input) => input.checked = false);
+        }
+      };
+      if (parent.dataset.dependentReady !== '1') {
+        parent.dataset.dependentReady = '1';
+        parent.addEventListener('change', sync);
+      }
+      sync();
+    });
+  }
+
   function prepareHomeForm() {
     const form = document.querySelector('.home-quote__form');
     if (!form) return false;
@@ -77,6 +145,7 @@
     }
 
     moveMisplacedOptions(form);
+    ensureDependentChoices(form);
 
     if (form.dataset.selectionGuardReady !== '1') {
       form.dataset.selectionGuardReady = '1';
@@ -107,6 +176,7 @@
       return;
     }
     moveMisplacedOptions(form);
+    ensureDependentChoices(form);
   });
 
   observer.observe(document.documentElement, { childList: true, subtree: true });
