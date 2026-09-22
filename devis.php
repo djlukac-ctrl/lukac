@@ -18,7 +18,7 @@ $formulaOptions = ['Essentiel', 'Ambiance', 'Expérience'];
 $extraOptions = [
     'Photobooth 150 tirages', 'Photobooth 300 tirages',
     "Livre d'or audio",
-    'Fumée lourde', 'Éclairage mural', 'Écran & projecteur'
+    'Fumée lourde', 'Étincelles froides', 'Éclairage mural', 'Écran & projecteur'
 ];
 $sparkOptions = ['Étincelles froides — 2 jets', 'Étincelles froides — 4 jets'];
 $selectionOptions = array_merge($formulaOptions, $extraOptions);
@@ -32,8 +32,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $selectedServices = array_values(array_intersect($serviceOptions, array_map('strval', (array)($_POST['services'] ?? []))));
     $selectedSelections = array_values(array_intersect($selectionOptions, array_map('strval', (array)($_POST['selections'] ?? []))));
     $selectedSpark = (string)($_POST['spark_option'] ?? '');
-    if (in_array($selectedSpark, $sparkOptions, true)) {
+    $sparkSelected = in_array('Étincelles froides', $selectedSelections, true);
+    if ($sparkSelected && in_array($selectedSpark, $sparkOptions, true)) {
         $selectedSelections[] = $selectedSpark;
+    } else {
+        $selectedSpark = '';
     }
     $selectedFormulas = array_values(array_intersect($formulaOptions, $selectedSelections));
     $honeypot = trim((string)($_POST['company'] ?? ''));
@@ -149,8 +152,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <fieldset class="quote-group">
           <legend>Options complémentaires</legend>
           <div class="quote-checks">
-            <?php foreach($extraOptions as $option): ?><label class="quote-check"><input type="checkbox" name="selections[]" value="<?= e($option) ?>" <?= in_array($option,$selectedSelections,true)?'checked':'' ?>><span><?= e($option) ?></span></label><?php endforeach; ?>
-            <?php foreach($sparkOptions as $option): ?><label class="quote-check"><input type="radio" name="spark_option" value="<?= e($option) ?>" <?= $selectedSpark===$option?'checked':'' ?>><span><?= e($option) ?></span></label><?php endforeach; ?>
+            <?php foreach($extraOptions as $option): ?>
+              <label class="quote-check"><input type="checkbox" name="selections[]" value="<?= e($option) ?>" <?= in_array($option,$selectedSelections,true)?'checked':'' ?> <?= $option==='Étincelles froides'?'id="spark-toggle"':'' ?>><span><?= e($option) ?></span></label>
+            <?php endforeach; ?>
+          </div>
+          <div id="spark-quantity" class="quote-checks" style="margin-top:10px;<?= in_array('Étincelles froides',$selectedSelections,true)?'':'display:none;' ?>">
+            <?php foreach($sparkOptions as $option): ?><label class="quote-check"><input type="radio" name="spark_option" value="<?= e($option) ?>" <?= $selectedSpark===$option?'checked':'' ?>><span><?= e(str_replace('Étincelles froides — ','',$option)) ?></span></label><?php endforeach; ?>
           </div>
         </fieldset>
 
@@ -162,4 +169,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </main>
 <footer class="site-footer"><a class="brand brand--footer" href="index.html"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo brand__logo--footer"></a><p>DJ & animateur événementiel</p><div class="site-footer__links"><a href="index.html#prestations">Prestations</a><a href="index.html#formules">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a></div><small>© 2026 Luka C • Tous droits réservés</small></footer>
 <script src="assets/js/main.js"></script>
+<script>
+  const sparkToggle = document.getElementById('spark-toggle');
+  const sparkQuantity = document.getElementById('spark-quantity');
+  if (sparkToggle && sparkQuantity) {
+    const updateSparkOptions = () => {
+      sparkQuantity.style.display = sparkToggle.checked ? 'grid' : 'none';
+      if (!sparkToggle.checked) {
+        sparkQuantity.querySelectorAll('input[type="radio"]').forEach(input => input.checked = false);
+      }
+    };
+    sparkToggle.addEventListener('change', updateSparkOptions);
+    updateSparkOptions();
+  }
+</script>
 </body></html>
