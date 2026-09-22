@@ -115,8 +115,8 @@
       const inputs = [...form.querySelectorAll('input[name="selections[]"]')];
       if (!inputs.length) return false;
 
-      const baseValues = new Set(['Essentiel', 'Ambiance', 'Expérience', 'Pack Instant Magique', 'Pack Instant Magique Signature']);
-      const container = inputs[0].closest('.home-quote__checks');
+      const baseValues = new Set(['Essentiel', 'Ambiance', 'Expérience']);
+      const container = form.querySelector('.home-quote__group--options .home-quote__checks') || inputs[0].closest('.home-quote__checks');
       if (!container) return false;
 
       [...container.querySelectorAll('label')].forEach((label) => {
@@ -131,7 +131,13 @@
         const normalized = title.toLowerCase().replace(/\s+/g, ' ').trim();
         if (normalized === 'photobooth') {
           quoteValues.push('Photobooth 150 tirages', 'Photobooth 300 tirages');
-        } else if (normalized !== 'photobooth 150 tirages' && normalized !== 'photobooth 300 tirages') {
+        } else if (
+          normalized !== 'photobooth 150 tirages' &&
+          normalized !== 'photobooth 300 tirages' &&
+          normalized !== 'pack instant magique' &&
+          normalized !== 'pack instant magique signature' &&
+          normalized !== 'étincelles froides'
+        ) {
           quoteValues.push(title);
         }
       });
