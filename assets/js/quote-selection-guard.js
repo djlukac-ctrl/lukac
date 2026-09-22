@@ -1,13 +1,10 @@
 (() => {
   const FORMULAS = ['Essentiel', 'Ambiance', 'Expérience'];
   const OPTIONS = [
-    'Pack Instant Magique',
-    'Pack Instant Magique Signature',
     'Photobooth 150 tirages',
     'Photobooth 300 tirages',
     "Livre d'or audio",
     'Fumée lourde',
-    'Étincelles froides',
     'Éclairage mural',
     'Écran & projecteur'
   ];
@@ -74,7 +71,7 @@
         [...existingGroup.querySelectorAll('input[name="selections[]"]:checked')].map((input) => input.value)
       );
       const formulaGroup = buildGroup('Choisissez votre formule *', FORMULAS, 'home-quote__group--formulas', checkedValues);
-      const optionGroup = buildGroup('Packs & options complémentaires', OPTIONS, 'home-quote__group--options', checkedValues);
+      const optionGroup = buildGroup('Options complémentaires', OPTIONS, 'home-quote__group--options', checkedValues);
       existingGroup.replaceWith(formulaGroup, optionGroup);
     }
 
