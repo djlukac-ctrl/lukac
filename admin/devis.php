@@ -50,58 +50,6 @@ if ($id > 0) {
     if (isset($_GET['saved'])): ?><div class="flash flash--success">Statut mis à jour.</div><?php endif; ?>
     <div class="quote-detail">
       <section class="quote-main">
-        <section class="form-card quote-block">
-          <div class="admin-section__head">
-            <div>
-              <span class="quote-section-kicker">Client</span>
-              <h2>Coordonnées du client</h2>
-            </div>
-            <span class="status status--<?= e($quote['status']) ?>"><?= e(quote_status_label($quote['status'])) ?></span>
-          </div>
-          <div class="quote-meta quote-meta--client">
-            <div><span>Nom et prénom</span><strong><?= e($quote['name']) ?></strong></div>
-            <div><span>E-mail</span><a href="mailto:<?= e($quote['email']) ?>"><?= e($quote['email']) ?></a></div>
-            <div><span>Téléphone</span><?= $quote['phone'] ? '<a href="tel:' . e($quote['phone']) . '">' . e($quote['phone']) . '</a>' : '—' ?></div>
-            <div class="quote-meta__wide"><span>Adresse postale</span><?= e($quote['postal_address'] ?: '—') ?></div>
-          </div>
-        </section>
-
-        <section class="form-card quote-block">
-          <div class="quote-block__heading"><span class="quote-section-kicker">Événement</span><h2>Détails de la soirée</h2></div>
-          <div class="quote-meta">
-            <div><span>Type d’événement</span><?= e($quote['event_type']) ?></div>
-            <div><span>Date</span><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></div>
-            <div><span>Lieu de réception / commune</span><?= e($quote['venue'] ?: 'À définir') ?></div>
-            <div><span>Nombre d’invités</span><?= $quote['guest_count'] ? (int) $quote['guest_count'] : '—' ?></div>
-            <div><span>Arrivée des invités</span><?= e($quote['start_time'] ?: '—') ?></div>
-            <div><span>Fin de soirée</span><?= e($quote['end_time'] ?: '—') ?></div>
-            <div><span>Recommandé par</span><?= e($quote['referral'] ?: 'Non renseigné') ?></div>
-            <div class="quote-meta__wide"><span>Demande reçue le</span><?= e(date('d/m/Y à H:i', strtotime($quote['created_at']))) ?></div>
-          </div>
-          <div class="quote-project">
-            <span>Projet du client</span>
-            <p><?= nl2br(e($quote['message'] ?: 'Aucun message complémentaire.')) ?></p>
-          </div>
-        </section>
-
-        <section class="form-card quote-block">
-          <div class="quote-block__heading"><span class="quote-section-kicker">Choix du client</span><h2>Prestations, formules & options</h2></div>
-          <div class="quote-choice-grid">
-            <div class="quote-choice">
-              <h3>Prestations</h3>
-              <?php if ($services): ?><ul><?php foreach ($services as $item): ?><li><?= e($item) ?></li><?php endforeach; ?></ul><?php else: ?><p>Non renseigné</p><?php endif; ?>
-            </div>
-            <div class="quote-choice">
-              <h3>Formules</h3>
-              <?php if ($formulas): ?><ul><?php foreach ($formulas as $item): ?><li><?= e($item) ?></li><?php endforeach; ?></ul><?php else: ?><p>Aucune formule sélectionnée</p><?php endif; ?>
-            </div>
-            <div class="quote-choice">
-              <h3>Options</h3>
-              <?php if ($options): ?><ul><?php foreach ($options as $item): ?><li><?= e($item) ?></li><?php endforeach; ?></ul><?php else: ?><p>Aucune option sélectionnée</p><?php endif; ?>
-            </div>
-          </div>
-        </section>
-
         <?php
           $postalLine = (string)($quote['postal_address'] ?? '');
           $clientAddress = $postalLine ?: '—';
@@ -146,12 +94,12 @@ if ($id > 0) {
 
           $djenesisQuoteInfo = trim(
               "Date de prestation : " . ($quote['event_date'] ? date('d/m/Y', strtotime($quote['event_date'])) : 'À définir') . "\n" .
-              "Lieu de prestation : " . ($quote['venue'] ?: 'À définir') . "\n" .
-              "Type d’événement : " . ($quote['event_type'] ?: '—') . "\n" .
               "Détails :\n" .
               "Recommandé par : " . ($quote['referral'] ?: 'Non renseigné') . "\n" .
               "Invités : " . ($quote['guest_count'] ? (int)$quote['guest_count'] : '—') . "\n" .
-              "Projet : " . ($quote['message'] ?: 'Aucun message complémentaire.')
+              "Projet : " . ($quote['message'] ?: 'Aucun message complémentaire.') . "\n" .
+              "Lieu de prestation : " . ($quote['venue'] ?: 'À définir') . "\n" .
+              "Type d’événement : " . ($quote['event_type'] ?: '—')
           );
 
           $djenesisFull = $djenesisClient . "\n\n" . $djenesisLine . "\n\n" . $djenesisQuoteInfo;
@@ -208,8 +156,6 @@ if ($id > 0) {
               </div>
               <div class="djenesis-service-preview">
                 <p><span>Date</span><strong><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></strong></p>
-                <p><span>Lieu</span><strong><?= e($quote['venue'] ?: 'À définir') ?></strong></p>
-                <p><span>Type</span><?= e($quote['event_type'] ?: '—') ?></p>
 
                 <div class="djenesis-details">
                   <strong class="djenesis-details__title">Détails</strong>
@@ -217,6 +163,9 @@ if ($id > 0) {
                   <p><span>Invités</span><strong><?= $quote['guest_count'] ? (int)$quote['guest_count'] : '—' ?></strong></p>
                   <p class="djenesis-details__project"><span>Projet</span><?= nl2br(e($quote['message'] ?: 'Aucun message complémentaire.')) ?></p>
                 </div>
+
+                <p><span>Lieu</span><strong><?= e($quote['venue'] ?: 'À définir') ?></strong></p>
+                <p><span>Type</span><?= e($quote['event_type'] ?: '—') ?></p>
               </div>
               <pre id="djenesis-quote-info" hidden><?= e($djenesisQuoteInfo) ?></pre>
             </div>          </div>
