@@ -101,6 +101,119 @@ if ($id > 0) {
             </div>
           </div>
         </section>
+
+        <?php
+          $djenesisClient = trim(
+              "Nom et prénom : " . ($quote['name'] ?: '—') . "\n" .
+              "E-mail : " . ($quote['email'] ?: '—') . "\n" .
+              "Téléphone : " . ($quote['phone'] ?: '—') . "\n" .
+              "Adresse : " . ($quote['postal_address'] ?: '—')
+          );
+
+          $djenesisService = trim(
+              "Événement : " . ($quote['event_type'] ?: '—') . "\n" .
+              "Date : " . ($quote['event_date'] ? date('d/m/Y', strtotime($quote['event_date'])) : 'À définir') . "\n" .
+              "Lieu : " . ($quote['venue'] ?: 'À définir') . "\n" .
+              "Horaires : " . (($quote['start_time'] ?: '—') . " → " . ($quote['end_time'] ?: '—')) . "\n" .
+              "Invités : " . ($quote['guest_count'] ? (int)$quote['guest_count'] : '—') . "\n" .
+              "Prestations : " . ($services ? implode(', ', $services) : 'Non renseigné') . "\n" .
+              "Formule : " . ($formulas ? implode(', ', $formulas) : 'Non renseignée') . "\n" .
+              "Options : " . ($options ? implode(', ', $options) : 'Aucune') . "\n" .
+              "Projet : " . ($quote['message'] ?: 'Aucun message complémentaire.')
+          );
+
+          $djenesisFull = $djenesisClient . "\n\n" . $djenesisService;
+        ?>
+        <section class="form-card quote-block djenesis-block">
+          <div class="quote-block__heading">
+            <span class="quote-section-kicker">Préparation devis</span>
+            <h2>Préparer pour Djenesis</h2>
+            <p class="djenesis-block__lead">Les informations sont déjà regroupées dans un format prêt à copier dans Djenesis.</p>
+          </div>
+
+          <div class="djenesis-grid">
+            <div class="djenesis-card">
+              <div class="djenesis-card__head">
+                <div><span>01</span><strong>Coordonnées client</strong></div>
+                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-client">Copier</button>
+              </div>
+              <pre id="djenesis-client"><?= e($djenesisClient) ?></pre>
+            </div>
+
+            <div class="djenesis-card">
+              <div class="djenesis-card__head">
+                <div><span>02</span><strong>Prestation</strong></div>
+                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-service">Copier</button>
+              </div>
+              <pre id="djenesis-service"><?= e($djenesisService) ?></pre>
+            </div>
+          </div>
+
+          <div class="djenesis-actions">
+            <button class="btn btn--primary djenesis-copy" type="button" data-copy-target="djenesis-full">Copier tout pour Djenesis</button>
+            <span class="djenesis-copy-status" aria-live="polite"></span>
+          </div>
+          <pre id="djenesis-full" hidden><?= e($djenesisFull) ?></pre>
+        </section>
+
+        <style>
+          .djenesis-block{overflow:hidden}
+          .djenesis-block__lead{margin:7px 0 0;color:#7b746e;font-size:12px;line-height:1.6}
+          .djenesis-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+          .djenesis-card{border:1px solid rgba(24,23,22,.10);border-radius:14px;background:#faf8f5;overflow:hidden}
+          .djenesis-card__head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(24,23,22,.08);background:#fff}
+          .djenesis-card__head>div{display:flex;align-items:center;gap:9px}
+          .djenesis-card__head span{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#181716;color:#fff;font-size:9px;font-weight:800}
+          .djenesis-card__head strong{font:600 13px 'Space Grotesk',sans-serif}
+          .djenesis-card pre{margin:0;padding:15px;white-space:pre-wrap;word-break:break-word;font:500 12px/1.65 'DM Sans',Arial,sans-serif;color:#514b46}
+          .djenesis-card .btn{padding:8px 12px;font-size:10px}
+          .djenesis-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+          .djenesis-copy-status{color:#4f7d3d;font-size:11px;font-weight:700;min-height:16px}
+          @media(max-width:800px){.djenesis-grid{grid-template-columns:1fr}}
+        </style>
+
+        <script>
+          (() => {
+            const status = document.querySelector('.djenesis-copy-status');
+            const fallbackCopy = (text) => {
+              const textarea = document.createElement('textarea');
+              textarea.value = text;
+              textarea.setAttribute('readonly', '');
+              textarea.style.position = 'fixed';
+              textarea.style.opacity = '0';
+              document.body.appendChild(textarea);
+              textarea.select();
+              document.execCommand('copy');
+              textarea.remove();
+            };
+
+            document.querySelectorAll('.djenesis-copy').forEach((button) => {
+              button.addEventListener('click', async () => {
+                const target = document.getElementById(button.dataset.copyTarget || '');
+                if (!target) return;
+                const text = target.textContent.trim();
+
+                try {
+                  if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(text);
+                  } else {
+                    fallbackCopy(text);
+                  }
+                  const original = button.textContent;
+                  button.textContent = 'Copié ✓';
+                  if (status) status.textContent = 'Prêt à coller dans Djenesis.';
+                  setTimeout(() => {
+                    button.textContent = original;
+                    if (status) status.textContent = '';
+                  }, 1800);
+                } catch (_) {
+                  fallbackCopy(text);
+                  if (status) status.textContent = 'Informations copiées.';
+                }
+              });
+            });
+          })();
+        </script>
       </section>
 
       <aside class="form-card quote-followup">
