@@ -161,7 +161,7 @@ if ($id > 0) {
                   <p class="djenesis-details__project"><span>Projet</span><?= nl2br(e($quote['message'] ?: 'Aucun message complémentaire.')) ?></p>
                 </div>
 
-                <p><span>Lieu</span><strong><?= e($quote['venue'] ?: 'À définir') ?></strong></p>
+                <p class="djenesis-copy-row"><span>Lieu</span><strong><?= e($quote['venue'] ?: 'À définir') ?></strong><button class="djenesis-line-copy" type="button" data-copy-text="<?= e($quote['venue'] ?: '') ?>">Copier</button></p>
                 <p><span>Type</span><?= e($quote['event_type'] ?: '—') ?></p>
               </div>
               <pre id="djenesis-quote-info" hidden><?= e($djenesisQuoteInfo) ?></pre>
@@ -210,6 +210,7 @@ if ($id > 0) {
           .djenesis-details-copy{padding:4px 9px!important}
           .djenesis-details p{grid-template-columns:92px minmax(0,1fr)!important}
           .djenesis-details__project{align-items:start!important;padding-top:8px;border-top:1px solid rgba(201,52,49,.08)}
+          .djenesis-copy-row{grid-template-columns:92px minmax(0,1fr) auto!important}
           .djenesis-card .btn{padding:7px 11px;font-size:9px;border-radius:999px}
           .djenesis-card .djenesis-copy{background:#fff}
           .djenesis-card .djenesis-copy:hover{color:#c93431;border-color:rgba(201,52,49,.28)}
