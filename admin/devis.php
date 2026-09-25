@@ -115,7 +115,6 @@ if ($id > 0) {
             <div class="djenesis-card">
               <div class="djenesis-card__head">
                 <div><span>01</span><strong>Créer le client</strong></div>
-                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-client">Copier tout</button>
               </div>
               <div class="djenesis-service-preview djenesis-copy-list">
                 <p><span>Nom</span><strong><?= e($clientLastName) ?></strong><button class="djenesis-line-copy" type="button" data-copy-text="<?= e($clientLastName) ?>">Copier</button></p>
@@ -133,7 +132,6 @@ if ($id > 0) {
             <div class="djenesis-card">
               <div class="djenesis-card__head">
                 <div><span>02</span><strong>Ligne du devis</strong></div>
-                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-line">Copier tout</button>
               </div>
               <div class="djenesis-service-preview">
                 <p><span>Prestation</span><strong><?= e($quoteLineName) ?></strong></p>
@@ -152,13 +150,12 @@ if ($id > 0) {
             <div class="djenesis-card">
               <div class="djenesis-card__head">
                 <div><span>03</span><strong>Informations devis</strong></div>
-                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-quote-info">Copier tout</button>
               </div>
               <div class="djenesis-service-preview">
                 <p><span>Date</span><strong><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></strong></p>
 
                 <div class="djenesis-details">
-                  <strong class="djenesis-details__title">Détails</strong>
+                  <div class="djenesis-details__head"><strong class="djenesis-details__title">Détails</strong><button class="djenesis-line-copy djenesis-details-copy" type="button" data-copy-target="djenesis-details-copy">Copier</button></div>
                   <p><span>Recommandé par</span><strong><?= e($quote['referral'] ?: 'Non renseigné') ?></strong></p>
                   <p><span>Invités</span><strong><?= $quote['guest_count'] ? (int)$quote['guest_count'] : '—' ?></strong></p>
                   <p class="djenesis-details__project"><span>Projet</span><?= nl2br(e($quote['message'] ?: 'Aucun message complémentaire.')) ?></p>
@@ -168,14 +165,17 @@ if ($id > 0) {
                 <p><span>Type</span><?= e($quote['event_type'] ?: '—') ?></p>
               </div>
               <pre id="djenesis-quote-info" hidden><?= e($djenesisQuoteInfo) ?></pre>
+              <pre id="djenesis-details-copy" hidden><?= e(
+                "Recommandé par : " . ($quote['referral'] ?: 'Non renseigné') . "\n" .
+                "Invités : " . ($quote['guest_count'] ? (int)$quote['guest_count'] : '—') . "\n" .
+                "Projet : " . ($quote['message'] ?: 'Aucun message complémentaire.') . "\n" .
+                "Lieu : " . ($quote['venue'] ?: 'À définir')
+              ) ?></pre>
             </div>          </div>
 
           <div class="djenesis-actions">
-            <button class="btn btn--primary djenesis-copy" type="button" data-copy-target="djenesis-full">Copier tout pour Djenesis</button>
             <a class="btn djenesis-open" href="https://djenesis.net/dj/quotes/create" target="_blank" rel="noopener noreferrer">Créer le devis dans Djenesis ↗</a>
-            <span class="djenesis-copy-status" aria-live="polite"></span>
           </div>
-          <pre id="djenesis-full" hidden><?= e($djenesisFull) ?></pre>
         </section>
 
         <style>
@@ -205,7 +205,9 @@ if ($id > 0) {
           .djenesis-service-preview p strong{color:#181716;font-weight:800}
           .djenesis-service-preview p strong small{font:600 10px 'DM Sans',Arial,sans-serif;color:#8a8179}
           .djenesis-details{margin-top:4px;padding:13px;border:1px solid rgba(201,52,49,.10);border-radius:13px;background:linear-gradient(145deg,#fff,#fff8f7);display:grid;gap:9px}
+          .djenesis-details__head{display:flex;align-items:center;justify-content:space-between;gap:10px}
           .djenesis-details__title{font:800 10px 'Space Grotesk',sans-serif;color:#c93431;text-transform:uppercase;letter-spacing:.10em}
+          .djenesis-details-copy{padding:4px 9px!important}
           .djenesis-details p{grid-template-columns:92px minmax(0,1fr)!important}
           .djenesis-details__project{align-items:start!important;padding-top:8px;border-top:1px solid rgba(201,52,49,.08)}
           .djenesis-card .btn{padding:7px 11px;font-size:9px;border-radius:999px}
@@ -216,7 +218,8 @@ if ($id > 0) {
           .djenesis-actions .btn{min-height:38px;border-radius:999px}
           .djenesis-copy-status{color:#4f7d3d;font-size:11px;font-weight:700;min-height:16px}
           .quote-followup{position:sticky;top:22px;border-radius:20px!important;border:1px solid rgba(24,23,22,.09)!important;background:#fff!important;box-shadow:0 16px 38px rgba(50,38,28,.055)!important}
-          .quote-followup h2{margin-bottom:16px;font-size:19px;letter-spacing:-.02em}
+          .quote-followup h2{margin-bottom:14px;font-size:19px;letter-spacing:-.02em}
+          .quote-followup .admin-form{gap:10px}
           .quote-followup .field select{background:#faf8f5}
           .quote-followup .btn{min-height:40px;border-radius:999px}
           .quote-followup .btn--primary{box-shadow:0 7px 18px rgba(24,23,22,.10)}
@@ -300,7 +303,8 @@ if ($id > 0) {
 
             document.querySelectorAll('.djenesis-line-copy').forEach((button) => {
               button.addEventListener('click', async () => {
-                const text = button.dataset.copyText || '';
+                const target = button.dataset.copyTarget ? document.getElementById(button.dataset.copyTarget) : null;
+                const text = target ? target.textContent.trim() : (button.dataset.copyText || '');
                 if (!text) return;
                 try {
                   if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
@@ -310,32 +314,6 @@ if ($id > 0) {
                   setTimeout(() => button.textContent = original, 1200);
                 } catch (_) {
                   fallbackCopy(text);
-                }
-              });
-            });
-
-            document.querySelectorAll('.djenesis-copy').forEach((button) => {
-              button.addEventListener('click', async () => {
-                const target = document.getElementById(button.dataset.copyTarget || '');
-                if (!target) return;
-                const text = target.textContent.trim();
-
-                try {
-                  if (navigator.clipboard && window.isSecureContext) {
-                    await navigator.clipboard.writeText(text);
-                  } else {
-                    fallbackCopy(text);
-                  }
-                  const original = button.textContent;
-                  button.textContent = 'Copié ✓';
-                  if (status) status.textContent = 'Prêt à coller dans Djenesis.';
-                  setTimeout(() => {
-                    button.textContent = original;
-                    if (status) status.textContent = '';
-                  }, 1800);
-                } catch (_) {
-                  fallbackCopy(text);
-                  if (status) status.textContent = 'Informations copiées.';
                 }
               });
             });
@@ -352,8 +330,6 @@ if ($id > 0) {
             <?php foreach ($quoteStatuses as $status): ?><option value="<?= e($status) ?>" <?= $quote['status'] === $status ? 'selected' : '' ?>><?= e(quote_status_label($status)) ?></option><?php endforeach; ?>
           </select></div>
           <button class="btn btn--primary" type="submit" name="action" value="update_status">Enregistrer le statut</button>
-          <a class="btn" href="mailto:<?= e($quote['email']) ?>?subject=Votre%20demande%20de%20devis%20-%20Luka%20C">Répondre par e-mail</a>
-          <?php if ($quote['phone']): ?><a class="btn" href="tel:<?= e($quote['phone']) ?>">Appeler le client</a><?php endif; ?>
           <button class="btn btn--danger" type="submit" name="action" value="delete" onclick="return confirm('Supprimer définitivement cette demande de devis ? Cette action est irréversible.');">Supprimer la demande</button>
           <a class="admin-link" href="devis.php">← Retour aux demandes</a>
         </form>
