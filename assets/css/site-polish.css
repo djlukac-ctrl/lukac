@@ -298,7 +298,7 @@ body{
 
 .availability,
 .home-formules{
-  box-shadow:0 -24px 54px rgba(201,52,49,.014);
+  box-shadow:0 -24px 54px rgba(50,38,28,.018);
 }
 
 .section--reviews .section-heading,
@@ -384,4 +384,15 @@ body{
   min-height:1px!important;
   max-height:1px!important;
   border-radius:0!important;
+}
+
+
+/* Disponibilités : même intensité visuelle que les autres séparateurs */
+.availability::before{
+  opacity:.58!important;
+  background:linear-gradient(90deg,transparent 0%,rgba(201,52,49,.14) 18%,rgba(201,52,49,.72) 50%,rgba(201,52,49,.14) 82%,transparent 100%)!important;
+}
+.availability::after{
+  opacity:.72!important;
+  background:radial-gradient(ellipse at center,rgba(201,52,49,.052) 0%,rgba(201,52,49,.016) 44%,transparent 74%)!important;
 }
