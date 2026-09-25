@@ -146,10 +146,12 @@ if ($id > 0) {
 
           $djenesisQuoteInfo = trim(
               "Date de prestation : " . ($quote['event_date'] ? date('d/m/Y', strtotime($quote['event_date'])) : 'À définir') . "\n" .
-              "Détail : Recommandé par : " . ($quote['referral'] ?: 'Non renseigné') . " | Projet : " . ($quote['message'] ?: 'Aucun message complémentaire.') . "\n" .
               "Lieu de prestation : " . ($quote['venue'] ?: 'À définir') . "\n" .
               "Type d’événement : " . ($quote['event_type'] ?: '—') . "\n" .
-              "Nombre d’invités : " . ($quote['guest_count'] ? (int)$quote['guest_count'] : '—')
+              "Détails :\n" .
+              "Recommandé par : " . ($quote['referral'] ?: 'Non renseigné') . "\n" .
+              "Invités : " . ($quote['guest_count'] ? (int)$quote['guest_count'] : '—') . "\n" .
+              "Projet : " . ($quote['message'] ?: 'Aucun message complémentaire.')
           );
 
           $djenesisFull = $djenesisClient . "\n\n" . $djenesisLine . "\n\n" . $djenesisQuoteInfo;
@@ -206,10 +208,15 @@ if ($id > 0) {
               </div>
               <div class="djenesis-service-preview">
                 <p><span>Date</span><strong><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></strong></p>
-                <p class="djenesis-service-preview__project"><span>Détail</span><strong>Recommandé par : <?= e($quote['referral'] ?: 'Non renseigné') ?></strong><br><?= nl2br(e($quote['message'] ?: 'Aucun message complémentaire.')) ?></p>
                 <p><span>Lieu</span><strong><?= e($quote['venue'] ?: 'À définir') ?></strong></p>
                 <p><span>Type</span><?= e($quote['event_type'] ?: '—') ?></p>
-                <p><span>Invités</span><strong><?= $quote['guest_count'] ? (int)$quote['guest_count'] : '—' ?></strong></p>
+
+                <div class="djenesis-details">
+                  <strong class="djenesis-details__title">Détails</strong>
+                  <p><span>Recommandé par</span><strong><?= e($quote['referral'] ?: 'Non renseigné') ?></strong></p>
+                  <p><span>Invités</span><strong><?= $quote['guest_count'] ? (int)$quote['guest_count'] : '—' ?></strong></p>
+                  <p class="djenesis-details__project"><span>Projet</span><?= nl2br(e($quote['message'] ?: 'Aucun message complémentaire.')) ?></p>
+                </div>
               </div>
               <pre id="djenesis-quote-info" hidden><?= e($djenesisQuoteInfo) ?></pre>
             </div>          </div>
@@ -241,6 +248,10 @@ if ($id > 0) {
           .djenesis-service-preview p strong{color:#181716;font-weight:800}
           .djenesis-service-preview p strong small{font:600 10px 'DM Sans',Arial,sans-serif;color:#8a8179}
           .djenesis-service-preview__project{padding-top:8px;margin-top:4px!important;border-top:1px solid rgba(24,23,22,.08)}
+          .djenesis-details{margin-top:8px;padding:12px;border:1px solid rgba(24,23,22,.08);border-radius:12px;background:#fff;display:grid;gap:8px}
+          .djenesis-details__title{font:700 11px 'Space Grotesk',sans-serif;color:#181716;text-transform:uppercase;letter-spacing:.08em}
+          .djenesis-details p{grid-template-columns:92px minmax(0,1fr)!important}
+          .djenesis-details__project{align-items:start!important}
           .djenesis-card .btn{padding:8px 12px;font-size:10px}
           .djenesis-open{background:#fff;color:#181716}
           .djenesis-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
