@@ -396,3 +396,24 @@ body{
   opacity:.72!important;
   background:radial-gradient(ellipse at center,rgba(201,52,49,.052) 0%,rgba(201,52,49,.016) 44%,transparent 74%)!important;
 }
+
+
+/* Finition séparateurs : disponibilité plus fine + respiration avant Options */
+.availability::before{
+  transform:translateX(-50%) scaleY(.5)!important;
+  transform-origin:center!important;
+  box-shadow:none!important;
+  filter:none!important;
+}
+
+.options-section{
+  margin-top:34px!important;
+  padding-top:70px!important;
+}
+
+@media(max-width:720px){
+  .options-section{
+    margin-top:24px!important;
+    padding-top:54px!important;
+  }
+}
