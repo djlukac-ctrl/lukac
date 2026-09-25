@@ -113,44 +113,47 @@ if ($id > 0) {
               $clientCity = trim($postalMatch[3]);
           }
 
-          $quoteLineName = 'Prestation ' . ($quote['event_type'] ?: 'événement');
-          if ($formulas) {
-              $quoteLineName .= ' — ' . implode(', ', $formulas);
-          }
+          $fullName = trim((string)($quote['name'] ?? ''));
+          $nameParts = preg_split('/\\s+/u', $fullName, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+          $clientLastName = $nameParts ? array_shift($nameParts) : '—';
+          $clientFirstName = $nameParts ? implode(' ', $nameParts) : '—';
 
-          $quoteDetail = trim(
-              "Prestations : " . ($services ? implode(', ', $services) : 'Non renseigné') . "\n" .
-              "Formule : " . ($formulas ? implode(', ', $formulas) : 'Non renseignée') . "\n" .
-              "Options : " . ($options ? implode(', ', $options) : 'Aucune') . "\n" .
-              "Horaires : " . (($quote['start_time'] ?: '—') . " → " . ($quote['end_time'] ?: '—')) . "\n" .
-              "Invités : " . ($quote['guest_count'] ? (int)$quote['guest_count'] : '—') . "\n" .
-              "Projet : " . ($quote['message'] ?: 'Aucun message complémentaire.')
+          $quoteLineName = trim(
+              ($services ? implode(', ', $services) : 'Prestation') .
+              ($formulas ? ' — ' . implode(', ', $formulas) : '')
           );
 
           $djenesisClient = trim(
-              "Nom / prénom saisi : " . ($quote['name'] ?: '—') . "\n" .
+              "Nom : " . $clientLastName . "\n" .
+              "Prénom : " . $clientFirstName . "\n" .
               "E-mail : " . ($quote['email'] ?: '—') . "\n" .
               "Téléphone : " . ($quote['phone'] ?: '—') . "\n" .
               "Adresse : " . $clientAddress . "\n" .
               "Ville : " . $clientCity . "\n" .
               "Code postal : " . $clientPostcode . "\n" .
-              "Pays : France\n" .
-              "Statut client : Prospect"
+              "Pays : France"
           );
 
-          $djenesisLine = trim(
-              "Catalogue : à sélectionner dans Djenesis\n" .
-              "Nom : " . $quoteLineName . "\n" .
-              "Description :\n" . $quoteDetail . "\n" .
-              "Prix HT : à renseigner\n" .
-              "Quantité : 1"
-          );
+          $lineParts = [
+              "Prestation : " . $quoteLineName,
+              "Horaires : " . (($quote['start_time'] ?: '—') . " → " . ($quote['end_time'] ?: '—'))
+          ];
+          foreach ($options as $option) {
+              $lineParts[] = "Option : " . $option;
+          }
+          $lineParts[] = "Lieu : " . ($quote['venue'] ?: 'À définir');
+          $lineParts[] = "Distance : à calculer";
+          $lineParts[] = "Prix HT : à renseigner";
+          $lineParts[] = "Quantité : 1";
+          $djenesisLine = implode("\n", $lineParts);
 
           $djenesisQuoteInfo = trim(
               "Date de prestation : " . ($quote['event_date'] ? date('d/m/Y', strtotime($quote['event_date'])) : 'À définir') . "\n" .
               "Détail prestation : " . ($services ? implode(', ', $services) : '—') . "\n" .
               "Lieu de prestation : " . ($quote['venue'] ?: 'À définir') . "\n" .
               "Type d’événement : " . ($quote['event_type'] ?: '—') . "\n" .
+              "Nombre d’invités : " . ($quote['guest_count'] ? (int)$quote['guest_count'] : '—') . "\n" .
+              "Projet : " . ($quote['message'] ?: 'Aucun message complémentaire.') . "\n" .
               "Pourcentage acompte : 30 %\n" .
               "Montant acompte : calculé dans Djenesis\n" .
               "Durée de validité : 15 jours\n" .
@@ -170,17 +173,17 @@ if ($id > 0) {
             <div class="djenesis-card">
               <div class="djenesis-card__head">
                 <div><span>01</span><strong>Créer le client</strong></div>
-                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-client">Copier</button>
+                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-client">Copier tout</button>
               </div>
-              <div class="djenesis-service-preview">
-                <p><span>Nom / prénom</span><strong><?= e($quote['name'] ?: '—') ?></strong></p>
-                <p><span>E-mail</span><?= e($quote['email'] ?: '—') ?></p>
-                <p><span>Téléphone</span><?= e($quote['phone'] ?: '—') ?></p>
-                <p><span>Adresse</span><?= e($clientAddress) ?></p>
-                <p><span>Ville</span><?= e($clientCity) ?></p>
-                <p><span>Code postal</span><?= e($clientPostcode) ?></p>
-                <p><span>Pays</span>France</p>
-                <p><span>Statut</span>Prospect</p>
+              <div class="djenesis-service-preview djenesis-copy-list">
+                <p><span>Nom</span><strong><?= e($clientLastName) ?></strong><button class="djenesis-line-copy" type="button" data-copy-text="<?= e($clientLastName) ?>">Copier</button></p>
+                <p><span>Prénom</span><strong><?= e($clientFirstName) ?></strong><button class="djenesis-line-copy" type="button" data-copy-text="<?= e($clientFirstName) ?>">Copier</button></p>
+                <p><span>E-mail</span><?= e($quote['email'] ?: '—') ?><button class="djenesis-line-copy" type="button" data-copy-text="<?= e($quote['email'] ?: '') ?>">Copier</button></p>
+                <p><span>Téléphone</span><?= e($quote['phone'] ?: '—') ?><button class="djenesis-line-copy" type="button" data-copy-text="<?= e($quote['phone'] ?: '') ?>">Copier</button></p>
+                <p><span>Adresse</span><?= e($clientAddress) ?><button class="djenesis-line-copy" type="button" data-copy-text="<?= e($clientAddress === '—' ? '' : $clientAddress) ?>">Copier</button></p>
+                <p><span>Ville</span><?= e($clientCity) ?><button class="djenesis-line-copy" type="button" data-copy-text="<?= e($clientCity === '—' ? '' : $clientCity) ?>">Copier</button></p>
+                <p><span>Code postal</span><?= e($clientPostcode) ?><button class="djenesis-line-copy" type="button" data-copy-text="<?= e($clientPostcode === '—' ? '' : $clientPostcode) ?>">Copier</button></p>
+                <p><span>Pays</span>France<button class="djenesis-line-copy" type="button" data-copy-text="France">Copier</button></p>
               </div>
               <pre id="djenesis-client" hidden><?= e($djenesisClient) ?></pre>
             </div>
@@ -188,12 +191,18 @@ if ($id > 0) {
             <div class="djenesis-card">
               <div class="djenesis-card__head">
                 <div><span>02</span><strong>Ligne du devis</strong></div>
-                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-line">Copier</button>
+                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-line">Copier tout</button>
               </div>
               <div class="djenesis-service-preview">
-                <p><span>Catalogue</span>À sélectionner</p>
-                <p><span>Nom</span><strong><?= e($quoteLineName) ?></strong></p>
-                <p><span>Description</span><?= nl2br(e($quoteDetail)) ?></p>
+                <p><span>Prestation</span><strong><?= e($quoteLineName) ?></strong></p>
+                <p><span>Horaires</span><strong><?= e(($quote['start_time'] ?: '—') . ' → ' . ($quote['end_time'] ?: '—')) ?></strong></p>
+                <?php if ($options): foreach ($options as $option): ?>
+                  <p><span>Option</span><?= e($option) ?></p>
+                <?php endforeach; else: ?>
+                  <p><span>Option</span>Aucune</p>
+                <?php endif; ?>
+                <p><span>Lieu</span><strong><?= e($quote['venue'] ?: 'À définir') ?></strong></p>
+                <p><span>Distance</span><em>Adresse de départ à configurer</em></p>
                 <p><span>Prix HT</span>À renseigner</p>
                 <p><span>Quantité</span><strong>1</strong></p>
               </div>
@@ -203,20 +212,21 @@ if ($id > 0) {
             <div class="djenesis-card">
               <div class="djenesis-card__head">
                 <div><span>03</span><strong>Informations devis</strong></div>
-                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-quote-info">Copier</button>
+                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-quote-info">Copier tout</button>
               </div>
               <div class="djenesis-service-preview">
                 <p><span>Date</span><strong><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></strong></p>
                 <p><span>Détail</span><?= e($services ? implode(', ', $services) : '—') ?></p>
                 <p><span>Lieu</span><strong><?= e($quote['venue'] ?: 'À définir') ?></strong></p>
                 <p><span>Type</span><?= e($quote['event_type'] ?: '—') ?></p>
+                <p><span>Invités</span><strong><?= $quote['guest_count'] ? (int)$quote['guest_count'] : '—' ?></strong></p>
+                <p class="djenesis-service-preview__project"><span>Projet</span><?= nl2br(e($quote['message'] ?: 'Aucun message complémentaire.')) ?></p>
                 <p><span>Acompte</span>30 %</p>
                 <p><span>Validité</span>15 jours</p>
                 <p><span>Statut</span>Brouillon</p>
               </div>
               <pre id="djenesis-quote-info" hidden><?= e($djenesisQuoteInfo) ?></pre>
-            </div>
-          </div>
+            </div>          </div>
 
           <div class="djenesis-actions">
             <button class="btn btn--primary djenesis-copy" type="button" data-copy-target="djenesis-full">Copier tout pour Djenesis</button>
@@ -237,7 +247,10 @@ if ($id > 0) {
           .djenesis-card__head strong{font:600 13px 'Space Grotesk',sans-serif}
           .djenesis-card pre{margin:0;padding:15px;white-space:pre-wrap;word-break:break-word;font:500 12px/1.65 'DM Sans',Arial,sans-serif;color:#514b46}
           .djenesis-service-preview{padding:15px;display:grid;gap:7px}
-          .djenesis-service-preview p{display:grid;grid-template-columns:92px 1fr;gap:10px;margin:0;color:#514b46;font-size:12px;line-height:1.5}
+          .djenesis-service-preview p{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;margin:0;color:#514b46;font-size:12px;line-height:1.5;align-items:center}
+          .djenesis-copy-list p{grid-template-columns:82px minmax(0,1fr) auto}
+          .djenesis-line-copy{border:1px solid rgba(24,23,22,.12);border-radius:999px;background:#fff;color:#514b46;padding:4px 8px;font-size:9px;font-weight:700;cursor:pointer}
+          .djenesis-line-copy:hover{border-color:rgba(24,23,22,.28);color:#181716}
           .djenesis-service-preview p span{color:#8a8179;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
           .djenesis-service-preview p strong{color:#181716;font-weight:800}
           .djenesis-service-preview__project{padding-top:8px;margin-top:4px!important;border-top:1px solid rgba(24,23,22,.08)}
@@ -262,6 +275,22 @@ if ($id > 0) {
               document.execCommand('copy');
               textarea.remove();
             };
+
+            document.querySelectorAll('.djenesis-line-copy').forEach((button) => {
+              button.addEventListener('click', async () => {
+                const text = button.dataset.copyText || '';
+                if (!text) return;
+                try {
+                  if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+                  else fallbackCopy(text);
+                  const original = button.textContent;
+                  button.textContent = 'Copié ✓';
+                  setTimeout(() => button.textContent = original, 1200);
+                } catch (_) {
+                  fallbackCopy(text);
+                }
+              });
+            });
 
             document.querySelectorAll('.djenesis-copy').forEach((button) => {
               button.addEventListener('click', async () => {
