@@ -118,10 +118,9 @@ if ($id > 0) {
           $clientLastName = $nameParts ? array_shift($nameParts) : '—';
           $clientFirstName = $nameParts ? implode(' ', $nameParts) : '—';
 
-          $quoteLineName = trim(
-              ($services ? implode(', ', $services) : 'Prestation') .
-              ($formulas ? ' — ' . implode(', ', $formulas) : '')
-          );
+          $quoteLineName = $services ? implode(', ', $services) : 'Prestation';
+          $formulaText = $formulas ? implode(', ', $formulas) : 'Non renseignée';
+          $venueText = $quote['venue'] ?: 'À définir';
 
           $djenesisClient = trim(
               "Nom : " . $clientLastName . "\n" .
@@ -136,15 +135,13 @@ if ($id > 0) {
 
           $lineParts = [
               "Prestation : " . $quoteLineName,
-              "Horaires : " . (($quote['start_time'] ?: '—') . " → " . ($quote['end_time'] ?: '—'))
+              "Horaires : " . (($quote['start_time'] ?: '—') . " → " . ($quote['end_time'] ?: '—')),
+              "Formule : " . $formulaText
           ];
           foreach ($options as $option) {
               $lineParts[] = "Option : " . $option;
           }
-          $lineParts[] = "Lieu : " . ($quote['venue'] ?: 'À définir');
-          $lineParts[] = "Distance : à calculer";
-          $lineParts[] = "Prix HT : à renseigner";
-          $lineParts[] = "Quantité : 1";
+          $lineParts[] = "Lieu : " . $venueText . " (distance en cours)";
           $djenesisLine = implode("\n", $lineParts);
 
           $djenesisQuoteInfo = trim(
@@ -196,15 +193,13 @@ if ($id > 0) {
               <div class="djenesis-service-preview">
                 <p><span>Prestation</span><strong><?= e($quoteLineName) ?></strong></p>
                 <p><span>Horaires</span><strong><?= e(($quote['start_time'] ?: '—') . ' → ' . ($quote['end_time'] ?: '—')) ?></strong></p>
+                <p><span>Formule</span><strong><?= e($formulaText) ?></strong></p>
                 <?php if ($options): foreach ($options as $option): ?>
                   <p><span>Option</span><?= e($option) ?></p>
                 <?php endforeach; else: ?>
                   <p><span>Option</span>Aucune</p>
                 <?php endif; ?>
-                <p><span>Lieu</span><strong><?= e($quote['venue'] ?: 'À définir') ?></strong></p>
-                <p><span>Distance</span><em>Adresse de départ à configurer</em></p>
-                <p><span>Prix HT</span>À renseigner</p>
-                <p><span>Quantité</span><strong>1</strong></p>
+                <p><span>Lieu</span><strong id="djenesis-venue-distance" data-venue="<?= e($venueText) ?>"><?= e($venueText) ?> <small>(calcul…)</small></strong></p>
               </div>
               <pre id="djenesis-line" hidden><?= e($djenesisLine) ?></pre>
             </div>
@@ -253,6 +248,7 @@ if ($id > 0) {
           .djenesis-line-copy:hover{border-color:rgba(24,23,22,.28);color:#181716}
           .djenesis-service-preview p span{color:#8a8179;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
           .djenesis-service-preview p strong{color:#181716;font-weight:800}
+          .djenesis-service-preview p strong small{font:600 10px 'DM Sans',Arial,sans-serif;color:#8a8179}
           .djenesis-service-preview__project{padding-top:8px;margin-top:4px!important;border-top:1px solid rgba(24,23,22,.08)}
           .djenesis-card .btn{padding:8px 12px;font-size:10px}
           .djenesis-open{background:#fff;color:#181716}
@@ -275,6 +271,63 @@ if ($id > 0) {
               document.execCommand('copy');
               textarea.remove();
             };
+
+            const venueDistance = document.getElementById('djenesis-venue-distance');
+            const lineCopy = document.getElementById('djenesis-line');
+            const fullCopy = document.getElementById('djenesis-full');
+            const originAddress = '65 rue de Verdun, 52290 Eclaron, France';
+
+            const geocode = async (address) => {
+              const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=fr&q=' + encodeURIComponent(address);
+              const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+              if (!response.ok) throw new Error('Geocoding failed');
+              const results = await response.json();
+              if (!Array.isArray(results) || !results[0]) throw new Error('Address not found');
+              return { lat: Number(results[0].lat), lon: Number(results[0].lon) };
+            };
+
+            const updateDistanceInCopies = (venue, distanceText) => {
+              const replacement = 'Lieu : ' + venue + ' (' + distanceText + ')';
+              if (lineCopy) {
+                lineCopy.textContent = lineCopy.textContent.replace(/Lieu : .*?(?: \(distance en cours\))?(?=\n|$)/, replacement);
+              }
+              if (fullCopy) {
+                fullCopy.textContent = fullCopy.textContent.replace(/Lieu : .*?(?: \(distance en cours\))?(?=\n|$)/, replacement);
+              }
+            };
+
+            const loadDistance = async () => {
+              if (!venueDistance) return;
+              const venue = venueDistance.dataset.venue || '';
+              if (!venue || venue === 'À définir') {
+                venueDistance.innerHTML = venue + ' <small>(distance indisponible)</small>';
+                return;
+              }
+
+              try {
+                const [origin, destination] = await Promise.all([
+                  geocode(originAddress),
+                  geocode(venue + ', France')
+                ]);
+                const routeUrl = 'https://router.project-osrm.org/route/v1/driving/' +
+                  origin.lon + ',' + origin.lat + ';' + destination.lon + ',' + destination.lat +
+                  '?overview=false';
+                const response = await fetch(routeUrl, { headers: { 'Accept': 'application/json' } });
+                if (!response.ok) throw new Error('Routing failed');
+                const data = await response.json();
+                const meters = data?.routes?.[0]?.distance;
+                if (!Number.isFinite(meters)) throw new Error('Distance unavailable');
+                const km = Math.round(meters / 1000);
+                const distanceText = '≈ ' + km + ' km';
+                venueDistance.innerHTML = venue.replace(/</g, '&lt;').replace(/>/g, '&gt;') + ' <small>(' + distanceText + ')</small>';
+                updateDistanceInCopies(venue, distanceText);
+              } catch (_) {
+                venueDistance.innerHTML = venue.replace(/</g, '&lt;').replace(/>/g, '&gt;') + ' <small>(distance indisponible)</small>';
+                updateDistanceInCopies(venue, 'distance indisponible');
+              }
+            };
+
+            loadDistance();
 
             document.querySelectorAll('.djenesis-line-copy').forEach((button) => {
               button.addEventListener('click', async () => {
