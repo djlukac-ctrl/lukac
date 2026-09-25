@@ -96,8 +96,8 @@ if ($id > 0) {
               <?php if ($formulas): ?><ul><?php foreach ($formulas as $item): ?><li><?= e($item) ?></li><?php endforeach; ?></ul><?php else: ?><p>Aucune formule sélectionnée</p><?php endif; ?>
             </div>
             <div class="quote-choice">
-              <h3>Packs & options</h3>
-              <?php if ($options): ?><ul><?php foreach ($options as $item): ?><li><?= e($item) ?></li><?php endforeach; ?></ul><?php else: ?><p>Aucun pack ou option sélectionné</p><?php endif; ?>
+              <h3>Options</h3>
+              <?php if ($options): ?><ul><?php foreach ($options as $item): ?><li><?= e($item) ?></li><?php endforeach; ?></ul><?php else: ?><p>Aucune option sélectionnée</p><?php endif; ?>
             </div>
           </div>
         </section>
@@ -143,14 +143,26 @@ if ($id > 0) {
             <div class="djenesis-card">
               <div class="djenesis-card__head">
                 <div><span>02</span><strong>Prestation</strong></div>
-                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-service">Copier</button>
+                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-service-copy">Copier</button>
               </div>
-              <pre id="djenesis-service"><?= e($djenesisService) ?></pre>
+              <div id="djenesis-service" class="djenesis-service-preview">
+                <p><span>Événement</span><strong><?= e($quote['event_type'] ?: '—') ?></strong></p>
+                <p><span>Date</span><strong><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></strong></p>
+                <p><span>Lieu</span><strong><?= e($quote['venue'] ?: 'À définir') ?></strong></p>
+                <p><span>Horaires</span><?= e(($quote['start_time'] ?: '—') . ' → ' . ($quote['end_time'] ?: '—')) ?></p>
+                <p><span>Invités</span><?= $quote['guest_count'] ? (int)$quote['guest_count'] : '—' ?></p>
+                <p><span>Prestations</span><?= e($services ? implode(', ', $services) : 'Non renseigné') ?></p>
+                <p><span>Formule</span><strong><?= e($formulas ? implode(', ', $formulas) : 'Non renseignée') ?></strong></p>
+                <p><span>Options</span><?= e($options ? implode(', ', $options) : 'Aucune') ?></p>
+                <p class="djenesis-service-preview__project"><span>Projet</span><?= nl2br(e($quote['message'] ?: 'Aucun message complémentaire.')) ?></p>
+              </div>
+              <pre id="djenesis-service-copy" hidden><?= e($djenesisService) ?></pre>
             </div>
           </div>
 
           <div class="djenesis-actions">
             <button class="btn btn--primary djenesis-copy" type="button" data-copy-target="djenesis-full">Copier tout pour Djenesis</button>
+            <a class="btn djenesis-open" href="https://www.djenesis.com/" target="_blank" rel="noopener noreferrer">Ouvrir Djenesis ↗</a>
             <span class="djenesis-copy-status" aria-live="polite"></span>
           </div>
           <pre id="djenesis-full" hidden><?= e($djenesisFull) ?></pre>
@@ -166,7 +178,13 @@ if ($id > 0) {
           .djenesis-card__head span{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#181716;color:#fff;font-size:9px;font-weight:800}
           .djenesis-card__head strong{font:600 13px 'Space Grotesk',sans-serif}
           .djenesis-card pre{margin:0;padding:15px;white-space:pre-wrap;word-break:break-word;font:500 12px/1.65 'DM Sans',Arial,sans-serif;color:#514b46}
+          .djenesis-service-preview{padding:15px;display:grid;gap:7px}
+          .djenesis-service-preview p{display:grid;grid-template-columns:92px 1fr;gap:10px;margin:0;color:#514b46;font-size:12px;line-height:1.5}
+          .djenesis-service-preview p span{color:#8a8179;font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+          .djenesis-service-preview p strong{color:#181716;font-weight:800}
+          .djenesis-service-preview__project{padding-top:8px;margin-top:4px!important;border-top:1px solid rgba(24,23,22,.08)}
           .djenesis-card .btn{padding:8px 12px;font-size:10px}
+          .djenesis-open{background:#fff;color:#181716}
           .djenesis-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
           .djenesis-copy-status{color:#4f7d3d;font-size:11px;font-weight:700;min-height:16px}
           @media(max-width:800px){.djenesis-grid{grid-template-columns:1fr}}
