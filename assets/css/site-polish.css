@@ -7,11 +7,11 @@
 .home-formules,
 .home-quote{scroll-margin-top:96px}
 
-.section--reviews{padding-bottom:78px}
-.availability{padding-top:78px;padding-bottom:78px}
-.home-prestations{padding-top:78px;padding-bottom:78px}
-.home-formules{padding-top:78px;padding-bottom:78px}
-.home-quote{padding-top:78px!important}
+.section--reviews{padding-bottom:64px}
+.availability{padding-top:64px;padding-bottom:64px}
+.home-prestations{padding-top:64px;padding-bottom:64px}
+.home-formules{padding-top:64px;padding-bottom:64px}
+.home-quote{padding-top:64px!important}
 
 /* Navigation active au scroll */
 .desktop-nav a.is-active{color:#181716;font-weight:700}
@@ -200,9 +200,9 @@ body{
   .menu-toggle{width:38px;height:38px}
   .brand__logo{max-width:82px}
   .back-to-top{right:16px;bottom:16px;width:42px;height:42px}
-  .section--reviews{padding-bottom:62px}
-  .availability,.home-prestations,.home-formules{padding-top:62px;padding-bottom:62px}
-  .home-quote{padding-top:62px!important}
+  .section--reviews{padding-bottom:52px}
+  .availability,.home-prestations,.home-formules{padding-top:52px;padding-bottom:52px}
+  .home-quote{padding-top:52px!important}
 }
 
 @media(max-width:420px){
@@ -266,14 +266,14 @@ body{
 .home-quote::after{
   content:"";
   position:absolute;
-  top:-64px;
+  top:-46px;
   left:50%;
-  width:min(78vw,1080px);
-  height:130px;
+  width:min(76vw,1040px);
+  height:96px;
   transform:translateX(-50%);
-  background:radial-gradient(ellipse at center,rgba(201,52,49,.075) 0%,rgba(201,52,49,.025) 42%,transparent 72%);
-  filter:blur(8px);
-  opacity:.9;
+  background:radial-gradient(ellipse at center,rgba(201,52,49,.06) 0%,rgba(201,52,49,.018) 44%,transparent 74%);
+  filter:blur(11px);
+  opacity:.78;
   z-index:-1;
   pointer-events:none;
 }
@@ -281,12 +281,12 @@ body{
 .section--reviews,
 .home-prestations,
 .home-quote{
-  box-shadow:0 -34px 70px rgba(50,38,28,.022);
+  box-shadow:0 -24px 54px rgba(50,38,28,.018);
 }
 
 .availability,
 .home-formules{
-  box-shadow:0 -34px 70px rgba(201,52,49,.018);
+  box-shadow:0 -24px 54px rgba(201,52,49,.014);
 }
 
 .section--reviews .section-heading,
@@ -335,9 +335,9 @@ body{
   .home-prestations::after,
   .home-formules::after,
   .home-quote::after{
-    top:-48px;
-    height:96px;
-    width:94vw;
+    top:-36px;
+    height:74px;
+    width:92vw;
   }
 }
 
