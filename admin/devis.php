@@ -146,15 +146,10 @@ if ($id > 0) {
 
           $djenesisQuoteInfo = trim(
               "Date de prestation : " . ($quote['event_date'] ? date('d/m/Y', strtotime($quote['event_date'])) : 'À définir') . "\n" .
-              "Détail prestation : " . ($services ? implode(', ', $services) : '—') . "\n" .
+              "Détail : Recommandé par : " . ($quote['referral'] ?: 'Non renseigné') . " | Projet : " . ($quote['message'] ?: 'Aucun message complémentaire.') . "\n" .
               "Lieu de prestation : " . ($quote['venue'] ?: 'À définir') . "\n" .
               "Type d’événement : " . ($quote['event_type'] ?: '—') . "\n" .
-              "Nombre d’invités : " . ($quote['guest_count'] ? (int)$quote['guest_count'] : '—') . "\n" .
-              "Projet : " . ($quote['message'] ?: 'Aucun message complémentaire.') . "\n" .
-              "Pourcentage acompte : 30 %\n" .
-              "Montant acompte : calculé dans Djenesis\n" .
-              "Durée de validité : 15 jours\n" .
-              "Statut : Brouillon"
+              "Nombre d’invités : " . ($quote['guest_count'] ? (int)$quote['guest_count'] : '—')
           );
 
           $djenesisFull = $djenesisClient . "\n\n" . $djenesisLine . "\n\n" . $djenesisQuoteInfo;
@@ -211,14 +206,10 @@ if ($id > 0) {
               </div>
               <div class="djenesis-service-preview">
                 <p><span>Date</span><strong><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></strong></p>
-                <p><span>Détail</span><?= e($services ? implode(', ', $services) : '—') ?></p>
+                <p class="djenesis-service-preview__project"><span>Détail</span><strong>Recommandé par : <?= e($quote['referral'] ?: 'Non renseigné') ?></strong><br><?= nl2br(e($quote['message'] ?: 'Aucun message complémentaire.')) ?></p>
                 <p><span>Lieu</span><strong><?= e($quote['venue'] ?: 'À définir') ?></strong></p>
                 <p><span>Type</span><?= e($quote['event_type'] ?: '—') ?></p>
                 <p><span>Invités</span><strong><?= $quote['guest_count'] ? (int)$quote['guest_count'] : '—' ?></strong></p>
-                <p class="djenesis-service-preview__project"><span>Projet</span><?= nl2br(e($quote['message'] ?: 'Aucun message complémentaire.')) ?></p>
-                <p><span>Acompte</span>30 %</p>
-                <p><span>Validité</span>15 jours</p>
-                <p><span>Statut</span>Brouillon</p>
               </div>
               <pre id="djenesis-quote-info" hidden><?= e($djenesisQuoteInfo) ?></pre>
             </div>          </div>
