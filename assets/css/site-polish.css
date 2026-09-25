@@ -234,7 +234,9 @@ body{
 .availability,
 .home-prestations,
 .home-formules,
-.home-quote{
+.options-section,
+.home-quote,
+.home-partners{
   position:relative;
   isolation:isolate;
 }
@@ -243,13 +245,19 @@ body{
 .availability::before,
 .home-prestations::before,
 .home-formules::before,
-.home-quote::before{
+.options-section::before,
+.home-quote::before,
+.home-partners::before{
   content:"";
   position:absolute;
+  inset:auto;
   top:0;
   left:50%;
   width:min(74%,980px);
-  height:1px;
+  height:1px!important;
+  min-height:1px;
+  max-height:1px;
+  border-radius:0;
   transform:translateX(-50%);
   background:linear-gradient(90deg,transparent 0%,rgba(201,52,49,.14) 18%,rgba(201,52,49,.72) 50%,rgba(201,52,49,.14) 82%,transparent 100%);
   background-size:200% 100%;
@@ -263,7 +271,9 @@ body{
 .availability::after,
 .home-prestations::after,
 .home-formules::after,
-.home-quote::after{
+.options-section::after,
+.home-quote::after,
+.home-partners::after{
   content:"";
   position:absolute;
   top:-46px;
@@ -280,7 +290,9 @@ body{
 
 .section--reviews,
 .home-prestations,
-.home-quote{
+.options-section,
+.home-quote,
+.home-partners{
   box-shadow:0 -24px 54px rgba(50,38,28,.018);
 }
 
@@ -315,7 +327,9 @@ body{
   .availability:hover::after,
   .home-prestations:hover::after,
   .home-formules:hover::after,
-  .home-quote:hover::after{
+  .options-section:hover::after,
+  .home-quote:hover::after,
+  .home-partners:hover::after{
     opacity:1;
   }
 }
@@ -325,7 +339,9 @@ body{
   .availability::before,
   .home-prestations::before,
   .home-formules::before,
-  .home-quote::before{
+  .options-section::before,
+  .home-quote::before,
+  .home-partners::before{
     width:82%;
     opacity:.45;
   }
@@ -334,7 +350,9 @@ body{
   .availability::after,
   .home-prestations::after,
   .home-formules::after,
-  .home-quote::after{
+  .options-section::after,
+  .home-quote::after,
+  .home-partners::after{
     top:-36px;
     height:74px;
     width:92vw;
@@ -346,7 +364,24 @@ body{
   .availability::before,
   .home-prestations::before,
   .home-formules::before,
-  .home-quote::before{
+  .options-section::before,
+  .home-quote::before,
+  .home-partners::before{
     animation:none!important;
   }
+}
+
+
+/* Uniformisation stricte du séparateur Disponibilités */
+.availability::before{
+  inset:auto!important;
+  top:0!important;
+  left:50%!important;
+  right:auto!important;
+  bottom:auto!important;
+  width:min(74%,980px)!important;
+  height:1px!important;
+  min-height:1px!important;
+  max-height:1px!important;
+  border-radius:0!important;
 }
