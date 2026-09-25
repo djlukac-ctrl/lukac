@@ -103,26 +103,61 @@ if ($id > 0) {
         </section>
 
         <?php
-          $djenesisClient = trim(
-              "Nom et prénom : " . ($quote['name'] ?: '—') . "\n" .
-              "E-mail : " . ($quote['email'] ?: '—') . "\n" .
-              "Téléphone : " . ($quote['phone'] ?: '—') . "\n" .
-              "Adresse : " . ($quote['postal_address'] ?: '—')
-          );
+          $postalLine = (string)($quote['postal_address'] ?? '');
+          $clientAddress = $postalLine ?: '—';
+          $clientPostcode = '—';
+          $clientCity = '—';
+          if ($postalLine && preg_match('/^(.*),\\s*(\\d{5})\\s+(.+)$/u', $postalLine, $postalMatch)) {
+              $clientAddress = trim($postalMatch[1]);
+              $clientPostcode = trim($postalMatch[2]);
+              $clientCity = trim($postalMatch[3]);
+          }
 
-          $djenesisService = trim(
-              "Événement : " . ($quote['event_type'] ?: '—') . "\n" .
-              "Date : " . ($quote['event_date'] ? date('d/m/Y', strtotime($quote['event_date'])) : 'À définir') . "\n" .
-              "Lieu : " . ($quote['venue'] ?: 'À définir') . "\n" .
-              "Horaires : " . (($quote['start_time'] ?: '—') . " → " . ($quote['end_time'] ?: '—')) . "\n" .
-              "Invités : " . ($quote['guest_count'] ? (int)$quote['guest_count'] : '—') . "\n" .
+          $quoteLineName = 'Prestation ' . ($quote['event_type'] ?: 'événement');
+          if ($formulas) {
+              $quoteLineName .= ' — ' . implode(', ', $formulas);
+          }
+
+          $quoteDetail = trim(
               "Prestations : " . ($services ? implode(', ', $services) : 'Non renseigné') . "\n" .
               "Formule : " . ($formulas ? implode(', ', $formulas) : 'Non renseignée') . "\n" .
               "Options : " . ($options ? implode(', ', $options) : 'Aucune') . "\n" .
+              "Horaires : " . (($quote['start_time'] ?: '—') . " → " . ($quote['end_time'] ?: '—')) . "\n" .
+              "Invités : " . ($quote['guest_count'] ? (int)$quote['guest_count'] : '—') . "\n" .
               "Projet : " . ($quote['message'] ?: 'Aucun message complémentaire.')
           );
 
-          $djenesisFull = $djenesisClient . "\n\n" . $djenesisService;
+          $djenesisClient = trim(
+              "Nom / prénom saisi : " . ($quote['name'] ?: '—') . "\n" .
+              "E-mail : " . ($quote['email'] ?: '—') . "\n" .
+              "Téléphone : " . ($quote['phone'] ?: '—') . "\n" .
+              "Adresse : " . $clientAddress . "\n" .
+              "Ville : " . $clientCity . "\n" .
+              "Code postal : " . $clientPostcode . "\n" .
+              "Pays : France\n" .
+              "Statut client : Prospect"
+          );
+
+          $djenesisLine = trim(
+              "Catalogue : à sélectionner dans Djenesis\n" .
+              "Nom : " . $quoteLineName . "\n" .
+              "Description :\n" . $quoteDetail . "\n" .
+              "Prix HT : à renseigner\n" .
+              "Quantité : 1"
+          );
+
+          $djenesisQuoteInfo = trim(
+              "Date de prestation : " . ($quote['event_date'] ? date('d/m/Y', strtotime($quote['event_date'])) : 'À définir') . "\n" .
+              "Détail prestation : " . ($services ? implode(', ', $services) : '—') . "\n" .
+              "Lieu de prestation : " . ($quote['venue'] ?: 'À définir') . "\n" .
+              "Type d’événement : " . ($quote['event_type'] ?: '—') . "\n" .
+              "Pourcentage acompte : 30 %\n" .
+              "Montant acompte : calculé dans Djenesis\n" .
+              "Durée de validité : 15 jours\n" .
+              "Statut : Brouillon"
+          );
+
+          $djenesisFull = $djenesisClient . "\n\n" . $djenesisLine . "\n\n" . $djenesisQuoteInfo;
         ?>
         <section class="form-card quote-block djenesis-block">
           <div class="quote-block__heading">
@@ -131,38 +166,61 @@ if ($id > 0) {
             <p class="djenesis-block__lead">Les informations sont déjà regroupées dans un format prêt à copier dans Djenesis.</p>
           </div>
 
-          <div class="djenesis-grid">
+          <div class="djenesis-grid djenesis-grid--three">
             <div class="djenesis-card">
               <div class="djenesis-card__head">
-                <div><span>01</span><strong>Coordonnées client</strong></div>
+                <div><span>01</span><strong>Créer le client</strong></div>
                 <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-client">Copier</button>
               </div>
-              <pre id="djenesis-client"><?= e($djenesisClient) ?></pre>
+              <div class="djenesis-service-preview">
+                <p><span>Nom / prénom</span><strong><?= e($quote['name'] ?: '—') ?></strong></p>
+                <p><span>E-mail</span><?= e($quote['email'] ?: '—') ?></p>
+                <p><span>Téléphone</span><?= e($quote['phone'] ?: '—') ?></p>
+                <p><span>Adresse</span><?= e($clientAddress) ?></p>
+                <p><span>Ville</span><?= e($clientCity) ?></p>
+                <p><span>Code postal</span><?= e($clientPostcode) ?></p>
+                <p><span>Pays</span>France</p>
+                <p><span>Statut</span>Prospect</p>
+              </div>
+              <pre id="djenesis-client" hidden><?= e($djenesisClient) ?></pre>
             </div>
 
             <div class="djenesis-card">
               <div class="djenesis-card__head">
-                <div><span>02</span><strong>Prestation</strong></div>
-                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-service-copy">Copier</button>
+                <div><span>02</span><strong>Ligne du devis</strong></div>
+                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-line">Copier</button>
               </div>
-              <div id="djenesis-service" class="djenesis-service-preview">
-                <p><span>Événement</span><strong><?= e($quote['event_type'] ?: '—') ?></strong></p>
+              <div class="djenesis-service-preview">
+                <p><span>Catalogue</span>À sélectionner</p>
+                <p><span>Nom</span><strong><?= e($quoteLineName) ?></strong></p>
+                <p><span>Description</span><?= nl2br(e($quoteDetail)) ?></p>
+                <p><span>Prix HT</span>À renseigner</p>
+                <p><span>Quantité</span><strong>1</strong></p>
+              </div>
+              <pre id="djenesis-line" hidden><?= e($djenesisLine) ?></pre>
+            </div>
+
+            <div class="djenesis-card">
+              <div class="djenesis-card__head">
+                <div><span>03</span><strong>Informations devis</strong></div>
+                <button class="btn djenesis-copy" type="button" data-copy-target="djenesis-quote-info">Copier</button>
+              </div>
+              <div class="djenesis-service-preview">
                 <p><span>Date</span><strong><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></strong></p>
+                <p><span>Détail</span><?= e($services ? implode(', ', $services) : '—') ?></p>
                 <p><span>Lieu</span><strong><?= e($quote['venue'] ?: 'À définir') ?></strong></p>
-                <p><span>Horaires</span><?= e(($quote['start_time'] ?: '—') . ' → ' . ($quote['end_time'] ?: '—')) ?></p>
-                <p><span>Invités</span><?= $quote['guest_count'] ? (int)$quote['guest_count'] : '—' ?></p>
-                <p><span>Prestations</span><?= e($services ? implode(', ', $services) : 'Non renseigné') ?></p>
-                <p><span>Formule</span><strong><?= e($formulas ? implode(', ', $formulas) : 'Non renseignée') ?></strong></p>
-                <p><span>Options</span><?= e($options ? implode(', ', $options) : 'Aucune') ?></p>
-                <p class="djenesis-service-preview__project"><span>Projet</span><?= nl2br(e($quote['message'] ?: 'Aucun message complémentaire.')) ?></p>
+                <p><span>Type</span><?= e($quote['event_type'] ?: '—') ?></p>
+                <p><span>Acompte</span>30 %</p>
+                <p><span>Validité</span>15 jours</p>
+                <p><span>Statut</span>Brouillon</p>
               </div>
-              <pre id="djenesis-service-copy" hidden><?= e($djenesisService) ?></pre>
+              <pre id="djenesis-quote-info" hidden><?= e($djenesisQuoteInfo) ?></pre>
             </div>
           </div>
 
           <div class="djenesis-actions">
             <button class="btn btn--primary djenesis-copy" type="button" data-copy-target="djenesis-full">Copier tout pour Djenesis</button>
-            <a class="btn djenesis-open" href="https://www.djenesis.com/" target="_blank" rel="noopener noreferrer">Ouvrir Djenesis ↗</a>
+            <a class="btn djenesis-open" href="https://djenesis.net/dj/quotes/create" target="_blank" rel="noopener noreferrer">Créer le devis dans Djenesis ↗</a>
             <span class="djenesis-copy-status" aria-live="polite"></span>
           </div>
           <pre id="djenesis-full" hidden><?= e($djenesisFull) ?></pre>
@@ -171,7 +229,7 @@ if ($id > 0) {
         <style>
           .djenesis-block{overflow:hidden}
           .djenesis-block__lead{margin:7px 0 0;color:#7b746e;font-size:12px;line-height:1.6}
-          .djenesis-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+          .djenesis-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.djenesis-grid--three{grid-template-columns:repeat(3,minmax(0,1fr))}
           .djenesis-card{border:1px solid rgba(24,23,22,.10);border-radius:14px;background:#faf8f5;overflow:hidden}
           .djenesis-card__head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid rgba(24,23,22,.08);background:#fff}
           .djenesis-card__head>div{display:flex;align-items:center;gap:9px}
@@ -187,7 +245,7 @@ if ($id > 0) {
           .djenesis-open{background:#fff;color:#181716}
           .djenesis-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
           .djenesis-copy-status{color:#4f7d3d;font-size:11px;font-weight:700;min-height:16px}
-          @media(max-width:800px){.djenesis-grid{grid-template-columns:1fr}}
+          @media(max-width:1100px){.djenesis-grid--three{grid-template-columns:1fr 1fr}}@media(max-width:800px){.djenesis-grid,.djenesis-grid--three{grid-template-columns:1fr}}
         </style>
 
         <script>
