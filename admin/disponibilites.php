@@ -48,14 +48,15 @@ $rows = $pdo
 $future = [];
 $past = [];
 $today = new DateTimeImmutable('today');
-$formatter = new IntlDateFormatter('fr_FR', IntlDateFormatter::FULL, IntlDateFormatter::NONE, 'Europe/Paris', IntlDateFormatter::GREGORIAN, 'EEEE d MMMM y');
+$weekdays = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+$months = [1=>'janvier',2=>'février',3=>'mars',4=>'avril',5=>'mai',6=>'juin',7=>'juillet',8=>'août',9=>'septembre',10=>'octobre',11=>'novembre',12=>'décembre'];
 
 foreach ($rows as $date) {
     $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', (string)$date);
     if (!$parsed) continue;
     $item = [
         'iso' => (string)$date,
-        'label' => ucfirst($formatter->format($parsed)),
+        'label' => $weekdays[(int)$parsed->format('w')] . ' ' . $parsed->format('j') . ' ' . $months[(int)$parsed->format('n')] . ' ' . $parsed->format('Y'),
     ];
     if ($parsed >= $today) $future[] = $item;
     else $past[] = $item;
