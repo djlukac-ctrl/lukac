@@ -764,3 +764,19 @@ document.head.appendChild(socialStyles);
     });
   });
 })();
+
+
+/* Étincelles froides : un seul choix 2 jets ou 4 jets */
+document.querySelectorAll('form').forEach((form) => {
+  const sparkChoices = Array.from(form.querySelectorAll(
+    'input[name="selections[]"][value="Étincelles froides — 2 jets"], input[name="selections[]"][value="Étincelles froides — 4 jets"]'
+  ));
+  sparkChoices.forEach((input) => {
+    input.addEventListener('change', () => {
+      if (!input.checked) return;
+      sparkChoices.forEach((other) => {
+        if (other !== input) other.checked = false;
+      });
+    });
+  });
+});
