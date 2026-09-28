@@ -146,6 +146,8 @@ if (homeMain && homeHero && reviewsSection && homePrestations) {
           <legend>Options complémentaires</legend>
           <p class="home-quote__group-help">Ajoutez uniquement ce qui vous intéresse. Vous pourrez toujours ajuster les options avec moi ensuite.</p>
           <div class="home-quote__choice-grid home-quote__choice-grid--options">
+            <label class="home-quote__choice-card home-quote__choice-card--option"><input type="checkbox" name="selections[]" value="Photobooth 150 tirages"><strong>Photobooth — 150 tirages</strong><small>Un photobooth avec 150 impressions pour vos invités.</small></label>
+            <label class="home-quote__choice-card home-quote__choice-card--option"><input type="checkbox" name="selections[]" value="Photobooth 300 tirages"><strong>Photobooth — 300 tirages</strong><small>Davantage de tirages pour les événements plus importants.</small></label>
             <label class="home-quote__choice-card home-quote__choice-card--option"><input type="checkbox" name="selections[]" value="Livre d'or audio"><strong>Livre d'or audio</strong><small>Les messages de vos invités enregistrés pendant la soirée.</small></label>
             <label class="home-quote__choice-card home-quote__choice-card--option"><input type="checkbox" name="selections[]" value="Fumée lourde"><strong>Fumée lourde</strong><small>Un nuage au sol pour sublimer l’ouverture de bal.</small></label>
             <label class="home-quote__choice-card home-quote__choice-card--option"><input type="checkbox" name="selections[]" value="Étincelles froides — 2 jets"><strong>Étincelles froides — 2 jets</strong><small>Pour accompagner un temps fort avec un effet spectaculaire.</small></label>
