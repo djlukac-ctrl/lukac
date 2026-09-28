@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <a class="header-cta" href="devis.php">Demander un devis <span>→</span></a>
   <button class="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false"><span></span><span></span></button>
 </header>
-<nav class="mobile-nav" hidden><a href="index.html">Accueil</a><a href="index.html#prestations">Prestations</a><a href="index.html#formules">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a></nav>
+<nav class="mobile-nav" hidden><a href="index.html">Accueil</a><a href="index.html#prestations">Prestations</a><a href="index.html#formules">Formules</a><a href="index.html#avis">Avis clients</a></nav>
 <main class="quote-page">
   <section class="quote-head"><p>Demande de devis</p><h1>Créons une soirée <span>qui vous ressemble.</span></h1><p>Parlez-moi de votre date, de votre lieu et de vos envies. Je vous proposerai une prestation pensée pour votre événement et l’ambiance que vous souhaitez créer.</p></section>
   <?php if ($success): ?>
@@ -170,8 +170,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
   <?php endif; ?>
 </main>
-<footer class="site-footer"><a class="brand brand--footer" href="index.html"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo brand__logo--footer"></a><p>DJ & animateur événementiel</p><div class="site-footer__links"><a href="index.html#prestations">Prestations</a><a href="index.html#formules">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a></div><small>© 2026 Luka C • Tous droits réservés</small></footer>
-<script src="assets/js/main.js?v=20260928-4"></script>
+<footer class="site-footer"><a class="brand brand--footer" href="index.html"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo brand__logo--footer"></a><p>DJ & animateur événementiel</p><div class="site-footer__links"><a href="index.html#prestations">Prestations</a><a href="index.html#formules">Formules</a><a href="index.html#avis">Avis clients</a></div><small>© 2026 Luka C • Tous droits réservés</small></footer>
+<script src="assets/js/main.js?v=20260928-5"></script>
 <script>
   const sparkToggle = document.getElementById('spark-toggle');
   const sparkQuantity = document.getElementById('spark-quantity');
