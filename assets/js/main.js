@@ -710,6 +710,19 @@ document.head.appendChild(socialStyles);
         return;
       }
 
+      const eventDate = getValue(form,'event_date');
+      if (!eventDate) {
+        const dateFeedback = form.querySelector('.lukac-date-feedback');
+        if (dateFeedback) {
+          dateFeedback.className = 'lukac-date-feedback is-error';
+          dateFeedback.textContent = 'Merci de choisir une date disponible dans le calendrier.';
+          dateFeedback.scrollIntoView({behavior:'smooth',block:'center'});
+        } else {
+          alert('Merci de choisir une date disponible.');
+        }
+        return;
+      }
+
       const hasService = services().length > 0;
       const selected = selections();
       const hasFormula = selected.some(value => formulaNames.has(value));
