@@ -95,13 +95,29 @@ if (homeMain && homeHero && reviewsSection && homePrestations) {
         <div class="home-quote__field"><label>Arrivée des invités *</label><input name="start_time" type="time" required></div>
         <div class="home-quote__field"><label>Fin de soirée *</label><input name="end_time" type="time" required></div>
 
-        <fieldset class="home-quote__group home-quote__group--full">
+        <fieldset class="home-quote__group home-quote__group--full home-quote__group--services">
           <legend>Quelle(s) prestation(s) souhaitez-vous ? *</legend>
-          <div class="home-quote__checks">
-            <label><input type="checkbox" name="services[]" value="DJ"><span>DJ</span></label>
-            <label><input type="checkbox" name="services[]" value="Animations"><span>Animations</span></label>
-            <label><input type="checkbox" name="services[]" value="Karaoké"><span>Karaoké</span></label>
-            <label><input type="checkbox" name="services[]" value="Sonorisation de vin d’honneur et cérémonie laïque"><span>Sonorisation de vin d’honneur et cérémonie laïque</span></label>
+          <div class="home-quote__choice-grid home-quote__choice-grid--services">
+            <label class="home-quote__choice-card home-quote__choice-card--service">
+              <input type="checkbox" name="services[]" value="DJ">
+              <strong>DJ</strong>
+              <small>Une programmation musicale adaptée à votre événement et à vos invités.</small>
+            </label>
+            <label class="home-quote__choice-card home-quote__choice-card--service">
+              <input type="checkbox" name="services[]" value="Animations">
+              <strong>Animations</strong>
+              <small>Des animations interactives pour faire participer vos invités.</small>
+            </label>
+            <label class="home-quote__choice-card home-quote__choice-card--service">
+              <input type="checkbox" name="services[]" value="Karaoké">
+              <strong>Karaoké</strong>
+              <small>Un moment convivial et participatif autour de vos chansons préférées.</small>
+            </label>
+            <label class="home-quote__choice-card home-quote__choice-card--service">
+              <input type="checkbox" name="services[]" value="Sonorisation de vin d’honneur et cérémonie laïque">
+              <strong>Vin d’honneur & cérémonie</strong>
+              <small>Sonorisation et ambiance musicale pour accompagner ces moments clés.</small>
+            </label>
           </div>
         </fieldset>
 
@@ -110,19 +126,16 @@ if (homeMain && homeHero && reviewsSection && homePrestations) {
           <div class="home-quote__choice-grid home-quote__choice-grid--formulas">
             <label class="home-quote__choice-card">
               <input type="radio" name="selections[]" value="Essentiel">
-              <span class="home-quote__choice-mark">01</span>
               <strong>Essentiel</strong>
               <small>L’essentiel pour une soirée réussie.</small>
             </label>
             <label class="home-quote__choice-card">
               <input type="radio" name="selections[]" value="Ambiance">
-              <span class="home-quote__choice-mark">02</span>
               <strong>Ambiance</strong>
               <small>Plus de lumière et une mise en scène plus dynamique.</small>
             </label>
             <label class="home-quote__choice-card">
               <input type="radio" name="selections[]" value="Expérience">
-              <span class="home-quote__choice-mark">03</span>
               <strong>Expérience</strong>
               <small>Une installation complète pour une soirée plus immersive.</small>
             </label>
@@ -165,14 +178,13 @@ if (homeMain && homeHero && reviewsSection && homePrestations) {
     .home-quote__field input:focus,.home-quote__field select:focus,.home-quote__field textarea:focus{border-color:#a99f95;box-shadow:0 0 0 3px rgba(201,52,49,.06)}
     .home-quote__group{border:1px solid rgba(24,23,22,.10);border-radius:16px;padding:16px;margin:0;background:#fbf9f6}.home-quote__group legend{padding:0 7px}.home-quote__address{display:grid;grid-template-columns:120px 1.5fr 1fr 150px;gap:12px}.home-quote__checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}.home-quote__checks label{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid rgba(24,23,22,.10);border-radius:11px;background:#fff;color:#393531;font-size:12px;cursor:pointer}.home-quote__checks input{width:16px;height:16px;margin:1px 0 0;accent-color:#c93431}
     .home-quote__group-help{margin:0 0 14px;color:#817a73;font-size:11px;line-height:1.55}
-    .home-quote__choice-grid{display:grid;gap:12px}.home-quote__choice-grid--formulas{grid-template-columns:repeat(3,minmax(0,1fr))}.home-quote__choice-grid--options{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .home-quote__choice-grid{display:grid;gap:12px}.home-quote__choice-grid--services{grid-template-columns:repeat(2,minmax(0,1fr))}.home-quote__choice-grid--formulas{grid-template-columns:repeat(3,minmax(0,1fr))}.home-quote__choice-grid--options{grid-template-columns:repeat(2,minmax(0,1fr))}
     .home-quote__choice-card{position:relative;display:grid;gap:7px;min-height:118px;padding:17px 17px 16px;border:1px solid rgba(24,23,22,.10);border-radius:15px;background:#fff;cursor:pointer;transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease,background .18s ease}
     .home-quote__choice-card:hover{transform:translateY(-1px);border-color:rgba(201,52,49,.28);box-shadow:0 10px 24px rgba(50,38,28,.06)}
     .home-quote__choice-card input{position:absolute;top:14px;right:14px;width:17px;height:17px;accent-color:#c93431}
     .home-quote__choice-card strong{padding-right:26px;font:600 15px 'Space Grotesk',sans-serif;color:#181716}.home-quote__choice-card small{color:#817a73;font-size:10px;line-height:1.5}
-    .home-quote__choice-mark{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#181716;color:#fff;font-size:9px;font-weight:800}
     .home-quote__choice-card:has(input:checked){border-color:#c93431;background:#fff8f7;box-shadow:0 0 0 2px rgba(201,52,49,.07)}
-    .home-quote__choice-card:has(input:checked) .home-quote__choice-mark{background:#c93431}
+    .home-quote__choice-card--service{min-height:100px}
     .home-quote__choice-card--option{min-height:96px}
     .quote-summary{grid-column:1/-1;margin-top:4px;padding:20px;border:1px solid rgba(201,52,49,.16);border-radius:16px;background:linear-gradient(135deg,#fff,#fff8f7)}
     .quote-summary[hidden]{display:none!important}.quote-summary__head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px}.quote-summary__head span{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#c93431;font-weight:800}.quote-summary__head strong{font:600 18px 'Space Grotesk',sans-serif}
@@ -181,8 +193,8 @@ if (homeMain && homeHero && reviewsSection && homePrestations) {
     .home-quote__message{display:none;margin-bottom:16px;padding:16px 18px;border-radius:14px;font-size:13px}.home-quote__message.is-success{display:block;background:#f2f8ee;color:#27451f;border:1px solid rgba(96,128,75,.22)}.home-quote__message.is-error{display:block;background:#fff1f0;color:#9a413d;border:1px solid rgba(168,76,71,.20)}
     .home-quote__hp{position:absolute;left:-9999px;opacity:0;pointer-events:none}
     @media(max-width:850px){.home-quote__address{grid-template-columns:1fr 1fr}}
-    @media(max-width:850px){.home-quote__choice-grid--formulas{grid-template-columns:1fr}.home-quote__choice-grid--options{grid-template-columns:1fr 1fr}}
-    @media(max-width:700px){.home-quote{padding:64px 18px 80px}.home-quote__grid{grid-template-columns:1fr}.home-quote__field--full,.home-quote__group--full{grid-column:auto}.home-quote__address,.home-quote__checks,.home-quote__choice-grid--options,.quote-summary__grid{grid-template-columns:1fr}.home-quote__form{padding:20px}.home-quote__actions{align-items:stretch;flex-direction:column}.home-quote__actions button{width:100%}}
+    @media(max-width:850px){.home-quote__choice-grid--services{grid-template-columns:1fr 1fr}.home-quote__choice-grid--formulas{grid-template-columns:1fr}.home-quote__choice-grid--options{grid-template-columns:1fr 1fr}}
+    @media(max-width:700px){.home-quote{padding:64px 18px 80px}.home-quote__grid{grid-template-columns:1fr}.home-quote__field--full,.home-quote__group--full{grid-column:auto}.home-quote__address,.home-quote__checks,.home-quote__choice-grid--services,.home-quote__choice-grid--options,.quote-summary__grid{grid-template-columns:1fr}.home-quote__form{padding:20px}.home-quote__actions{align-items:stretch;flex-direction:column}.home-quote__actions button{width:100%}}
   `;
   document.head.appendChild(quoteStyles);
 
