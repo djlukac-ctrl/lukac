@@ -338,319 +338,221 @@ socialStyles.textContent = `
 `;
 document.head.appendChild(socialStyles);
 
-/* Calendrier de devis relié aux disponibilités du site */
+/* Calendrier de devis relié aux dates réservées */
 (() => {
   const dateInputs = Array.from(document.querySelectorAll('input[name="event_date"]'));
   if (!dateInputs.length) return;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
-  const monthNames = [
-    'Janvier','Février','Mars','Avril','Mai','Juin',
-    'Juillet','Août','Septembre','Octobre','Novembre','Décembre'
-  ];
+  const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
   const weekdayNames = ['L','M','M','J','V','S','D'];
 
   const style = document.createElement('style');
   style.textContent = `
     .lukac-date-picker{position:relative}
-    .lukac-date-trigger{
-      width:100%;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;
-      border:1px solid rgba(24,23,22,.12);border-radius:12px;background:#faf8f5;color:#181716;
-      padding:13px 14px;font:inherit;text-align:left;cursor:pointer;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease
-    }
+    .lukac-date-trigger{width:100%;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid rgba(24,23,22,.12);border-radius:12px;background:#faf8f5;color:#181716;padding:13px 14px;font:inherit;text-align:left;cursor:pointer;transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}
     .lukac-date-trigger:hover,.lukac-date-trigger[aria-expanded="true"]{border-color:#a99f95;box-shadow:0 0 0 3px rgba(201,52,49,.06);background:#fff}
-    .lukac-date-trigger__icon{font-size:18px;line-height:1;color:#c93431}
-    .lukac-date-trigger__placeholder{color:#8a837c}
-    .lukac-calendar{
-      position:absolute;left:0;top:calc(100% + 8px);z-index:80;width:min(360px,calc(100vw - 44px));
-      padding:18px;border:1px solid rgba(24,23,22,.12);border-radius:18px;background:#fff;color:#181716;
-      box-shadow:0 24px 60px rgba(43,34,28,.18)
-    }
-    .lukac-calendar[hidden]{display:none!important}
-    .lukac-calendar__head{display:grid;grid-template-columns:38px 1fr 38px;gap:8px;align-items:center;margin-bottom:14px}
-    .lukac-calendar__title{text-align:center;font:600 17px 'Space Grotesk',sans-serif}
-    .lukac-calendar__nav{
-      width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(24,23,22,.10);border-radius:50%;
-      background:#faf8f5;color:#181716;cursor:pointer;font-size:18px
-    }
-    .lukac-calendar__nav:hover:not(:disabled){background:#181716;color:#fff}
-    .lukac-calendar__nav:disabled{opacity:.25;cursor:not-allowed}
-    .lukac-calendar__status{margin:-4px 0 13px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#817a73}
-    .lukac-calendar__weekdays,.lukac-calendar__days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
-    .lukac-calendar__weekdays span{display:grid;place-items:center;height:26px;font-size:9px;font-weight:800;color:#9a938c}
-    .lukac-calendar__empty{height:39px}
-    .lukac-calendar__day{
-      height:39px;border:0;border-radius:10px;background:#f8f5f1;color:#26221f;font-size:12px;font-weight:700;cursor:pointer;
-      transition:transform .15s ease,background .15s ease,color .15s ease
-    }
-    .lukac-calendar__day:hover{background:#181716;color:#fff;transform:translateY(-1px)}
-    .lukac-calendar__day.is-selected{background:#c93431;color:#fff;box-shadow:0 5px 14px rgba(201,52,49,.22)}
-    .lukac-calendar__day--unavailable{
-      height:39px;display:grid;place-items:center;border-radius:10px;background:#f5f2ee;color:#c1bbb5;
-      font-size:12px;font-weight:600;text-decoration:line-through;cursor:not-allowed
-    }
-    .lukac-calendar__day--today{outline:1px solid rgba(201,52,49,.45);outline-offset:-2px}
+    .lukac-date-trigger__icon{font-size:18px;line-height:1;color:#c93431}.lukac-date-trigger__placeholder{color:#8a837c}
+    .lukac-calendar{position:absolute;left:0;top:calc(100% + 8px);z-index:80;width:min(360px,calc(100vw - 44px));padding:18px;border:1px solid rgba(24,23,22,.12);border-radius:18px;background:#fff;color:#181716;box-shadow:0 24px 60px rgba(43,34,28,.18)}
+    .lukac-calendar[hidden]{display:none!important}.lukac-calendar__head{display:grid;grid-template-columns:38px 1fr 38px;gap:8px;align-items:center;margin-bottom:14px}
+    .lukac-calendar__title{text-align:center;font:600 17px 'Space Grotesk',sans-serif}.lukac-calendar__nav{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(24,23,22,.10);border-radius:50%;background:#faf8f5;color:#181716;cursor:pointer;font-size:18px}
+    .lukac-calendar__nav:hover:not(:disabled){background:#181716;color:#fff}.lukac-calendar__nav:disabled{opacity:.25;cursor:not-allowed}
+    .lukac-calendar__status{margin:-4px 0 13px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.05em;color:#817a73}
+    .lukac-calendar__weekdays,.lukac-calendar__days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.lukac-calendar__weekdays span{display:grid;place-items:center;height:26px;font-size:9px;font-weight:800;color:#9a938c}
+    .lukac-calendar__empty{height:39px}.lukac-calendar__day{height:39px;border:0;border-radius:10px;background:#f8f5f1;color:#26221f;font-size:12px;font-weight:700;cursor:pointer;transition:transform .15s ease,background .15s ease,color .15s ease}
+    .lukac-calendar__day:hover{background:#181716;color:#fff;transform:translateY(-1px)}.lukac-calendar__day.is-selected{background:#c93431;color:#fff;box-shadow:0 5px 14px rgba(201,52,49,.22)}
+    .lukac-calendar__day--unavailable{height:39px;display:grid;place-items:center;border-radius:10px;background:#f5f2ee;color:#c1bbb5;font-size:12px;font-weight:600;text-decoration:line-through;cursor:not-allowed}
+    .lukac-calendar__day--reserved{background:#f6e9e8;color:#bf7772}.lukac-calendar__day--today{outline:1px solid rgba(201,52,49,.45);outline-offset:-2px}
     .lukac-calendar__legend{display:flex;gap:15px;flex-wrap:wrap;margin-top:14px;padding-top:13px;border-top:1px solid rgba(24,23,22,.08);font-size:10px;color:#817a73}
-    .lukac-calendar__legend span{display:inline-flex;align-items:center;gap:6px}
-    .lukac-calendar__legend i{width:8px;height:8px;border-radius:50%;background:#181716}
-    .lukac-calendar__legend .off i{background:#d3cdc7}
-    .lukac-date-feedback{min-height:18px;margin-top:5px;font-size:11px;line-height:1.45;color:#817a73}
-    .lukac-date-feedback.is-ok{color:#557347;font-weight:600}
-    .lukac-date-feedback.is-error{color:#b24540;font-weight:600}
-    @media(max-width:620px){
-      .lukac-calendar{position:fixed;left:14px;right:14px;top:50%;width:auto;max-width:390px;margin:auto;transform:translateY(-50%);padding:16px}
-      .lukac-calendar__day,.lukac-calendar__day--unavailable{height:42px}
-    }
+    .lukac-calendar__legend span{display:inline-flex;align-items:center;gap:6px}.lukac-calendar__legend i{width:8px;height:8px;border-radius:50%;background:#181716}.lukac-calendar__legend .off i{background:#d7a09c}
+    .lukac-date-feedback{min-height:18px;margin-top:5px;font-size:11px;line-height:1.45;color:#817a73}.lukac-date-feedback.is-ok{color:#557347;font-weight:600}.lukac-date-feedback.is-error{color:#b24540;font-weight:600}
+    @media(max-width:620px){.lukac-calendar{position:fixed;left:14px;right:14px;top:50%;width:auto;max-width:390px;margin:auto;transform:translateY(-50%);padding:16px}.lukac-calendar__day,.lukac-calendar__day--unavailable{height:42px}}
   `;
   document.head.appendChild(style);
 
-  const toIso = (year, month, day) =>
-    `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-
+  const toIso = (year, month, day) => `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
   const parseIso = (value) => {
     const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || ''));
-    return match ? { year:Number(match[1]), month:Number(match[2]), day:Number(match[3]) } : null;
+    return match ? {year:Number(match[1]),month:Number(match[2]),day:Number(match[3])} : null;
   };
-
   const formatFr = (value) => {
     const parsed = parseIso(value);
     if (!parsed) return '';
-    return new Intl.DateTimeFormat('fr-FR', {
-      weekday:'long', day:'numeric', month:'long', year:'numeric'
-    }).format(new Date(parsed.year, parsed.month - 1, parsed.day));
+    return new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}).format(new Date(parsed.year,parsed.month-1,parsed.day));
   };
-
-  const isPast = (year, month, day) => {
-    const d = new Date(year, month - 1, day);
+  const isPast = (year,month,day) => {
+    const d = new Date(year,month-1,day);
     d.setHours(0,0,0,0);
     return d < today;
   };
+  const monthIndex = (year,month) => year * 12 + (month - 1);
 
-  function dayAvailability(year, month, day, availability) {
-    if (isPast(year, month, day)) return false;
-    const data = availability?.[String(year)]?.[String(month)];
-    if (!data) return false;
-    if (data.status === 'open') return true;
-    if (data.status === 'closed') return false;
-    if (data.status === 'limited') {
-      return Array.isArray(data.available_days) && data.available_days.map(Number).includes(day);
-    }
-    return false;
-  }
-
-  function knownMonths(availability) {
-    const list = [];
-    Object.entries(availability || {}).forEach(([year, months]) => {
-      Object.keys(months || {}).forEach((month) => {
-        list.push({year:Number(year), month:Number(month)});
-      });
-    });
-    return list.sort((a,b) => (a.year * 12 + a.month) - (b.year * 12 + b.month));
-  }
-
-  function monthIndex(year, month) {
-    return year * 12 + (month - 1);
-  }
-
-  function setupPicker(input, availability) {
+  function setupPicker(input, reservedDates) {
+    const reserved = new Set((reservedDates || []).map(String));
     const originalValue = input.value;
-    const months = knownMonths(availability);
-    if (!months.length) return;
-
-    const minMonth = months[0];
-    const maxMonth = months[months.length - 1];
     const selected = parseIso(originalValue);
-
     let viewYear = selected?.year || today.getFullYear();
     let viewMonth = selected?.month || (today.getMonth() + 1);
-
-    const currentIndex = monthIndex(viewYear, viewMonth);
-    const minIndex = monthIndex(minMonth.year, minMonth.month);
-    const maxIndex = monthIndex(maxMonth.year, maxMonth.month);
-    if (currentIndex < minIndex) { viewYear = minMonth.year; viewMonth = minMonth.month; }
-    if (currentIndex > maxIndex) { viewYear = maxMonth.year; viewMonth = maxMonth.month; }
+    const minIndex = monthIndex(today.getFullYear(), today.getMonth() + 1);
 
     input.type = 'hidden';
     input.removeAttribute('required');
 
     const picker = document.createElement('div');
     picker.className = 'lukac-date-picker';
-
     const trigger = document.createElement('button');
     trigger.type = 'button';
     trigger.className = 'lukac-date-trigger';
-    trigger.setAttribute('aria-expanded', 'false');
-
+    trigger.setAttribute('aria-expanded','false');
     const feedback = document.createElement('div');
     feedback.className = 'lukac-date-feedback';
     feedback.setAttribute('aria-live','polite');
-
     const calendar = document.createElement('div');
     calendar.className = 'lukac-calendar';
     calendar.hidden = true;
-
-    picker.append(trigger, calendar, feedback);
-    input.insertAdjacentElement('afterend', picker);
+    picker.append(trigger,calendar,feedback);
+    input.insertAdjacentElement('afterend',picker);
 
     const updateTrigger = () => {
-      if (input.value) {
-        trigger.innerHTML = `<span>${formatFr(input.value)}</span><span class="lukac-date-trigger__icon">▣</span>`;
-      } else {
-        trigger.innerHTML = '<span class="lukac-date-trigger__placeholder">Choisir une date disponible</span><span class="lukac-date-trigger__icon">▣</span>';
-      }
+      trigger.innerHTML = input.value
+        ? `<span>${formatFr(input.value)}</span><span class="lukac-date-trigger__icon">▣</span>`
+        : '<span class="lukac-date-trigger__placeholder">Choisir une date disponible</span><span class="lukac-date-trigger__icon">▣</span>';
     };
 
-    function monthStatusLabel() {
-      const data = availability?.[String(viewYear)]?.[String(viewMonth)];
-      if (!data) return 'Réservations non ouvertes';
-      if (data.status === 'open') return 'Mois ouvert';
-      if (data.status === 'closed') return 'Complet / fermé';
-      if (data.status === 'limited') return data.dates ? `Disponibilités restantes : ${data.dates}` : 'Quelques disponibilités restantes';
-      return '';
+    function monthReservedCount() {
+      const prefix = `${viewYear}-${String(viewMonth).padStart(2,'0')}-`;
+      return Array.from(reserved).filter(date => date.startsWith(prefix)).length;
     }
 
     function render() {
-      const firstDay = new Date(viewYear, viewMonth - 1, 1);
-      const daysInMonth = new Date(viewYear, viewMonth, 0).getDate();
-      const mondayOffset = (firstDay.getDay() + 6) % 7;
+      const firstDay = new Date(viewYear,viewMonth-1,1);
+      const daysInMonth = new Date(viewYear,viewMonth,0).getDate();
+      const mondayOffset = (firstDay.getDay()+6)%7;
       const selectedDate = parseIso(input.value);
+      const reservedCount = monthReservedCount();
 
       calendar.innerHTML = `
         <div class="lukac-calendar__head">
           <button type="button" class="lukac-calendar__nav" data-cal-prev aria-label="Mois précédent">‹</button>
-          <div class="lukac-calendar__title">${monthNames[viewMonth - 1]} ${viewYear}</div>
+          <div class="lukac-calendar__title">${monthNames[viewMonth-1]} ${viewYear}</div>
           <button type="button" class="lukac-calendar__nav" data-cal-next aria-label="Mois suivant">›</button>
         </div>
-        <div class="lukac-calendar__status">${monthStatusLabel()}</div>
-        <div class="lukac-calendar__weekdays">${weekdayNames.map(d => `<span>${d}</span>`).join('')}</div>
+        <div class="lukac-calendar__status">${reservedCount ? `${reservedCount} date${reservedCount > 1 ? 's' : ''} déjà réservée${reservedCount > 1 ? 's' : ''} ce mois-ci` : 'Toutes les dates futures sont disponibles'}</div>
+        <div class="lukac-calendar__weekdays">${weekdayNames.map(d=>`<span>${d}</span>`).join('')}</div>
         <div class="lukac-calendar__days"></div>
-        <div class="lukac-calendar__legend">
-          <span><i></i> Disponible</span>
-          <span class="off"><i></i> Indisponible</span>
-        </div>
+        <div class="lukac-calendar__legend"><span><i></i> Disponible</span><span class="off"><i></i> Réservée</span></div>
       `;
 
       const days = calendar.querySelector('.lukac-calendar__days');
-      for (let i = 0; i < mondayOffset; i++) {
-        const empty = document.createElement('span');
-        empty.className = 'lukac-calendar__empty';
+      for(let i=0;i<mondayOffset;i++){
+        const empty=document.createElement('span');
+        empty.className='lukac-calendar__empty';
         days.appendChild(empty);
       }
 
-      for (let day = 1; day <= daysInMonth; day++) {
-        const available = dayAvailability(viewYear, viewMonth, day, availability);
-        const iso = toIso(viewYear, viewMonth, day);
-        const isSelected = selectedDate &&
-          selectedDate.year === viewYear && selectedDate.month === viewMonth && selectedDate.day === day;
-        const isToday = today.getFullYear() === viewYear &&
-          today.getMonth() + 1 === viewMonth && today.getDate() === day;
+      for(let day=1;day<=daysInMonth;day++){
+        const iso=toIso(viewYear,viewMonth,day);
+        const past=isPast(viewYear,viewMonth,day);
+        const isReserved=reserved.has(iso);
+        const available=!past && !isReserved;
+        const isSelected=selectedDate && selectedDate.year===viewYear && selectedDate.month===viewMonth && selectedDate.day===day;
+        const isToday=today.getFullYear()===viewYear && today.getMonth()+1===viewMonth && today.getDate()===day;
 
-        if (available) {
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.className = 'lukac-calendar__day';
-          if (isSelected) button.classList.add('is-selected');
-          if (isToday) button.classList.add('lukac-calendar__day--today');
-          button.textContent = String(day);
-          button.setAttribute('aria-label', formatFr(iso));
-          button.addEventListener('click', () => {
-            input.value = iso;
+        if(available){
+          const button=document.createElement('button');
+          button.type='button';
+          button.className='lukac-calendar__day';
+          if(isSelected) button.classList.add('is-selected');
+          if(isToday) button.classList.add('lukac-calendar__day--today');
+          button.textContent=String(day);
+          button.setAttribute('aria-label',formatFr(iso));
+          button.addEventListener('click',()=>{
+            input.value=iso;
             updateTrigger();
-            feedback.className = 'lukac-date-feedback is-ok';
-            feedback.textContent = '✓ Cette date est disponible.';
-            calendar.hidden = true;
+            feedback.className='lukac-date-feedback is-ok';
+            feedback.textContent='✓ Cette date est disponible.';
+            calendar.hidden=true;
             trigger.setAttribute('aria-expanded','false');
-            input.dispatchEvent(new Event('change', { bubbles:true }));
+            input.dispatchEvent(new Event('change',{bubbles:true}));
           });
           days.appendChild(button);
         } else {
-          const off = document.createElement('span');
-          off.className = 'lukac-calendar__day--unavailable';
-          if (isToday) off.classList.add('lukac-calendar__day--today');
-          off.textContent = String(day);
-          off.title = isPast(viewYear, viewMonth, day) ? 'Date passée' : 'Indisponible';
+          const off=document.createElement('span');
+          off.className='lukac-calendar__day--unavailable';
+          if(isReserved) off.classList.add('lukac-calendar__day--reserved');
+          if(isToday) off.classList.add('lukac-calendar__day--today');
+          off.textContent=String(day);
+          off.title=past ? 'Date passée' : 'Déjà réservée';
           days.appendChild(off);
         }
       }
 
-      const prev = calendar.querySelector('[data-cal-prev]');
-      const next = calendar.querySelector('[data-cal-next]');
-      const idx = monthIndex(viewYear, viewMonth);
-      prev.disabled = idx <= minIndex;
-      next.disabled = idx >= maxIndex;
+      const prev=calendar.querySelector('[data-cal-prev]');
+      const next=calendar.querySelector('[data-cal-next]');
+      prev.disabled=monthIndex(viewYear,viewMonth)<=minIndex;
 
-      prev.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        if (viewMonth === 1) { viewMonth = 12; viewYear--; } else viewMonth--;
+      prev.addEventListener('click',(event)=>{
+        event.preventDefault(); event.stopPropagation();
+        if(viewMonth===1){viewMonth=12;viewYear--;}else viewMonth--;
         render();
       });
-      next.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        if (viewMonth === 12) { viewMonth = 1; viewYear++; } else viewMonth++;
+      next.addEventListener('click',(event)=>{
+        event.preventDefault(); event.stopPropagation();
+        if(viewMonth===12){viewMonth=1;viewYear++;}else viewMonth++;
         render();
       });
     }
 
-    trigger.addEventListener('click', () => {
-      const opening = calendar.hidden;
-      document.querySelectorAll('.lukac-calendar').forEach((other) => { if (other !== calendar) other.hidden = true; });
-      calendar.hidden = !opening;
-      trigger.setAttribute('aria-expanded', String(opening));
-      if (opening) render();
+    trigger.addEventListener('click',()=>{
+      const opening=calendar.hidden;
+      document.querySelectorAll('.lukac-calendar').forEach(other=>{if(other!==calendar) other.hidden=true;});
+      calendar.hidden=!opening;
+      trigger.setAttribute('aria-expanded',String(opening));
+      if(opening) render();
     });
 
-    document.addEventListener('click', (event) => {
-      if (!picker.contains(event.target)) {
-        calendar.hidden = true;
+    document.addEventListener('click',(event)=>{
+      if(!picker.contains(event.target)){
+        calendar.hidden=true;
+        trigger.setAttribute('aria-expanded','false');
+      }
+    });
+    document.addEventListener('keydown',(event)=>{
+      if(event.key==='Escape'){
+        calendar.hidden=true;
         trigger.setAttribute('aria-expanded','false');
       }
     });
 
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        calendar.hidden = true;
-        trigger.setAttribute('aria-expanded','false');
-      }
-    });
-
-    const form = input.closest('form');
-    form?.addEventListener('submit', (event) => {
-      if (!input.value) {
+    const form=input.closest('form');
+    form?.addEventListener('submit',(event)=>{
+      if(!input.value){
         event.preventDefault();
         event.stopImmediatePropagation();
-        feedback.className = 'lukac-date-feedback is-error';
-        feedback.textContent = 'Merci de choisir une date disponible dans le calendrier.';
+        feedback.className='lukac-date-feedback is-error';
+        feedback.textContent='Merci de choisir une date disponible dans le calendrier.';
         picker.scrollIntoView({behavior:'smooth',block:'center'});
         trigger.focus();
       }
-    }, true);
+    },true);
 
-    if (originalValue) {
-      const parsed = parseIso(originalValue);
-      if (parsed && dayAvailability(parsed.year, parsed.month, parsed.day, availability)) {
-        feedback.className = 'lukac-date-feedback is-ok';
-        feedback.textContent = '✓ Cette date est disponible.';
-      } else {
-        input.value = '';
-        feedback.className = 'lukac-date-feedback is-error';
-        feedback.textContent = 'La date précédemment choisie n’est plus disponible.';
+    if(originalValue){
+      const parsed=parseIso(originalValue);
+      if(parsed && !isPast(parsed.year,parsed.month,parsed.day) && !reserved.has(originalValue)){
+        feedback.className='lukac-date-feedback is-ok';
+        feedback.textContent='✓ Cette date est disponible.';
+      }else{
+        input.value='';
+        feedback.className='lukac-date-feedback is-error';
+        feedback.textContent='La date précédemment choisie n’est plus disponible.';
       }
     }
-
     updateTrigger();
   }
 
-  fetch('api/site-data.php?availability_calendar=' + Date.now(), {
-    credentials:'same-origin',
-    cache:'no-store'
-  })
-    .then(response => response.ok ? response.json() : Promise.reject())
-    .then(data => dateInputs.forEach(input => setupPicker(input, data?.availability || {})))
-    .catch(() => {
-      // En cas d'échec du calendrier, la vérification serveur protège toujours les demandes.
-    });
+  fetch('api/site-data.php?reserved_calendar='+Date.now(),{credentials:'same-origin',cache:'no-store'})
+    .then(response=>response.ok ? response.json() : Promise.reject())
+    .then(data=>dateInputs.forEach(input=>setupPicker(input,data?.reserved_dates || [])))
+    .catch(()=>{});
 })();
