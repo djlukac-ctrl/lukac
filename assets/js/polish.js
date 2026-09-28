@@ -1,9 +1,10 @@
 (() => {
-  // Optimisation légère du chargement des images sans toucher aux fichiers sources.
+  // Chargement léger des images.
   document.querySelectorAll('img').forEach((img) => {
     img.decoding = 'async';
     const isHero = img.matches('.hero-modern__frame img');
     const isHeaderLogo = img.matches('.site-header .brand__logo');
+
     if (isHero) {
       img.loading = 'eager';
       img.fetchPriority = 'high';
@@ -12,101 +13,12 @@
     }
   });
 
-  // Met en évidence le lien du menu correspondant à la zone visible.
-  const desktopNav = document.querySelector('.desktop-nav');
-  const navLinks = desktopNav ? [...desktopNav.querySelectorAll('a[href^="#"]')] : [];
-  const trackedSections = navLinks.map((link) => {
-    const href = link.getAttribute('href');
-    const target = href === '#top' ? document.querySelector('.hero-modern') : document.querySelector(href);
-    return target ? { link, target } : null;
-  }).filter(Boolean);
+  // Les animations ont été supprimées : tout le contenu reste visible immédiatement.
+  document.querySelectorAll('.reveal, .scroll-reveal').forEach((el) => {
+    el.classList.add('is-visible');
+  });
 
-  const updateActiveNav = () => {
-    if (!trackedSections.length) return;
-    const marker = Math.min(window.innerHeight * 0.35, 260);
-    let active = trackedSections[0];
-
-    trackedSections.forEach((item) => {
-      if (item.target.getBoundingClientRect().top <= marker) active = item;
-    });
-
-    navLinks.forEach((link) => link.classList.toggle('is-active', link === active.link));
-  };
-
-  updateActiveNav();
-  window.addEventListener('scroll', updateActiveNav, { passive: true });
-  window.addEventListener('resize', updateActiveNav);
-
-  // Apparitions discrètes au scroll, une seule fois par élément.
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const revealSelectors = [
-    '.section-heading',
-    '.review',
-    '.availability__year',
-    '.prestations-section__head',
-    '.prestation-card',
-    '.formules-section__head',
-    '.formule-card',
-    '.signature-card',
-    '.option-card',
-    '.home-quote__intro',
-    '.home-quote__form'
-  ].join(',');
-
-  const prepareRevealElements = () => {
-    const elements = [...document.querySelectorAll(revealSelectors)]
-      .filter((el) => !el.dataset.scrollRevealReady);
-
-    elements.forEach((el, index) => {
-      el.dataset.scrollRevealReady = '1';
-      el.classList.add('scroll-reveal');
-      el.classList.add(`scroll-reveal--delay-${(index % 4) + 1}`);
-
-      if (reduceMotion) {
-        el.classList.add('is-visible');
-      }
-    });
-
-    return elements;
-  };
-
-  const initialHeroReveals = [...document.querySelectorAll('.hero-modern .reveal')];
-  if (reduceMotion) {
-    initialHeroReveals.forEach((el) => el.classList.add('is-visible'));
-  } else {
-    requestAnimationFrame(() => {
-      initialHeroReveals.forEach((el) => el.classList.add('is-visible'));
-    });
-  }
-
-  if (!reduceMotion && 'IntersectionObserver' in window) {
-    const revealObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      });
-    }, {
-      threshold: 0.12,
-      rootMargin: '0px 0px -7% 0px'
-    });
-
-    const observePrepared = () => {
-      prepareRevealElements().forEach((el) => revealObserver.observe(el));
-    };
-
-    observePrepared();
-
-    // Certaines zones (formules/devis) sont injectées dynamiquement par main.js.
-    const mutationObserver = new MutationObserver(() => observePrepared());
-    mutationObserver.observe(document.body, { childList: true, subtree: true });
-  } else {
-    prepareRevealElements().forEach((el) => el.classList.add('is-visible'));
-  }
-
-  // Correctif ciblé : les visuels des packs/options sont masqués tant que
-  // la classe has-cms-image n'est pas présente. Le lazy-loading du CMS pouvait
-  // donc empêcher leur chargement. On restaure ici uniquement ces images.
+  // Restaure les images CMS des options/packs sans animation ni observation du scroll.
   const restorePackOptionImages = async () => {
     const targets = [...document.querySelectorAll('.signature-card__image[data-cms-image], .option-card__image[data-cms-image]')];
     if (!targets.length) return;
@@ -117,6 +29,7 @@
         cache: 'no-store'
       });
       if (!response.ok) return;
+
       const data = await response.json();
       const content = data && data.content ? data.content : {};
 
@@ -139,5 +52,4 @@
   };
 
   restorePackOptionImages();
-
 })();
