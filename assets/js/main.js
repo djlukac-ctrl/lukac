@@ -588,3 +588,179 @@ document.head.appendChild(socialStyles);
     .then(data=>dateInputs.forEach(input=>setupPicker(input,data?.reserved_dates || [])))
     .catch(()=>{});
 })();
+
+
+/* Récapitulatif avant envoi */
+(() => {
+  const forms = Array.from(document.querySelectorAll('form.home-quote__form, form.quote-form'));
+  if (!forms.length) return;
+
+  const formulaNames = new Set(['Essentiel','Ambiance','Expérience']);
+
+  const summaryStyles = document.createElement('style');
+  summaryStyles.textContent = `
+    .quote-review{margin-top:18px;padding:22px;border:1px solid rgba(201,52,49,.18);border-radius:18px;background:linear-gradient(135deg,#fff,#fff8f7);color:#181716;box-shadow:0 12px 30px rgba(50,38,28,.05)}
+    .quote-review[hidden]{display:none!important}.quote-review__top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}
+    .quote-review__kicker{display:block;margin-bottom:5px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:#c93431;font-weight:800}
+    .quote-review h3{margin:0;font:600 22px 'Space Grotesk',sans-serif;letter-spacing:-.02em}.quote-review__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px}
+    .quote-review__item{display:grid;gap:3px;padding:10px 0;border-bottom:1px solid rgba(24,23,22,.07)}.quote-review__item small{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:#9a938c;font-weight:700}.quote-review__item span{font-size:12px;line-height:1.5;color:#302c28}
+    .quote-review__item--full{grid-column:1/-1}.quote-review__actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}.quote-review__actions button{border-radius:999px;padding:11px 16px;font-weight:700;cursor:pointer}
+    .quote-review__edit{border:1px solid rgba(24,23,22,.13);background:#fff;color:#181716}.quote-review__confirm{border:0;background:#181716;color:#fff}.quote-review__confirm:hover{background:#c93431}
+    .quote-reviewing .quote-submit,.quote-reviewing .home-quote__actions button[type="submit"]{display:none!important}
+    @media(max-width:700px){.quote-review__grid{grid-template-columns:1fr}.quote-review__item--full{grid-column:auto}.quote-review__top{display:block}.quote-review__actions{flex-direction:column}.quote-review__actions button{width:100%}}
+  `;
+  document.head.appendChild(summaryStyles);
+
+  const formatDate = (iso) => {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+    if (!match) return '—';
+    return new Intl.DateTimeFormat('fr-FR', {
+      weekday:'long', day:'numeric', month:'long', year:'numeric'
+    }).format(new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
+  };
+
+  const getValue = (form, name) => form.querySelector(`[name="${name}"]`)?.value?.trim() || '';
+
+  forms.forEach((form) => {
+    let confirmed = false;
+    let reviewing = false;
+
+    const originalSubmit = form.querySelector('button[type="submit"]');
+    if (originalSubmit && !originalSubmit.dataset.reviewLabel) {
+      originalSubmit.dataset.reviewLabel = originalSubmit.innerHTML;
+      originalSubmit.innerHTML = 'Vérifier ma demande <span>→</span>';
+    }
+
+    const review = document.createElement('section');
+    review.className = 'quote-review';
+    review.hidden = true;
+    review.setAttribute('aria-live','polite');
+
+    const actions = form.querySelector('.home-quote__actions, .quote-actions');
+    if (actions) actions.insertAdjacentElement('beforebegin', review);
+    else form.appendChild(review);
+
+    const selections = () => Array.from(form.querySelectorAll('input[name="selections[]"]:checked')).map(input => input.value);
+    const services = () => Array.from(form.querySelectorAll('input[name="services[]"]:checked')).map(input => input.value);
+
+    function buildReview() {
+      const selected = selections();
+      const formula = selected.find(value => formulaNames.has(value)) || '—';
+      const options = selected.filter(value => !formulaNames.has(value));
+      const spark = form.querySelector('input[name="spark_option"]:checked')?.value;
+      if (spark && !options.includes(spark)) options.push(spark);
+
+      const start = getValue(form,'start_time');
+      const end = getValue(form,'end_time');
+      const hours = start && end ? `${start} → ${end}` : (start || end || '—');
+
+      const items = [
+        ['Événement', getValue(form,'event_type') || '—', false],
+        ['Date', formatDate(getValue(form,'event_date')), false],
+        ['Lieu', getValue(form,'venue') || '—', false],
+        ['Horaires', hours, false],
+        ['Prestations', services().join(', ') || '—', true],
+        ['Formule', formula, false],
+        ['Options', options.join(', ') || 'Aucune option', true],
+      ];
+
+      review.innerHTML = `
+        <div class="quote-review__top">
+          <div><span class="quote-review__kicker">Avant l’envoi</span><h3>Vérifiez votre demande</h3></div>
+        </div>
+        <div class="quote-review__grid">
+          ${items.map(([label,value,full]) => `
+            <div class="quote-review__item${full ? ' quote-review__item--full' : ''}">
+              <small>${label}</small><span></span>
+            </div>
+          `).join('')}
+        </div>
+        <div class="quote-review__actions">
+          <button type="button" class="quote-review__edit">Modifier ma demande</button>
+          <button type="button" class="quote-review__confirm">Confirmer et envoyer →</button>
+        </div>
+      `;
+
+      review.querySelectorAll('.quote-review__item span').forEach((node,index) => {
+        node.textContent = items[index][1];
+      });
+
+      review.querySelector('.quote-review__edit')?.addEventListener('click', () => {
+        reviewing = false;
+        confirmed = false;
+        review.hidden = true;
+        form.classList.remove('quote-reviewing');
+        form.scrollIntoView({behavior:'smooth',block:'center'});
+      });
+
+      review.querySelector('.quote-review__confirm')?.addEventListener('click', () => {
+        confirmed = true;
+        form.requestSubmit();
+      });
+    }
+
+    form.addEventListener('submit', (event) => {
+      if (confirmed) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const hasService = services().length > 0;
+      const selected = selections();
+      const hasFormula = selected.some(value => formulaNames.has(value));
+
+      if (!hasService || !hasFormula) {
+        const message = form.closest('.home-quote')?.querySelector('.home-quote__message');
+        if (message) {
+          message.className = 'home-quote__message is-error';
+          message.textContent = !hasService
+            ? 'Merci de sélectionner au moins une prestation.'
+            : 'Merci de choisir une formule.';
+          message.scrollIntoView({behavior:'smooth',block:'center'});
+        } else {
+          alert(!hasService ? 'Merci de sélectionner au moins une prestation.' : 'Merci de choisir une formule.');
+        }
+        return;
+      }
+
+      buildReview();
+      reviewing = true;
+      review.hidden = false;
+      form.classList.add('quote-reviewing');
+      review.scrollIntoView({behavior:'smooth',block:'center'});
+    }, true);
+
+    form.addEventListener('input', () => {
+      if (!reviewing) return;
+      confirmed = false;
+      reviewing = false;
+      review.hidden = true;
+      form.classList.remove('quote-reviewing');
+    });
+
+    form.addEventListener('change', () => {
+      if (!reviewing) return;
+      confirmed = false;
+      reviewing = false;
+      review.hidden = true;
+      form.classList.remove('quote-reviewing');
+    });
+
+    form.addEventListener('reset', () => {
+      confirmed = false;
+      reviewing = false;
+      review.hidden = true;
+      form.classList.remove('quote-reviewing');
+      if (originalSubmit?.dataset.reviewLabel) {
+        setTimeout(() => {
+          originalSubmit.innerHTML = 'Vérifier ma demande <span>→</span>';
+        }, 0);
+      }
+    });
+  });
+})();
