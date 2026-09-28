@@ -40,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $selectedFormulas = array_values(array_intersect($formulaOptions, $selectedSelections));
     $honeypot = trim((string)($_POST['company'] ?? ''));
+    $dateAvailability = event_date_availability($values['event_date']);
 
     if ($honeypot !== '') {
         $success = true;
@@ -168,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 </main>
 <footer class="site-footer"><a class="brand brand--footer" href="index.html"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo brand__logo--footer"></a><p>DJ & animateur événementiel</p><div class="site-footer__links"><a href="index.html#prestations">Prestations</a><a href="index.html#formules">Formules</a><a href="index.html#disponibilites">Disponibilités</a><a href="index.html#avis">Avis clients</a></div><small>© 2026 Luka C • Tous droits réservés</small></footer>
-<script src="assets/js/main.js"></script>
+<script src="assets/js/main.js?v=20260928-1"></script>
 <script>
   const sparkToggle = document.getElementById('spark-toggle');
   const sparkQuantity = document.getElementById('spark-quantity');
