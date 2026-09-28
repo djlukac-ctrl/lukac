@@ -17,7 +17,7 @@ function admin_header(string $title, string $active = ''): void
         ],
         'Site' => [
             'contenu' => ['Contenu du site', 'contenu.php'],
-            'disponibilites' => ['Disponibilités', 'disponibilites.php'],
+            'disponibilites' => ['Dates réservées', 'disponibilites.php'],
             'avis' => ['Avis clients', 'avis.php'],
             'options' => ['Options', 'options.php'],
             'partenaires' => ['Prestataires partenaires', 'partenaires.php'],
