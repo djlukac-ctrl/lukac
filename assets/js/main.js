@@ -232,7 +232,7 @@ if (homeMain && homeHero && reviewsSection && homePrestations) {
     if (!servicesChecked || !selectionsChecked) {
       quoteMessage.className = 'home-quote__message is-error';
       quoteMessage.textContent = 'Merci de sélectionner au moins une prestation et une formule.';
-      quoteMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      quoteMessage.scrollIntoView({ behavior: 'auto', block: 'center' });
       return;
     }
 
@@ -271,7 +271,7 @@ if (homeMain && homeHero && reviewsSection && homePrestations) {
     } finally {
       quoteButton.disabled = false;
       quoteButton.innerHTML = 'Envoyer ma demande <span>→</span>';
-      quoteMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      quoteMessage.scrollIntoView({ behavior: 'auto', block: 'center' });
     }
   });
 }
@@ -294,19 +294,7 @@ if (menuToggle && mobileNav) {
   });
 }
 
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  },
-  { threshold: 0.12 }
-);
-
-document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+document.querySelectorAll('.reveal').forEach((el) => el.classList.add('is-visible'));
 
 // Navigation dans l'ordre réel des blocs de la page.
 const navItems = [
@@ -576,7 +564,7 @@ document.head.appendChild(socialStyles);
         event.stopImmediatePropagation();
         feedback.className='lukac-date-feedback is-error';
         feedback.textContent='Merci de choisir une date disponible dans le calendrier.';
-        picker.scrollIntoView({behavior:'smooth',block:'center'});
+        picker.scrollIntoView({behavior:'auto',block:'center'});
         trigger.focus();
       }
     },true);
@@ -702,7 +690,7 @@ document.head.appendChild(socialStyles);
         confirmed = false;
         review.hidden = true;
         form.classList.remove('quote-reviewing');
-        form.scrollIntoView({behavior:'smooth',block:'center'});
+        form.scrollIntoView({behavior:'auto',block:'center'});
       });
 
       review.querySelector('.quote-review__confirm')?.addEventListener('click', () => {
@@ -728,7 +716,7 @@ document.head.appendChild(socialStyles);
         if (dateFeedback) {
           dateFeedback.className = 'lukac-date-feedback is-error';
           dateFeedback.textContent = 'Merci de choisir une date disponible dans le calendrier.';
-          dateFeedback.scrollIntoView({behavior:'smooth',block:'center'});
+          dateFeedback.scrollIntoView({behavior:'auto',block:'center'});
         } else {
           alert('Merci de choisir une date disponible.');
         }
@@ -746,7 +734,7 @@ document.head.appendChild(socialStyles);
           message.textContent = !hasService
             ? 'Merci de sélectionner au moins une prestation.'
             : 'Merci de choisir une formule.';
-          message.scrollIntoView({behavior:'smooth',block:'center'});
+          message.scrollIntoView({behavior:'auto',block:'center'});
         } else {
           alert(!hasService ? 'Merci de sélectionner au moins une prestation.' : 'Merci de choisir une formule.');
         }
@@ -757,7 +745,7 @@ document.head.appendChild(socialStyles);
       reviewing = true;
       review.hidden = false;
       form.classList.add('quote-reviewing');
-      review.scrollIntoView({behavior:'smooth',block:'center'});
+      review.scrollIntoView({behavior:'auto',block:'center'});
     }, true);
 
     form.addEventListener('input', () => {
