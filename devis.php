@@ -21,7 +21,7 @@ $extraOptions = [
     'Fumée lourde', 'Étincelles froides', 'Éclairage mural', 'Écran & projecteur'
 ];
 $sparkOptions = ['Étincelles froides — 2 jets', 'Étincelles froides — 4 jets'];
-$selectionOptions = array_merge($formulaOptions, $extraOptions);
+$selectionOptions = array_merge($formulaOptions, $extraOptions, $sparkOptions);
 $eventOptions = ['Mariage', 'Anniversaire', 'Baptême', 'Retraite', 'Autre'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -207,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 </main>
 <footer class="site-footer"><a class="brand brand--footer" href="index.html"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo brand__logo--footer"></a><p>DJ & animateur événementiel</p><div class="site-footer__links"><a href="index.html#prestations">Prestations</a><a href="index.html#formules">Formules</a><a href="index.html#avis">Avis clients</a></div><small>© 2026 Luka C • Tous droits réservés</small></footer>
-<script src="assets/js/main.js?v=20260928-6"></script>
+<script src="assets/js/main.js?v=20260928-7"></script>
 <script>
   const sparkToggle = document.getElementById('spark-toggle');
   const sparkQuantity = document.getElementById('spark-quantity');
