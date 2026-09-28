@@ -92,7 +92,7 @@ admin_header('Disponibilités', 'disponibilites');
             <div class="availability-dates">
               <label for="d-<?= $year ?>-<?= $month ?>">Dates encore disponibles</label>
               <input id="d-<?= $year ?>-<?= $month ?>" name="dates[<?= $year ?>][<?= $month ?>]" maxlength="120" value="<?= e($currentDates[$year][$month] ?? '') ?>" placeholder="Ex. Samedis 3, 10 et 24">
-              <small>Ce texte sera affiché sur le site uniquement pour ce mois.</small>
+              <small>Ce texte est affiché sur le site et pilote aussi le formulaire de devis. Indique bien les numéros des jours disponibles (ex. « Samedis 3, 10 et 24 »).</small>
             </div>
           </div>
         <?php endforeach; ?>
