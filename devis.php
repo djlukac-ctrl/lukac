@@ -62,6 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Merci de choisir au moins une formule : Essentiel, Ambiance ou Expérience.';
     } elseif (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $values['event_date'])) {
         $error = 'La date indiquée n’est pas valide.';
+    } elseif (!($dateAvailability['available'] ?? false)) {
+        $error = (string)($dateAvailability['message'] ?? 'Cette date n’est pas disponible. Merci de choisir une autre date.');
     } elseif ($values['guest_count'] !== '' && ((int)$values['guest_count'] < 1 || (int)$values['guest_count'] > 5000)) {
         $error = 'Le nombre d’invités indiqué n’est pas valide.';
     } else {
