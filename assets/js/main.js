@@ -39,28 +39,26 @@ document.querySelectorAll('.review').forEach((review) => {
 const homeMain = document.querySelector('body > main');
 const homeHero = document.querySelector('main > .hero-modern');
 const reviewsSection = document.querySelector('main > #avis');
-const availabilitySection = document.querySelector('main > #disponibilites');
 const homePrestations = document.querySelector('main > .home-prestations');
 const homeFormules = document.querySelector('main > .home-formules');
 
-if (homeMain && homeHero && reviewsSection && availabilitySection && homePrestations) {
+if (homeMain && homeHero && reviewsSection && homePrestations) {
   homeMain.style.display = 'flex';
   homeMain.style.flexDirection = 'column';
   homeHero.style.order = '1';
   reviewsSection.style.order = '2';
-  availabilitySection.style.order = '3';
-  homePrestations.style.order = '4';
+  homePrestations.style.order = '3';
   homePrestations.style.width = '100%';
 
   if (homeFormules) {
-    homeFormules.style.order = '5';
+    homeFormules.style.order = '4';
     homeFormules.style.width = '100%';
   }
 
   const quoteSection = document.createElement('section');
   quoteSection.id = 'devis';
   quoteSection.className = 'home-quote reveal';
-  quoteSection.style.order = '6';
+  quoteSection.style.order = '5';
   quoteSection.innerHTML = `
     <div class="home-quote__head">
       <p class="home-quote__kicker">Demande de devis</p>
@@ -270,7 +268,6 @@ document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 const navItems = [
   ['Accueil', '#top'],
   ['Avis clients', '#avis'],
-  ['Disponibilités', '#disponibilites'],
   ['Prestations', '#prestations'],
   ['Formules', '#formules']
 ];
