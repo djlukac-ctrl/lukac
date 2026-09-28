@@ -437,3 +437,44 @@ body{
 .scroll-reveal.is-visible{
   will-change:auto!important;
 }
+
+
+/* Mode performance maximal : aucune animation ni transition */
+html{
+  scroll-behavior:auto!important;
+}
+*,
+*::before,
+*::after{
+  animation:none!important;
+  transition:none!important;
+}
+.reveal,
+.scroll-reveal,
+.reveal.is-visible,
+.scroll-reveal.is-visible{
+  opacity:1!important;
+  transform:none!important;
+  will-change:auto!important;
+}
+.hero-modern__frame img,
+.hero-modern__visual.is-visible .hero-modern__frame img,
+.review:hover,
+.prestation-card:hover,
+.formule-card:hover,
+.signature-card:hover,
+.option-card:hover,
+.btn-modern:hover,
+.btn-modern:hover span,
+.header-cta:hover span,
+.header-socials a:hover,
+.home-partner-card:hover,
+.home-partner-card__link:hover{
+  transform:none!important;
+}
+.site-header,
+.mobile-nav,
+.hero-modern__label{
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
