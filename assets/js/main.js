@@ -340,3 +340,121 @@ socialStyles.textContent = `
   @media(max-width:1180px){.header-socials{display:none}}
 `;
 document.head.appendChild(socialStyles);
+
+/* Disponibilités -> formulaire de devis : contrôle immédiat des dates */
+(() => {
+  const dateInputs = Array.from(document.querySelectorAll('input[name="event_date"]'));
+  if (!dateInputs.length) return;
+
+  const now = new Date();
+  const localToday = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0')
+  ].join('-');
+
+  dateInputs.forEach((input) => {
+    input.min = localToday;
+
+    const feedback = document.createElement('div');
+    feedback.className = 'quote-date-feedback';
+    feedback.setAttribute('aria-live', 'polite');
+    input.insertAdjacentElement('afterend', feedback);
+  });
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .quote-date-feedback{min-height:18px;margin-top:2px;font-size:11px;line-height:1.45;color:#817a73}
+    .quote-date-feedback.is-ok{color:#557347;font-weight:600}
+    .quote-date-feedback.is-error{color:#b24540;font-weight:600}
+  `;
+  document.head.appendChild(style);
+
+  function readDate(value) {
+    const match = /^(\\d{4})-(\\d{2})-(\\d{2})$/.exec(value || '');
+    if (!match) return null;
+    return { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) };
+  }
+
+  function availabilityFor(value, availability) {
+    const date = readDate(value);
+    if (!date) return { available: false, message: 'Choisissez une date valide.' };
+    if (value < localToday) return { available: false, message: 'Cette date est déjà passée.' };
+
+    const monthData = availability?.[String(date.year)]?.[String(date.month)];
+    if (!monthData) {
+      return { available: false, message: 'Cette période n’est pas encore ouverte à la réservation.' };
+    }
+
+    if (monthData.status === 'open') {
+      return { available: true, message: '✓ Cette date est disponible.' };
+    }
+
+    if (monthData.status === 'closed') {
+      return { available: false, message: 'Cette date n’est plus disponible. Merci de choisir une autre date.' };
+    }
+
+    if (monthData.status === 'limited') {
+      const days = Array.isArray(monthData.available_days)
+        ? monthData.available_days.map(Number)
+        : [];
+
+      if (days.includes(date.day)) {
+        return { available: true, message: '✓ Cette date fait partie des disponibilités restantes.' };
+      }
+
+      const detail = String(monthData.dates || '').trim();
+      return {
+        available: false,
+        message: detail
+          ? `Cette date n’est plus disponible. Dates encore disponibles : ${detail}.`
+          : 'Cette date n’est plus disponible. Merci de choisir une autre date.'
+      };
+    }
+
+    return { available: false, message: 'Cette période n’est pas encore ouverte à la réservation.' };
+  }
+
+  function setupEventDateAvailability(availability) {
+    dateInputs.forEach((input) => {
+      const feedback = input.nextElementSibling;
+
+      const validate = (clearUnavailable = true) => {
+        if (!input.value) {
+          feedback.className = 'quote-date-feedback';
+          feedback.textContent = '';
+          return true;
+        }
+
+        const result = availabilityFor(input.value, availability);
+        if (result.available) {
+          feedback.className = 'quote-date-feedback is-ok';
+          feedback.textContent = result.message;
+          return true;
+        }
+
+        feedback.className = 'quote-date-feedback is-error';
+        feedback.textContent = result.message;
+
+        if (clearUnavailable) {
+          input.value = '';
+          input.focus({ preventScroll: true });
+        }
+        return false;
+      };
+
+      input.addEventListener('change', () => validate(true));
+      if (input.value) validate(true);
+    });
+  }
+
+  fetch('api/site-data.php?availability_form=' + Date.now(), {
+    credentials: 'same-origin',
+    cache: 'no-store'
+  })
+    .then((response) => response.ok ? response.json() : Promise.reject())
+    .then((data) => setupEventDateAvailability(data?.availability || {}))
+    .catch(() => {
+      // La vérification serveur reste active même si le chargement client échoue.
+    });
+})();
