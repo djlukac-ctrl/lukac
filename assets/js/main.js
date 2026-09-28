@@ -584,11 +584,15 @@ document.head.appendChild(socialStyles);
       prev.disabled = idx <= minIndex;
       next.disabled = idx >= maxIndex;
 
-      prev.addEventListener('click', () => {
+      prev.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         if (viewMonth === 1) { viewMonth = 12; viewYear--; } else viewMonth--;
         render();
       });
-      next.addEventListener('click', () => {
+      next.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         if (viewMonth === 12) { viewMonth = 1; viewYear++; } else viewMonth++;
         render();
       });
