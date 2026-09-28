@@ -84,6 +84,11 @@ function db(): PDO
         PRIMARY KEY (year, month)
     )');
 
+    $pdo->exec('CREATE TABLE IF NOT EXISTS reserved_dates (
+        event_date TEXT PRIMARY KEY,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+
     $pdo->exec('CREATE TABLE IF NOT EXISTS content (
         content_key TEXT PRIMARY KEY,
         value TEXT NOT NULL,
@@ -250,29 +255,6 @@ function site_content(): array
     return $out;
 }
 
-function availability_days_from_note(int $year, int $month, ?string $note): array
-{
-    $note = trim((string)$note);
-    if ($note === '') {
-        return [];
-    }
-
-    preg_match_all('/(?<!\\d)(\\d{1,2})(?!\\d)/u', $note, $matches);
-    $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-    $days = [];
-
-    foreach ($matches[1] ?? [] as $rawDay) {
-        $day = (int)$rawDay;
-        if ($day >= 1 && $day <= $daysInMonth) {
-            $days[$day] = true;
-        }
-    }
-
-    $days = array_keys($days);
-    sort($days, SORT_NUMERIC);
-    return $days;
-}
-
 function event_date_availability(string $date): array
 {
     $date = trim($date);
@@ -287,63 +269,22 @@ function event_date_availability(string $date): array
         return ['available' => false, 'reason' => 'invalid', 'message' => 'La date indiquée n’est pas valide.'];
     }
 
-    $today = new DateTimeImmutable('today');
-    if ($parsed < $today) {
+    if ($parsed < new DateTimeImmutable('today')) {
         return ['available' => false, 'reason' => 'past', 'message' => 'Cette date est déjà passée.'];
     }
 
-    $year = (int)$parsed->format('Y');
-    $month = (int)$parsed->format('n');
-    $day = (int)$parsed->format('j');
+    $stmt = db()->prepare('SELECT 1 FROM reserved_dates WHERE event_date = :date LIMIT 1');
+    $stmt->execute([':date' => $date]);
 
-    $stmt = db()->prepare('SELECT status, note FROM availability WHERE year = :year AND month = :month LIMIT 1');
-    $stmt->execute([':year' => $year, ':month' => $month]);
-    $row = $stmt->fetch();
-
-    if (!$row) {
+    if ($stmt->fetchColumn()) {
         return [
             'available' => false,
-            'reason' => 'not_open',
-            'message' => 'Cette période n’est pas encore ouverte à la réservation.',
+            'reason' => 'reserved',
+            'message' => 'Cette date est déjà réservée. Merci de choisir une autre date.',
         ];
     }
 
-    $status = (string)$row['status'];
-    $note = trim((string)($row['note'] ?? ''));
-
-    if ($status === 'open') {
-        return ['available' => true, 'reason' => 'open', 'message' => ''];
-    }
-
-    if ($status === 'closed') {
-        return [
-            'available' => false,
-            'reason' => 'closed',
-            'message' => 'Cette date n’est plus disponible. Merci de choisir une autre date.',
-        ];
-    }
-
-    if ($status === 'limited') {
-        $availableDays = availability_days_from_note($year, $month, $note);
-        if (in_array($day, $availableDays, true)) {
-            return ['available' => true, 'reason' => 'limited', 'message' => '', 'note' => $note];
-        }
-
-        return [
-            'available' => false,
-            'reason' => 'limited',
-            'message' => $note !== ''
-                ? 'Cette date n’est plus disponible. Dates encore disponibles ce mois-ci : ' . $note . '.'
-                : 'Cette date n’est plus disponible. Merci de choisir une autre date.',
-            'note' => $note,
-        ];
-    }
-
-    return [
-        'available' => false,
-        'reason' => 'not_open',
-        'message' => 'Cette période n’est pas encore ouverte à la réservation.',
-    ];
+    return ['available' => true, 'reason' => 'available', 'message' => ''];
 }
 
 function quote_status_label(string $status): string
