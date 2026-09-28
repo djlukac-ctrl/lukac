@@ -250,6 +250,102 @@ function site_content(): array
     return $out;
 }
 
+function availability_days_from_note(int $year, int $month, ?string $note): array
+{
+    $note = trim((string)$note);
+    if ($note === '') {
+        return [];
+    }
+
+    preg_match_all('/(?<!\\d)(\\d{1,2})(?!\\d)/u', $note, $matches);
+    $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+    $days = [];
+
+    foreach ($matches[1] ?? [] as $rawDay) {
+        $day = (int)$rawDay;
+        if ($day >= 1 && $day <= $daysInMonth) {
+            $days[$day] = true;
+        }
+    }
+
+    $days = array_keys($days);
+    sort($days, SORT_NUMERIC);
+    return $days;
+}
+
+function event_date_availability(string $date): array
+{
+    $date = trim($date);
+    $parsed = DateTimeImmutable::createFromFormat('!Y-m-d', $date);
+    $errors = DateTimeImmutable::getLastErrors();
+
+    if (
+        !$parsed ||
+        ($errors !== false && (($errors['warning_count'] ?? 0) > 0 || ($errors['error_count'] ?? 0) > 0)) ||
+        $parsed->format('Y-m-d') !== $date
+    ) {
+        return ['available' => false, 'reason' => 'invalid', 'message' => 'La date indiquée n’est pas valide.'];
+    }
+
+    $today = new DateTimeImmutable('today');
+    if ($parsed < $today) {
+        return ['available' => false, 'reason' => 'past', 'message' => 'Cette date est déjà passée.'];
+    }
+
+    $year = (int)$parsed->format('Y');
+    $month = (int)$parsed->format('n');
+    $day = (int)$parsed->format('j');
+
+    $stmt = db()->prepare('SELECT status, note FROM availability WHERE year = :year AND month = :month LIMIT 1');
+    $stmt->execute([':year' => $year, ':month' => $month]);
+    $row = $stmt->fetch();
+
+    if (!$row) {
+        return [
+            'available' => false,
+            'reason' => 'not_open',
+            'message' => 'Cette période n’est pas encore ouverte à la réservation.',
+        ];
+    }
+
+    $status = (string)$row['status'];
+    $note = trim((string)($row['note'] ?? ''));
+
+    if ($status === 'open') {
+        return ['available' => true, 'reason' => 'open', 'message' => ''];
+    }
+
+    if ($status === 'closed') {
+        return [
+            'available' => false,
+            'reason' => 'closed',
+            'message' => 'Cette date n’est plus disponible. Merci de choisir une autre date.',
+        ];
+    }
+
+    if ($status === 'limited') {
+        $availableDays = availability_days_from_note($year, $month, $note);
+        if (in_array($day, $availableDays, true)) {
+            return ['available' => true, 'reason' => 'limited', 'message' => '', 'note' => $note];
+        }
+
+        return [
+            'available' => false,
+            'reason' => 'limited',
+            'message' => $note !== ''
+                ? 'Cette date n’est plus disponible. Dates encore disponibles ce mois-ci : ' . $note . '.'
+                : 'Cette date n’est plus disponible. Merci de choisir une autre date.',
+            'note' => $note,
+        ];
+    }
+
+    return [
+        'available' => false,
+        'reason' => 'not_open',
+        'message' => 'Cette période n’est pas encore ouverte à la réservation.',
+    ];
+}
+
 function quote_status_label(string $status): string
 {
     return [
