@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <title>Demander un devis — Luka C</title>
   <link rel="stylesheet" href="assets/css/modern-dark.css?v=20260909-3">
   <style>
-    .quote-page{max-width:1100px;margin:0 auto;padding:70px 34px 110px}.quote-head{max-width:790px;margin-bottom:34px}.quote-head p:first-child{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700}.quote-head h1{font:600 clamp(46px,6vw,76px)/.98 'Space Grotesk',sans-serif;letter-spacing:-.045em;margin:0 0 18px}.quote-head h1 span{color:var(--accent)}.quote-head>p:last-child{color:#8f8a84;line-height:1.75}.quote-form{border:1px solid var(--line);border-radius:22px;background:#0d0d0d;padding:28px}.quote-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.quote-field{display:grid;gap:7px}.quote-field--full{grid-column:1/-1}.quote-field label,.quote-group>legend{font-size:11px;color:#8f8a84}.quote-field input,.quote-field select,.quote-field textarea{width:100%;border:1px solid var(--line);border-radius:12px;background:#090909;color:#fff;padding:13px 14px;outline:none;font:inherit}.quote-field textarea{min-height:140px;resize:vertical}.quote-field input:focus,.quote-field select:focus,.quote-field textarea:focus{border-color:var(--line-strong)}.quote-address{grid-column:1/-1;border:1px solid var(--line);border-radius:16px;padding:16px;margin:0}.quote-address>legend{padding:0 7px;font-size:11px;color:#8f8a84}.quote-address-grid{display:grid;grid-template-columns:120px 1.5fr 1fr 150px;gap:12px}.quote-group{grid-column:1/-1;border:1px solid var(--line);border-radius:16px;padding:16px;margin:0}.quote-group>legend{padding:0 7px}.quote-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}.quote-check{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid rgba(255,255,255,.06);border-radius:11px;background:#090909;color:#d7d2cc;font-size:12px;cursor:pointer}.quote-check input{width:16px;height:16px;margin:1px 0 0;accent-color:var(--accent)}.quote-group--formulas{border-color:rgba(201,52,49,.28)}.quote-group--formulas>legend{color:#c93431!important;font-weight:700}.quote-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px}.quote-actions p{margin:0;color:#66615c;font-size:10px}.quote-submit{border:0;border-radius:999px;background:#f4f1ec;color:#111;padding:14px 20px;font-weight:700;cursor:pointer}.quote-success{padding:26px;border:1px solid rgba(147,178,124,.3);border-radius:18px;background:rgba(147,178,124,.07)}.quote-success h2{font:600 28px 'Space Grotesk',sans-serif;margin:0 0 8px}.quote-success p{margin:0;color:#aabda0;line-height:1.7}.quote-error{margin-bottom:16px;padding:12px 14px;border-radius:12px;background:rgba(184,110,105,.08);color:#e2aaa6;border:1px solid rgba(184,110,105,.25);font-size:12px}.hp{position:absolute;left:-9999px;opacity:0;pointer-events:none}@media(max-width:850px){.quote-address-grid{grid-template-columns:1fr 1fr}}@media(max-width:700px){.quote-page{padding:45px 18px 75px}.quote-grid{grid-template-columns:1fr}.quote-field--full,.quote-group,.quote-address{grid-column:auto}.quote-address-grid{grid-template-columns:1fr}.quote-checks{grid-template-columns:1fr}.quote-form{padding:20px}.quote-actions{align-items:stretch;flex-direction:column}.quote-submit{width:100%}}
+    .quote-page{max-width:1100px;margin:0 auto;padding:70px 34px 110px}.quote-head{max-width:790px;margin-bottom:34px}.quote-head p:first-child{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700}.quote-head h1{font:600 clamp(46px,6vw,76px)/.98 'Space Grotesk',sans-serif;letter-spacing:-.045em;margin:0 0 18px}.quote-head h1 span{color:var(--accent)}.quote-head>p:last-child{color:#8f8a84;line-height:1.75}.quote-form{border:1px solid var(--line);border-radius:22px;background:#0d0d0d;padding:28px}.quote-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.quote-field{display:grid;gap:7px}.quote-field--full{grid-column:1/-1}.quote-field label,.quote-group>legend{font-size:11px;color:#8f8a84}.quote-field input,.quote-field select,.quote-field textarea{width:100%;border:1px solid var(--line);border-radius:12px;background:#090909;color:#fff;padding:13px 14px;outline:none;font:inherit}.quote-field textarea{min-height:140px;resize:vertical}.quote-field input:focus,.quote-field select:focus,.quote-field textarea:focus{border-color:var(--line-strong)}.quote-address{grid-column:1/-1;border:1px solid var(--line);border-radius:16px;padding:16px;margin:0}.quote-address>legend{padding:0 7px;font-size:11px;color:#8f8a84}.quote-address-grid{display:grid;grid-template-columns:120px 1.5fr 1fr 150px;gap:12px}.quote-group{grid-column:1/-1;border:1px solid var(--line);border-radius:16px;padding:16px;margin:0}.quote-group>legend{padding:0 7px}.quote-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}.quote-check{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid rgba(255,255,255,.06);border-radius:11px;background:#090909;color:#d7d2cc;font-size:12px;cursor:pointer}.quote-check input{width:16px;height:16px;margin:1px 0 0;accent-color:var(--accent)}.quote-group--formulas{border-color:rgba(201,52,49,.28)}.quote-group--formulas>legend{color:#c93431!important;font-weight:700}.quote-group-help{margin:0 0 14px;color:#817a73;font-size:11px;line-height:1.55}.quote-choice-grid{display:grid;gap:12px}.quote-choice-grid--formulas{grid-template-columns:repeat(3,minmax(0,1fr))}.quote-choice-grid--options{grid-template-columns:repeat(2,minmax(0,1fr))}.quote-choice-grid--spark{grid-template-columns:repeat(2,minmax(0,1fr))}.quote-choice-card{position:relative;display:grid;gap:7px;min-height:110px;padding:17px;border:1px solid rgba(24,23,22,.11);border-radius:15px;background:#fff;color:#181716;cursor:pointer;transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease,background .18s ease}.quote-choice-card:hover{transform:translateY(-1px);border-color:rgba(201,52,49,.28);box-shadow:0 10px 24px rgba(50,38,28,.06)}.quote-choice-card input{position:absolute;top:14px;right:14px;width:17px;height:17px;accent-color:#c93431}.quote-choice-card strong{padding-right:26px;font:600 15px 'Space Grotesk',sans-serif}.quote-choice-card small{color:#817a73;font-size:10px;line-height:1.5}.quote-choice-mark{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#181716;color:#fff;font-size:9px;font-weight:800}.quote-choice-card:has(input:checked){border-color:#c93431;background:#fff8f7;box-shadow:0 0 0 2px rgba(201,52,49,.07)}.quote-choice-card:has(input:checked) .quote-choice-mark{background:#c93431}.quote-choice-card--option{min-height:92px}.quote-choice-card--spark{min-height:auto}.quote-actions{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:20px}.quote-actions p{margin:0;color:#66615c;font-size:10px}.quote-submit{border:0;border-radius:999px;background:#f4f1ec;color:#111;padding:14px 20px;font-weight:700;cursor:pointer}.quote-success{padding:26px;border:1px solid rgba(147,178,124,.3);border-radius:18px;background:rgba(147,178,124,.07)}.quote-success h2{font:600 28px 'Space Grotesk',sans-serif;margin:0 0 8px}.quote-success p{margin:0;color:#aabda0;line-height:1.7}.quote-error{margin-bottom:16px;padding:12px 14px;border-radius:12px;background:rgba(184,110,105,.08);color:#e2aaa6;border:1px solid rgba(184,110,105,.25);font-size:12px}.hp{position:absolute;left:-9999px;opacity:0;pointer-events:none}@media(max-width:850px){.quote-address-grid{grid-template-columns:1fr 1fr}.quote-choice-grid--formulas{grid-template-columns:1fr}.quote-choice-grid--options{grid-template-columns:1fr 1fr}}@media(max-width:700px){.quote-page{padding:45px 18px 75px}.quote-grid{grid-template-columns:1fr}.quote-field--full,.quote-group,.quote-address{grid-column:auto}.quote-address-grid{grid-template-columns:1fr}.quote-checks,.quote-choice-grid--options,.quote-choice-grid--spark{grid-template-columns:1fr}.quote-form{padding:20px}.quote-actions{align-items:stretch;flex-direction:column}.quote-submit{width:100%}}
   </style>
   <link rel="stylesheet" href="assets/css/site-light.css?v=20260910-1">
 </head>
@@ -147,20 +147,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <fieldset class="quote-group quote-group--formulas">
           <legend>Choisissez votre formule *</legend>
-          <div class="quote-checks">
-            <?php foreach($formulaOptions as $option): ?><label class="quote-check"><input type="checkbox" name="selections[]" value="<?= e($option) ?>" <?= in_array($option,$selectedSelections,true)?'checked':'' ?>><span><?= e($option) ?></span></label><?php endforeach; ?>
+          <div class="quote-choice-grid quote-choice-grid--formulas">
+            <?php
+              $formulaDescriptions = [
+                'Essentiel' => 'L’essentiel pour une soirée réussie.',
+                'Ambiance' => 'Plus de lumière et une mise en scène plus dynamique.',
+                'Expérience' => 'Une installation complète pour une soirée plus immersive.',
+              ];
+              $formulaNumber = 0;
+            ?>
+            <?php foreach($formulaOptions as $option): $formulaNumber++; ?>
+              <label class="quote-choice-card">
+                <input type="radio" name="selections[]" value="<?= e($option) ?>" <?= in_array($option,$selectedSelections,true)?'checked':'' ?>>
+                <span class="quote-choice-mark">0<?= $formulaNumber ?></span>
+                <strong><?= e($option) ?></strong>
+                <small><?= e($formulaDescriptions[$option] ?? '') ?></small>
+              </label>
+            <?php endforeach; ?>
           </div>
         </fieldset>
 
-        <fieldset class="quote-group">
+        <fieldset class="quote-group quote-group--options">
           <legend>Options complémentaires</legend>
-          <div class="quote-checks">
+          <p class="quote-group-help">Ajoutez uniquement ce qui vous intéresse. Les options pourront toujours être ajustées avec moi ensuite.</p>
+          <?php
+            $optionDescriptions = [
+              'Photobooth 150 tirages' => 'Un photobooth avec 150 impressions pour vos invités.',
+              'Photobooth 300 tirages' => 'Davantage de tirages pour les événements plus importants.',
+              "Livre d'or audio" => 'Les messages de vos invités enregistrés pendant la soirée.',
+              'Fumée lourde' => 'Un nuage au sol pour sublimer l’ouverture de bal.',
+              'Étincelles froides' => 'Un effet spectaculaire pour accompagner un temps fort.',
+              'Éclairage mural' => 'Pour habiller la salle et créer une ambiance lumineuse.',
+              'Écran & projecteur' => 'Pour diffuser vidéos, diaporamas et surprises.',
+            ];
+          ?>
+          <div class="quote-choice-grid quote-choice-grid--options">
             <?php foreach($extraOptions as $option): ?>
-              <label class="quote-check"><input type="checkbox" name="selections[]" value="<?= e($option) ?>" <?= in_array($option,$selectedSelections,true)?'checked':'' ?> <?= $option==='Étincelles froides'?'id="spark-toggle"':'' ?>><span><?= e($option) ?></span></label>
+              <label class="quote-choice-card quote-choice-card--option">
+                <input type="checkbox" name="selections[]" value="<?= e($option) ?>" <?= in_array($option,$selectedSelections,true)?'checked':'' ?> <?= $option==='Étincelles froides'?'id="spark-toggle"':'' ?>>
+                <strong><?= e($option) ?></strong>
+                <small><?= e($optionDescriptions[$option] ?? '') ?></small>
+              </label>
             <?php endforeach; ?>
           </div>
-          <div id="spark-quantity" class="quote-checks" style="margin-top:10px;<?= in_array('Étincelles froides',$selectedSelections,true)?'':'display:none;' ?>">
-            <?php foreach($sparkOptions as $option): ?><label class="quote-check"><input type="radio" name="spark_option" value="<?= e($option) ?>" <?= $selectedSpark===$option?'checked':'' ?>><span><?= e(str_replace('Étincelles froides — ','',$option)) ?></span></label><?php endforeach; ?>
+          <div id="spark-quantity" class="quote-choice-grid quote-choice-grid--spark" style="margin-top:10px;<?= in_array('Étincelles froides',$selectedSelections,true)?'':'display:none;' ?>">
+            <?php foreach($sparkOptions as $option): ?>
+              <label class="quote-choice-card quote-choice-card--spark">
+                <input type="radio" name="spark_option" value="<?= e($option) ?>" <?= $selectedSpark===$option?'checked':'' ?>>
+                <strong><?= e(str_replace('Étincelles froides — ','',$option)) ?></strong>
+              </label>
+            <?php endforeach; ?>
           </div>
         </fieldset>
 
@@ -171,7 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 </main>
 <footer class="site-footer"><a class="brand brand--footer" href="index.html"><img src="assets/img/logo-lukac.png" alt="Luka C" class="brand__logo brand__logo--footer"></a><p>DJ & animateur événementiel</p><div class="site-footer__links"><a href="index.html#prestations">Prestations</a><a href="index.html#formules">Formules</a><a href="index.html#avis">Avis clients</a></div><small>© 2026 Luka C • Tous droits réservés</small></footer>
-<script src="assets/js/main.js?v=20260928-5"></script>
+<script src="assets/js/main.js?v=20260928-6"></script>
 <script>
   const sparkToggle = document.getElementById('spark-toggle');
   const sparkQuantity = document.getElementById('spark-quantity');
