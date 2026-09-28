@@ -5,9 +5,15 @@ header('Cache-Control: no-store, max-age=0');
 
 $availability = [];
 foreach (db()->query('SELECT year, month, status, note FROM availability ORDER BY year, month')->fetchAll() as $row) {
-    $availability[(string)$row['year']][(string)$row['month']] = [
+    $year = (int)$row['year'];
+    $month = (int)$row['month'];
+    $note = $row['status'] === 'limited' ? trim((string)($row['note'] ?? '')) : '';
+    $availability[(string)$year][(string)$month] = [
         'status' => $row['status'],
-        'dates' => $row['status'] === 'limited' ? trim((string)($row['note'] ?? '')) : '',
+        'dates' => $note,
+        'available_days' => $row['status'] === 'limited'
+            ? availability_days_from_note($year, $month, $note)
+            : [],
     ];
 }
 
