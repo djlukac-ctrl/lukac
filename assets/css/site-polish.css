@@ -114,6 +114,7 @@ body{
 .scroll-reveal.is-visible{
   opacity:1;
   transform:none;
+  will-change:auto;
 }
 
 .scroll-reveal--delay-1{transition-delay:.06s}
@@ -260,10 +261,10 @@ body{
   border-radius:0;
   transform:translateX(-50%);
   background:linear-gradient(90deg,transparent 0%,rgba(201,52,49,.14) 18%,rgba(201,52,49,.72) 50%,rgba(201,52,49,.14) 82%,transparent 100%);
-  background-size:200% 100%;
+  background-size:100% 100%;
   opacity:.58;
   z-index:0;
-  animation:lukac-section-sweep 7s ease-in-out infinite;
+  animation:none;
   pointer-events:none;
 }
 
@@ -281,9 +282,9 @@ body{
   width:min(76vw,1040px);
   height:96px;
   transform:translateX(-50%);
-  background:radial-gradient(ellipse at center,rgba(201,52,49,.06) 0%,rgba(201,52,49,.018) 44%,transparent 74%);
-  filter:blur(11px);
-  opacity:.78;
+  background:radial-gradient(ellipse at center,rgba(201,52,49,.045) 0%,rgba(201,52,49,.014) 46%,transparent 76%);
+  filter:none;
+  opacity:.66;
   z-index:-1;
   pointer-events:none;
 }
@@ -315,11 +316,6 @@ body{
 .formules-hero.is-visible,
 .home-quote__head.is-visible{
   transform:translateY(0) scale(1);
-}
-
-@keyframes lukac-section-sweep{
-  0%,100%{background-position:0% 50%;opacity:.42}
-  50%{background-position:100% 50%;opacity:.72}
 }
 
 @media (hover:hover){
@@ -416,4 +412,28 @@ body{
     margin-top:24px!important;
     padding-top:54px!important;
   }
+}
+
+
+/* Performance scroll : effets décoratifs sans recalculs coûteux */
+.section--reviews::before,
+.home-prestations::before,
+.home-formules::before,
+.options-section::before,
+.home-quote::before,
+.home-partners::before{
+  animation:none!important;
+  background-size:100% 100%!important;
+}
+.section--reviews::after,
+.home-prestations::after,
+.home-formules::after,
+.options-section::after,
+.home-quote::after,
+.home-partners::after{
+  filter:none!important;
+}
+.reveal.is-visible,
+.scroll-reveal.is-visible{
+  will-change:auto!important;
 }
