@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /src/
+Disallow: /storage/
+
+Sitemap: https://www.lukac.fr/sitemap.xml
