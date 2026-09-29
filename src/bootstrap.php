@@ -3,6 +3,12 @@ declare(strict_types=1);
 
 date_default_timezone_set('Europe/Paris');
 
+// Protections HTTP communes aux pages PHP.
+header('X-Content-Type-Options: nosniff');
+header('X-Frame-Options: DENY');
+header('Referrer-Policy: strict-origin-when-cross-origin');
+header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+
 const APP_ROOT = __DIR__ . '/..';
 const STORAGE_DIR = APP_ROOT . '/storage';
 
@@ -11,6 +17,9 @@ if (!is_dir(STORAGE_DIR)) {
 }
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
+    ini_set('session.use_strict_mode', '1');
+    ini_set('session.use_only_cookies', '1');
+    ini_set('session.use_trans_sid', '0');
     session_name('lukac_admin');
     session_set_cookie_params([
         'lifetime' => 0,
@@ -87,6 +96,13 @@ function db(): PDO
     $pdo->exec('CREATE TABLE IF NOT EXISTS reserved_dates (
         event_date TEXT PRIMARY KEY,
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS login_attempts (
+        key_hash TEXT PRIMARY KEY,
+        attempts INTEGER NOT NULL DEFAULT 0,
+        first_attempt_at INTEGER NOT NULL,
+        locked_until INTEGER NOT NULL DEFAULT 0
     )');
 
     $pdo->exec('CREATE TABLE IF NOT EXISTS content (
@@ -238,6 +254,93 @@ function require_admin(): void
         header('Location: login.php');
         exit;
     }
+
+    $now = time();
+    $lastActivity = (int)($_SESSION['admin_last_activity'] ?? 0);
+
+    // Déconnexion automatique après 2 h d'inactivité.
+    if ($lastActivity > 0 && ($now - $lastActivity) > 7200) {
+        unset($_SESSION['admin_id'], $_SESSION['admin_email'], $_SESSION['admin_last_activity'], $_SESSION['admin_regenerated_at']);
+        session_regenerate_id(true);
+        header('Location: login.php?expired=1');
+        exit;
+    }
+
+    $_SESSION['admin_last_activity'] = $now;
+
+    // Renouvelle périodiquement l'identifiant de session.
+    $regeneratedAt = (int)($_SESSION['admin_regenerated_at'] ?? 0);
+    if ($regeneratedAt === 0 || ($now - $regeneratedAt) > 900) {
+        session_regenerate_id(true);
+        $_SESSION['admin_regenerated_at'] = $now;
+    }
+}
+
+function login_rate_limit_key(string $email): string
+{
+    $ip = (string)($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+    return hash('sha256', strtolower(trim($email)) . '|' . $ip);
+}
+
+function login_rate_limit_status(string $email): int
+{
+    $key = login_rate_limit_key($email);
+    $stmt = db()->prepare('SELECT attempts, first_attempt_at, locked_until FROM login_attempts WHERE key_hash = :key LIMIT 1');
+    $stmt->execute([':key' => $key]);
+    $row = $stmt->fetch();
+    if (!$row) return 0;
+
+    $now = time();
+    $lockedUntil = (int)($row['locked_until'] ?? 0);
+    if ($lockedUntil > $now) return $lockedUntil - $now;
+
+    // Nettoie automatiquement une ancienne fenêtre de tentatives.
+    if (($now - (int)($row['first_attempt_at'] ?? 0)) > 900) {
+        $delete = db()->prepare('DELETE FROM login_attempts WHERE key_hash = :key');
+        $delete->execute([':key' => $key]);
+    }
+
+    return 0;
+}
+
+function login_rate_limit_fail(string $email): void
+{
+    $pdo = db();
+    $key = login_rate_limit_key($email);
+    $now = time();
+
+    $stmt = $pdo->prepare('SELECT attempts, first_attempt_at FROM login_attempts WHERE key_hash = :key LIMIT 1');
+    $stmt->execute([':key' => $key]);
+    $row = $stmt->fetch();
+
+    $attempts = 1;
+    $firstAttempt = $now;
+    if ($row && ($now - (int)$row['first_attempt_at']) <= 900) {
+        $attempts = (int)$row['attempts'] + 1;
+        $firstAttempt = (int)$row['first_attempt_at'];
+    }
+
+    $lockedUntil = $attempts >= 5 ? $now + 900 : 0;
+    $upsert = $pdo->prepare(
+        'INSERT INTO login_attempts(key_hash, attempts, first_attempt_at, locked_until)
+         VALUES(:key,:attempts,:first,:locked)
+         ON CONFLICT(key_hash) DO UPDATE SET
+           attempts=excluded.attempts,
+           first_attempt_at=excluded.first_attempt_at,
+           locked_until=excluded.locked_until'
+    );
+    $upsert->execute([
+        ':key' => $key,
+        ':attempts' => $attempts,
+        ':first' => $firstAttempt,
+        ':locked' => $lockedUntil,
+    ]);
+}
+
+function login_rate_limit_clear(string $email): void
+{
+    $stmt = db()->prepare('DELETE FROM login_attempts WHERE key_hash = :key');
+    $stmt->execute([':key' => login_rate_limit_key($email)]);
 }
 
 function admin_exists(): bool
