@@ -5,4 +5,4 @@ Disallow: /api/
 Disallow: /src/
 Disallow: /storage/
 
-Sitemap: https://www.lukac.fr/sitemap.xml
+Sitemap: https://lukac.fr/sitemap.xml
