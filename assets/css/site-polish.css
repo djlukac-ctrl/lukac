@@ -695,3 +695,75 @@ html{
     min-height:38px;
   }
 }
+
+
+/* Secteur d'intervention intégré au hero */
+.hero-modern__sector{
+  margin-top:16px;
+  max-width:700px;
+  padding:14px 16px;
+  border:1px solid rgba(24,23,22,.10);
+  border-radius:16px;
+  background:rgba(255,255,255,.58);
+}
+.hero-modern__sector-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:10px;
+}
+.hero-modern__sector-head small{
+  color:#c93431;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+}
+.hero-modern__sector-head strong{
+  color:#181716;
+  font:600 13px 'Space Grotesk',sans-serif;
+  text-align:right;
+}
+.hero-modern__sector-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+.hero-modern__sector-meta span{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid rgba(24,23,22,.08);
+  color:#6b645e;
+  font-size:10px;
+  font-weight:600;
+}
+.hero-modern__sector-meta span:last-child{
+  color:#181716;
+  font-weight:700;
+}
+
+@media(max-width:700px){
+  .hero-modern__sector{
+    margin-top:14px;
+    padding:13px;
+  }
+  .hero-modern__sector-head{
+    display:block;
+  }
+  .hero-modern__sector-head small,
+  .hero-modern__sector-head strong{
+    display:block;
+    text-align:left;
+  }
+  .hero-modern__sector-head strong{
+    margin-top:5px;
+  }
+  .hero-modern__sector-meta span{
+    border-radius:10px;
+  }
+}
