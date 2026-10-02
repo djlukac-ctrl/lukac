@@ -1424,3 +1424,19 @@ html{
   text-transform:uppercase;
   line-height:1.2;
 }
+
+
+/* Hero : séparateurs événements en virgules */
+.hero-modern__editorial-row:first-child .hero-modern__editorial-content{
+  gap:0;
+}
+.hero-modern__editorial-row:first-child .hero-modern__editorial-content span{
+  padding-left:0;
+}
+.hero-modern__editorial-row:first-child .hero-modern__editorial-content span::before{
+  display:none!important;
+}
+.hero-modern__editorial-row:first-child .hero-modern__editorial-content span:not(:last-child)::after{
+  content:",";
+  margin-right:7px;
+}
