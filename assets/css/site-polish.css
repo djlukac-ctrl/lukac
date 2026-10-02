@@ -1188,3 +1188,121 @@ html{
     padding-top:16px;
   }
 }
+
+
+/* Comment ça se passe : chemin en 3 étapes */
+.home-process{
+  max-width:var(--max);
+  padding-left:34px;
+  padding-right:34px;
+}
+.home-process .home-visible__head{
+  max-width:920px;
+  margin-bottom:46px;
+}
+.home-process__path{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:44px;
+  padding-top:18px;
+}
+.home-process__path::before{
+  content:"";
+  position:absolute;
+  top:37px;
+  left:7%;
+  right:7%;
+  height:1px;
+  background:linear-gradient(90deg,rgba(201,52,49,.18),rgba(201,52,49,.62),rgba(201,52,49,.18));
+}
+.home-process__step{
+  position:relative;
+  min-width:0;
+}
+.home-process__node{
+  position:relative;
+  z-index:1;
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  margin-bottom:24px;
+  border-radius:50%;
+  background:#f5f2ed;
+  border:1px solid rgba(201,52,49,.5);
+  color:#c93431;
+  font:700 10px/1 'Space Grotesk',sans-serif;
+  letter-spacing:.08em;
+}
+.home-process__node::after{
+  content:"";
+  position:absolute;
+  inset:6px;
+  border-radius:50%;
+  background:rgba(201,52,49,.08);
+}
+.home-process__copy h3{
+  margin:0 0 10px;
+  max-width:280px;
+  font:600 20px/1.22 'Space Grotesk',sans-serif;
+  letter-spacing:-.02em;
+  color:#181716;
+}
+.home-process__copy p{
+  margin:0;
+  max-width:340px;
+  color:#756e67;
+  font-size:12px;
+  font-weight:500;
+  line-height:1.7;
+}
+
+@media(max-width:980px){
+  .home-process{
+    padding-left:22px;
+    padding-right:22px;
+  }
+  .home-process__path{
+    grid-template-columns:1fr;
+    gap:0;
+    padding-top:0;
+  }
+  .home-process__path::before{
+    top:20px;
+    bottom:20px;
+    left:20px;
+    right:auto;
+    width:1px;
+    height:auto;
+    background:linear-gradient(180deg,rgba(201,52,49,.18),rgba(201,52,49,.62),rgba(201,52,49,.18));
+  }
+  .home-process__step{
+    display:grid;
+    grid-template-columns:40px minmax(0,1fr);
+    gap:18px;
+    padding-bottom:30px;
+  }
+  .home-process__node{
+    margin-bottom:0;
+  }
+  .home-process__copy h3,
+  .home-process__copy p{
+    max-width:none;
+  }
+}
+@media(max-width:620px){
+  .home-process{
+    padding-left:18px;
+    padding-right:18px;
+  }
+  .home-process .home-visible__head{
+    margin-bottom:34px;
+  }
+  .home-process__copy h3{
+    font-size:18px;
+  }
+  .home-process__copy p{
+    font-size:12px;
+  }
+}
