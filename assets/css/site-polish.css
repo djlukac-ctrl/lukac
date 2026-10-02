@@ -1412,3 +1412,15 @@ html{
     margin-top:0;
   }
 }
+
+
+/* Comment ça se passe : kicker aligné avec les autres sections */
+.home-process .home-visible__kicker{
+  margin:0 0 14px;
+  color:#c93431;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  line-height:1.2;
+}
