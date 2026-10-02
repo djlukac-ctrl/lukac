@@ -38,27 +38,34 @@ document.querySelectorAll('.review').forEach((review) => {
 
 const homeMain = document.querySelector('body > main');
 const homeHero = document.querySelector('main > .hero-modern');
+const homeEventTypes = document.querySelector('main > .home-event-types');
 const reviewsSection = document.querySelector('main > #avis');
 const homePrestations = document.querySelector('main > .home-prestations');
+const homeLocalArea = document.querySelector('main > .home-local-area');
 const homeFormules = document.querySelector('main > .home-formules');
+const homeProcess = document.querySelector('main > .home-process');
 
 if (homeMain && homeHero && reviewsSection && homePrestations) {
   homeMain.style.display = 'flex';
   homeMain.style.flexDirection = 'column';
   homeHero.style.order = '1';
-  reviewsSection.style.order = '2';
-  homePrestations.style.order = '3';
+  if (homeEventTypes) homeEventTypes.style.order = '2';
+  reviewsSection.style.order = '3';
+  homePrestations.style.order = '4';
   homePrestations.style.width = '100%';
+  if (homeLocalArea) homeLocalArea.style.order = '5';
 
   if (homeFormules) {
-    homeFormules.style.order = '4';
+    homeFormules.style.order = '6';
     homeFormules.style.width = '100%';
   }
+
+  if (homeProcess) homeProcess.style.order = '7';
 
   const quoteSection = document.createElement('section');
   quoteSection.id = 'devis';
   quoteSection.className = 'home-quote reveal';
-  quoteSection.style.order = '5';
+  quoteSection.style.order = '8';
   quoteSection.innerHTML = `
     <div class="home-quote__head">
       <p class="home-quote__kicker">Demande de devis</p>
