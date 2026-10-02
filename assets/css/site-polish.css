@@ -1131,3 +1131,16 @@ html{
   color:#c93431;
   transform:none!important;
 }
+
+
+/* Hero : tous les éléments au même niveau visuel */
+.hero-modern__editorial-content strong,
+.hero-modern__editorial-content span{
+  color:#4f4944!important;
+  font-weight:600!important;
+}
+.hero-modern__editorial-content--area strong,
+.hero-modern__editorial-content--area span{
+  color:#4f4944!important;
+  font-weight:600!important;
+}
