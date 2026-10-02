@@ -651,3 +651,47 @@ html{
   .home-event-types .home-visible__head h2{margin-bottom:12px}
   .home-event-types .home-visible__grid--events{grid-template-columns:1fr}
 }
+
+
+/* Types d'événements intégrés au hero */
+.hero-modern__events{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:20px 0 2px;
+  max-width:700px;
+}
+.hero-modern__events span{
+  display:inline-flex;
+  align-items:center;
+  min-height:34px;
+  padding:8px 12px;
+  border:1px solid rgba(24,23,22,.11);
+  border-radius:999px;
+  background:rgba(255,255,255,.72);
+  color:#393531;
+  font-size:11px;
+  font-weight:700;
+  line-height:1.2;
+}
+.hero-modern__events span::before{
+  content:"";
+  width:5px;
+  height:5px;
+  margin-right:7px;
+  border-radius:50%;
+  background:#c93431;
+  flex:0 0 auto;
+}
+
+@media(max-width:700px){
+  .hero-modern__events{
+    gap:7px;
+    margin-top:18px;
+  }
+  .hero-modern__events span{
+    width:100%;
+    border-radius:12px;
+    min-height:38px;
+  }
+}
