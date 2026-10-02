@@ -1168,3 +1168,23 @@ html{
 .hero-modern__editorial-label span{
   color:#8f877f;
 }
+
+
+/* Hero éditorial : affinage des espacements */
+.hero-modern__editorial-content{
+  gap:6px 13px;
+}
+.hero-modern__editorial-row--area{
+  padding-top:18px;
+}
+.hero-modern__editorial-row + .hero-modern__editorial-row{
+  margin-top:2px;
+}
+@media(max-width:620px){
+  .hero-modern__editorial-content{
+    gap:6px 12px;
+  }
+  .hero-modern__editorial-row--area{
+    padding-top:16px;
+  }
+}
