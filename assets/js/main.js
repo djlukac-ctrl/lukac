@@ -49,10 +49,10 @@ if (homeMain && homeHero && reviewsSection && homePrestations) {
   homeMain.style.display = 'flex';
   homeMain.style.flexDirection = 'column';
   homeHero.style.order = '1';
-  if (homeEventTypes) homeEventTypes.style.order = '2';
-  reviewsSection.style.order = '3';
-  homePrestations.style.order = '4';
+  reviewsSection.style.order = '2';
+  homePrestations.style.order = '3';
   homePrestations.style.width = '100%';
+  if (homeEventTypes) homeEventTypes.style.order = '4';
   if (homeLocalArea) homeLocalArea.style.order = '5';
 
   if (homeFormules) {
