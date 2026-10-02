@@ -35,7 +35,7 @@
     const section = document.createElement('section');
     section.className = 'home-partners';
     section.id = 'partenaires';
-    section.style.order = '8';
+    section.style.order = '9';
 
     const head = document.createElement('div');
     head.className = 'home-partners__head';
