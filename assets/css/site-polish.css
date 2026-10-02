@@ -875,3 +875,72 @@ html{
   .hero-modern__essential--area p{font-size:10px}
   .hero-modern__mobility{font-size:9px}
 }
+
+
+/* Hero : équilibre final des cartes essentielles */
+.hero-modern__essentials{
+  grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);
+  gap:9px;
+  margin-top:18px;
+  max-width:660px;
+}
+.hero-modern__essential{
+  padding:13px 14px;
+  border-radius:15px;
+}
+.hero-modern__essential-title{
+  margin-bottom:9px;
+}
+.hero-modern__essential-title small{
+  font-size:7px;
+  letter-spacing:.15em;
+}
+.hero-modern__essential-title strong{
+  font-size:13px;
+}
+.hero-modern__event-list{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:5px 12px;
+}
+.hero-modern__event-list span{
+  padding-left:9px;
+  font-size:8px;
+  line-height:1.35;
+}
+.hero-modern__event-list span::before{
+  top:.48em;
+  width:3px;
+  height:3px;
+}
+.hero-modern__essential--area{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.hero-modern__essential--area p{
+  margin:0 0 8px;
+  font-size:8px;
+}
+.hero-modern__mobility{
+  align-self:flex-start;
+  min-height:24px;
+  padding:5px 8px;
+  font-size:7px;
+}
+.hero-modern__mobility i{
+  width:4px;
+  height:4px;
+}
+
+@media(max-width:620px){
+  .hero-modern__essentials{
+    margin-top:16px;
+  }
+  .hero-modern__event-list{
+    grid-template-columns:1fr 1fr;
+  }
+  .hero-modern__event-list span{
+    font-size:9px;
+  }
+}
