@@ -251,28 +251,58 @@ if (homeMain && homeHero && reviewsSection && homePrestations) {
     quoteButton.textContent = 'Envoi en cours…';
 
     try {
-      const response = await fetch('devis.php', {
-        method: 'POST',
-        body: new FormData(quoteForm),
-        credentials: 'same-origin'
-      });
-      const html = await response.text();
+      const sendQuote = async (retryOnSessionExpiry = true) => {
+        const response = await fetch('devis.php', {
+          method: 'POST',
+          body: new FormData(quoteForm),
+          credentials: 'same-origin',
+          cache: 'no-store'
+        });
+
+        const html = await response.text();
+
+        // Une session/clé CSRF peut expirer si le formulaire reste ouvert longtemps.
+        // Dans ce cas, on récupère une nouvelle clé et on retente une seule fois,
+        // sans demander au client de ressaisir son formulaire.
+        if (response.status === 419 && retryOnSessionExpiry) {
+          const refreshed = await loadCsrfToken();
+          if (refreshed) return sendQuote(false);
+        }
+
+        return { response, html };
+      };
+
+      const { response, html } = await sendQuote(true);
       const doc = new DOMParser().parseFromString(html, 'text/html');
       const success = doc.querySelector('.quote-success');
       const error = doc.querySelector('.quote-error');
+      const plainServerMessage = !html.includes('<')
+        ? html.trim().replace(/\s+/g, ' ').slice(0, 300)
+        : '';
 
-      if (success) {
+      if (success && response.ok) {
         quoteMessage.className = 'home-quote__message is-success';
         quoteMessage.textContent = 'Merci ! Votre demande de devis a bien été envoyée. Je reviendrai vers vous dès que possible.';
         quoteForm.reset();
         await loadCsrfToken();
       } else {
         quoteMessage.className = 'home-quote__message is-error';
-        quoteMessage.textContent = error?.textContent?.trim() || 'Une erreur est survenue pendant l’envoi. Merci de vérifier les informations saisies.';
+
+        if (error?.textContent?.trim()) {
+          quoteMessage.textContent = error.textContent.trim();
+        } else if (response.status === 419) {
+          quoteMessage.textContent = 'Votre session a expiré. Merci de recharger la page puis de réessayer.';
+        } else if (plainServerMessage && response.status < 500) {
+          quoteMessage.textContent = plainServerMessage;
+        } else if (!response.ok) {
+          quoteMessage.textContent = 'Le serveur n’a pas pu enregistrer votre demande. Merci de réessayer dans quelques instants.';
+        } else {
+          quoteMessage.textContent = 'La demande n’a pas pu être confirmée. Merci de réessayer ou de me contacter directement.';
+        }
       }
     } catch (error) {
       quoteMessage.className = 'home-quote__message is-error';
-      quoteMessage.textContent = 'Une erreur réseau est survenue pendant l’envoi. Merci de réessayer.';
+      quoteMessage.textContent = 'Une erreur réseau est survenue pendant l’envoi. Merci de vérifier votre connexion puis de réessayer.';
     } finally {
       quoteButton.disabled = false;
       quoteButton.innerHTML = 'Envoyer ma demande <span>→</span>';
