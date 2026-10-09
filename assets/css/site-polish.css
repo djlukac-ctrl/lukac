@@ -1440,3 +1440,34 @@ html{
   content:",";
   margin-right:7px;
 }
+
+
+/* Hero : uniformisation finale Événements / Secteur */
+.hero-modern__editorial-content,
+.hero-modern__editorial-content--area{
+  font-family:'Space Grotesk',sans-serif;
+}
+.hero-modern__editorial-content span,
+.hero-modern__editorial-content strong,
+.hero-modern__editorial-content--area span,
+.hero-modern__editorial-content--area strong{
+  font-family:'Space Grotesk',sans-serif!important;
+  font-size:11px!important;
+  font-weight:600!important;
+  line-height:1.35!important;
+  color:#4f4944!important;
+  letter-spacing:0!important;
+}
+.hero-modern__editorial-content--area span::before,
+.hero-modern__editorial-content--area strong::before{
+  display:none!important;
+  content:none!important;
+}
+@media(max-width:620px){
+  .hero-modern__editorial-content span,
+  .hero-modern__editorial-content strong,
+  .hero-modern__editorial-content--area span,
+  .hero-modern__editorial-content--area strong{
+    font-size:10.5px!important;
+  }
+}
