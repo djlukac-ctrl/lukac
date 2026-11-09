@@ -1863,3 +1863,303 @@ body{
       #070707!important;
   }
 }
+
+
+/* =========================================================
+   Luka C — thème monochrome premium
+   Base noir / blanc, couleurs uniquement en accents
+   ========================================================= */
+:root{
+  --bg:#080808;
+  --surface:#101010;
+  --surface-2:#171717;
+  --text:#f5f5f3;
+  --muted:#a6a29d;
+  --line:rgba(255,255,255,.10);
+  --line-strong:rgba(255,255,255,.18);
+  --accent:#ffffff;
+  --accent-soft:#d9d9d9;
+  --warm:#f1c51b;
+}
+
+html,
+body{
+  background:#080808!important;
+  color:#f5f5f3!important;
+}
+
+body{
+  background:
+    radial-gradient(circle at 16% 0%,rgba(255,255,255,.035),transparent 26%),
+    radial-gradient(circle at 88% 8%,rgba(227,34,40,.018),transparent 22%),
+    #080808!important;
+}
+
+/* Couleurs secondaires réduites au minimum */
+.reviews-kicker,
+.prestations-kicker,
+.prestation-card__kicker,
+.formules-kicker,
+.home-visible__kicker,
+.home-quote__kicker,
+.quote-head p:first-child{
+  color:#d8d8d6!important;
+}
+
+.section--reviews h2 em,
+.prestations-hero h1 span:last-child,
+.formules-hero h1 span:last-child,
+.home-visible__head h2 em,
+.hero-modern h1 span:last-child{
+  color:#fff!important;
+}
+
+/* Header */
+.site-header{
+  background:#090909!important;
+  border-bottom:1px solid rgba(255,255,255,.08)!important;
+}
+.desktop-nav a{color:#b7b5b1!important}
+.desktop-nav a:hover,
+.desktop-nav a.is-active{color:#fff!important}
+.desktop-nav a:after{background:#fff!important}
+
+.header-cta,
+.mobile-nav__cta{
+  background:#fff!important;
+  color:#0a0a0a!important;
+  border-color:#fff!important;
+}
+.header-cta:hover{
+  background:#f1c51b!important;
+  color:#0a0a0a!important;
+  border-color:#f1c51b!important;
+}
+.header-socials a{
+  background:#111!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.12)!important;
+}
+.header-socials a:hover{
+  background:#fff!important;
+  color:#0a0a0a!important;
+  border-color:#fff!important;
+}
+
+/* Hero */
+.hero-modern::before{
+  background:radial-gradient(circle,rgba(255,255,255,.055) 0%,rgba(255,255,255,.018) 40%,transparent 72%)!important;
+}
+.hero-modern h1{color:#fff!important}
+.hero-modern__lead{color:#aaa7a2!important}
+.hero-modern__frame{
+  background:#111!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  box-shadow:0 24px 70px rgba(0,0,0,.48)!important;
+}
+.hero-modern__label{
+  background:#0c0c0c!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.12)!important;
+}
+.hero-modern__label i{background:#e32228!important}
+.hero-modern__editorial{
+  border-color:rgba(255,255,255,.11)!important;
+}
+.hero-modern__editorial-row + .hero-modern__editorial-row{
+  border-top-color:rgba(255,255,255,.07)!important;
+}
+.hero-modern__editorial-label,
+.hero-modern__editorial-label span{color:#8f8c87!important}
+.hero-modern__editorial-label svg{stroke:#fff!important}
+.hero-modern__editorial-content span,
+.hero-modern__editorial-content strong,
+.hero-modern__editorial-content--area span,
+.hero-modern__editorial-content--area strong{
+  color:#dedbd7!important;
+}
+.hero-modern__editorial-row:first-child .hero-modern__editorial-content span:not(:last-child)::after{
+  color:#777!important;
+}
+
+/* Cartes */
+.review,
+.prestation-card,
+.formule-card,
+.signature-card,
+.option-card,
+.home-visible__card,
+.home-visible__zone>div,
+.home-quote__form,
+.quote-form{
+  background:#101010!important;
+  border-color:rgba(255,255,255,.09)!important;
+  box-shadow:none!important;
+}
+.review:hover,
+.prestation-card:hover,
+.formule-card:hover,
+.signature-card:hover,
+.option-card:hover{
+  border-color:rgba(255,255,255,.18)!important;
+}
+
+/* Prestations / formules */
+.prestation-card__content{background:#101010!important}
+.prestation-card h2,
+.formule-card__body h2,
+.signature-card h3,
+.option-card h3{color:#fff!important}
+.prestation-card__content>p,
+.formule-card__intro,
+.signature-card p,
+.option-card p{color:#aaa7a2!important}
+.prestation-card__content li,
+.formule-card li,
+.signature-card li{color:#d0cdc8!important}
+.prestation-card__content li::before,
+.formule-card li::before,
+.signature-card li::before{
+  background:#fff!important;
+}
+
+.formule-card--featured{
+  border-color:rgba(255,255,255,.22)!important;
+  box-shadow:0 0 0 1px rgba(255,255,255,.04)!important;
+}
+.option-card{
+  border-top:1px solid rgba(255,255,255,.14)!important;
+}
+.option-card:nth-child(2n){
+  border-top-color:rgba(241,197,27,.50)!important;
+}
+
+/* Parcours */
+.home-process__curve path{
+  stroke:rgba(255,255,255,.22)!important;
+}
+.home-process__node{
+  background:#0d0d0d!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.30)!important;
+  box-shadow:0 0 0 6px rgba(8,8,8,.96)!important;
+}
+.home-process__node::after{
+  background:rgba(255,255,255,.05)!important;
+}
+
+/* Formulaire */
+.home-quote__field input,
+.home-quote__field select,
+.home-quote__field textarea,
+.quote-field input,
+.quote-field select,
+.quote-field textarea{
+  background:#0a0a0a!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.12)!important;
+}
+.home-quote__field input:focus,
+.home-quote__field select:focus,
+.home-quote__field textarea:focus,
+.quote-field input:focus,
+.quote-field select:focus,
+.quote-field textarea:focus{
+  border-color:#fff!important;
+  box-shadow:0 0 0 3px rgba(255,255,255,.07)!important;
+}
+.home-quote__group,
+.quote-address,
+.quote-group{
+  background:#0c0c0c!important;
+  border-color:rgba(255,255,255,.09)!important;
+}
+.home-quote__choice-card,
+.quote-choice-card{
+  background:#111!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.09)!important;
+}
+.home-quote__choice-card:has(input:checked),
+.quote-choice-card:has(input:checked){
+  background:#151515!important;
+  border-color:#fff!important;
+  box-shadow:0 0 0 2px rgba(255,255,255,.05)!important;
+}
+.home-quote__form input,
+.quote-form input{
+  accent-color:#fff!important;
+}
+.home-quote__actions button[type="submit"],
+.quote-submit{
+  background:#fff!important;
+  color:#0a0a0a!important;
+}
+.home-quote__actions button[type="submit"]:hover,
+.quote-submit:hover{
+  background:#f1c51b!important;
+  color:#0a0a0a!important;
+}
+
+/* Récapitulatif */
+.quote-review{
+  background:#111!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.12)!important;
+}
+.quote-review__confirm{
+  background:#fff!important;
+  color:#0a0a0a!important;
+}
+.quote-review__edit{
+  background:#151515!important;
+  color:#fff!important;
+  border-color:rgba(255,255,255,.12)!important;
+}
+
+/* Séparateurs */
+.section--reviews::before,
+.availability::before,
+.home-prestations::before,
+.home-formules::before,
+.options-section::before,
+.home-quote::before,
+.home-partners::before,
+.home-process::before{
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.05) 18%,rgba(255,255,255,.34) 50%,rgba(255,255,255,.05) 82%,transparent 100%)!important;
+}
+.section--reviews::after,
+.availability::after,
+.home-prestations::after,
+.home-formules::after,
+.options-section::after,
+.home-quote::after,
+.home-partners::after{
+  background:radial-gradient(ellipse at center,rgba(255,255,255,.025) 0%,rgba(255,255,255,.008) 46%,transparent 76%)!important;
+}
+
+/* Micro-accents de marque */
+.hero-modern__label i,
+.back-to-top:hover{
+  background:#e32228!important;
+}
+.back-to-top:hover{
+  color:#fff!important;
+  border-color:#e32228!important;
+}
+.site-footer a:hover{
+  color:#f1c51b!important;
+}
+
+/* Footer */
+.site-footer{
+  background:#050505!important;
+  color:#88847f!important;
+  border-top:1px solid rgba(255,255,255,.07)!important;
+}
+.site-footer p,
+.site-footer a{color:#aaa7a2!important}
+.site-footer small{
+  color:#66625e!important;
+  border-color:rgba(255,255,255,.05)!important;
+}
