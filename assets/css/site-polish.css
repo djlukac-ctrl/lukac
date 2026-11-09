@@ -2163,3 +2163,148 @@ body{
   color:#66625e!important;
   border-color:rgba(255,255,255,.05)!important;
 }
+
+
+/* =========================================================
+   Ajustements devis + partenaires
+   ========================================================= */
+
+/* Titre du devis : blanc + rouge */
+.home-quote__head h2{
+  color:#fff!important;
+}
+.home-quote__head h2 em{
+  color:#e32228!important;
+}
+
+/* Carte du formulaire : blanche */
+.home-quote__form{
+  background:#fff!important;
+  color:#181716!important;
+  border-color:rgba(255,255,255,.16)!important;
+  box-shadow:0 18px 50px rgba(0,0,0,.22)!important;
+}
+.home-quote__field label,
+.home-quote__group legend,
+.home-quote__checks label{
+  color:#5f5a55!important;
+}
+.home-quote__field input,
+.home-quote__field select,
+.home-quote__field textarea{
+  background:#f7f5f2!important;
+  color:#181716!important;
+  border-color:rgba(24,23,22,.14)!important;
+}
+.home-quote__field input:focus,
+.home-quote__field select:focus,
+.home-quote__field textarea:focus{
+  border-color:#181716!important;
+  box-shadow:0 0 0 3px rgba(24,23,22,.06)!important;
+}
+.home-quote__group{
+  background:#fbfaf8!important;
+  border-color:rgba(24,23,22,.10)!important;
+}
+.home-quote__choice-card{
+  background:#fff!important;
+  color:#181716!important;
+  border-color:rgba(24,23,22,.11)!important;
+}
+.home-quote__choice-card small{
+  color:#77716a!important;
+}
+.home-quote__choice-card:has(input:checked){
+  background:#f5f3ef!important;
+  border-color:#181716!important;
+  box-shadow:0 0 0 2px rgba(24,23,22,.05)!important;
+}
+.home-quote__form input{
+  accent-color:#e32228!important;
+}
+.home-quote__actions p{
+  color:#7d766f!important;
+}
+.home-quote__actions button[type="submit"]{
+  background:#181716!important;
+  color:#fff!important;
+}
+.home-quote__actions button[type="submit"]:hover{
+  background:#e32228!important;
+  color:#fff!important;
+}
+
+/* Récapitulatif avant envoi, cohérent avec le formulaire blanc */
+.home-quote .quote-review{
+  background:#f7f5f2!important;
+  color:#181716!important;
+  border-color:rgba(24,23,22,.12)!important;
+}
+.home-quote .quote-review h3,
+.home-quote .quote-review__item span{
+  color:#181716!important;
+}
+.home-quote .quote-review__item{
+  border-bottom-color:rgba(24,23,22,.08)!important;
+}
+.home-quote .quote-review__item small{
+  color:#8a837c!important;
+}
+.home-quote .quote-review__edit{
+  background:#fff!important;
+  color:#181716!important;
+  border-color:rgba(24,23,22,.13)!important;
+}
+.home-quote .quote-review__confirm{
+  background:#181716!important;
+  color:#fff!important;
+}
+
+/* Partenaires : section et cartes noires */
+.home-partners{
+  color:#fff!important;
+}
+.home-partners__kicker{
+  color:#d8d8d6!important;
+}
+.home-partners__head h2{
+  color:#fff!important;
+}
+.home-partners__head h2 em{
+  color:#e32228!important;
+}
+.home-partners__head>p:last-child{
+  color:#aaa7a2!important;
+}
+.home-partner-card{
+  background:#101010!important;
+  border-color:rgba(255,255,255,.09)!important;
+  box-shadow:none!important;
+}
+.home-partner-card__visual{
+  background:#0c0c0c!important;
+  border-bottom-color:rgba(255,255,255,.08)!important;
+}
+.home-partner-card__body{
+  background:#101010!important;
+  color:#fff!important;
+}
+.home-partner-card__activity{
+  color:#e32228!important;
+}
+.home-partner-card h3{
+  color:#fff!important;
+}
+.home-partner-card p{
+  color:#aaa7a2!important;
+}
+.home-partner-card__link{
+  background:#fff!important;
+  color:#0a0a0a!important;
+  border-color:#fff!important;
+}
+.home-partner-card__link:hover{
+  background:#f1c51b!important;
+  color:#0a0a0a!important;
+  border-color:#f1c51b!important;
+}
