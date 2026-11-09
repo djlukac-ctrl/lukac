@@ -2308,3 +2308,27 @@ body{
   color:#0a0a0a!important;
   border-color:#f1c51b!important;
 }
+
+
+/* =========================================================
+   Corrections finales des titres : blanc puis rouge
+   ========================================================= */
+.section--reviews h2{color:#fff!important}
+.section--reviews h2 em{color:#e32228!important}
+
+.prestations-hero h1{color:#fff!important}
+.prestations-hero h1 span:first-child{color:#fff!important}
+.prestations-hero h1 span:last-child{color:#e32228!important}
+
+.formules-hero h1{color:#fff!important}
+.formules-hero h1 span:first-child{color:#fff!important}
+.formules-hero h1 span:last-child{color:#e32228!important}
+
+.section-title h2{color:#fff!important}
+.section-title h2 span{color:#e32228!important}
+
+.home-visible__head h2{color:#fff!important}
+.home-visible__head h2 em{color:#e32228!important}
+
+.home-quote__head h2{color:#fff!important}
+.home-quote__head h2 em{color:#e32228!important}
