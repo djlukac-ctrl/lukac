@@ -2379,3 +2379,72 @@ body{
   background:rgba(227,34,40,.34);
   color:#fff;
 }
+
+
+/* =========================================================
+   Options — visuels plus présents
+   ========================================================= */
+.options-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:22px!important;
+}
+
+.option-card{
+  padding:0 24px 24px!important;
+  min-height:0!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  border-top:1px solid rgba(255,255,255,.12)!important;
+  border-radius:22px!important;
+  overflow:hidden!important;
+  background:#101010!important;
+}
+
+.option-card:nth-child(2n){
+  border-top-color:rgba(255,255,255,.12)!important;
+}
+
+.option-card__image{
+  display:none;
+  height:290px!important;
+  margin:0 -24px 22px!important;
+  background:#111 center/cover no-repeat!important;
+  border-bottom:1px solid rgba(255,255,255,.07)!important;
+}
+
+.option-card__image.has-cms-image{
+  display:block!important;
+  background-size:cover!important;
+  background-position:center!important;
+}
+
+.option-card h3{
+  font-size:24px!important;
+  margin-bottom:10px!important;
+}
+
+.option-card p{
+  margin-bottom:0!important;
+}
+
+@media(max-width:980px){
+  .options-grid{
+    grid-template-columns:1fr 1fr!important;
+    gap:18px!important;
+  }
+  .option-card__image{
+    height:240px!important;
+  }
+}
+
+@media(max-width:700px){
+  .options-grid{
+    grid-template-columns:1fr!important;
+  }
+  .option-card{
+    padding:0 20px 22px!important;
+  }
+  .option-card__image{
+    height:230px!important;
+    margin:0 -20px 20px!important;
+  }
+}
