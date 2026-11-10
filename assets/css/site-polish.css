@@ -2332,3 +2332,21 @@ body{
 
 .home-quote__head h2{color:#fff!important}
 .home-quote__head h2 em{color:#e32228!important}
+
+
+/* =========================================================
+   Header fondu dans le fond
+   ========================================================= */
+.site-header{
+  background:rgba(10,10,10,.78)!important;
+  border-bottom:1px solid rgba(255,255,255,.07)!important;
+  box-shadow:0 12px 36px rgba(0,0,0,.10)!important;
+  backdrop-filter:blur(10px)!important;
+  -webkit-backdrop-filter:blur(10px)!important;
+}
+
+@media(max-width:1180px){
+  .site-header{
+    background:rgba(10,10,10,.82)!important;
+  }
+}
