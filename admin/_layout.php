@@ -21,7 +21,6 @@ function admin_header(string $title, string $active = ''): void
             'avis' => ['Avis clients', 'avis.php'],
             'options' => ['Options', 'options.php'],
             'partenaires' => ['Prestataires partenaires', 'partenaires.php'],
-            'bon-plan' => ['Bon plan', 'bon-plan.php'],
         ],
     ];
     ?>
