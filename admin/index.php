@@ -118,7 +118,6 @@ admin_header('Tableau de bord', 'dashboard');
         <a href="disponibilites.php"><span>Disponibilités</span><span>→</span></a>
         <a href="avis.php"><span>Avis clients</span><span>→</span></a>
         <a href="options.php"><span>Options</span><span>→</span></a>
-        <a href="bon-plan.php"><span>Bon plan</span><span>→</span></a>
       </div>
     </section>
   </aside>
