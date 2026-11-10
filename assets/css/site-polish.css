@@ -2368,3 +2368,14 @@ body{
     background:transparent!important;
   }
 }
+
+
+/* Sélection de texte lisible sur le thème sombre */
+::selection{
+  background:rgba(227,34,40,.34);
+  color:#fff;
+}
+::-moz-selection{
+  background:rgba(227,34,40,.34);
+  color:#fff;
+}
