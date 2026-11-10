@@ -2407,14 +2407,13 @@ body{
   display:none;
   height:290px!important;
   margin:0 -24px 22px!important;
-  background:#111 center/cover no-repeat!important;
+  background-color:#111!important;
+  background-repeat:no-repeat;
   border-bottom:1px solid rgba(255,255,255,.07)!important;
 }
 
 .option-card__image.has-cms-image{
   display:block!important;
-  background-size:cover!important;
-  background-position:center!important;
 }
 
 .option-card h3{
