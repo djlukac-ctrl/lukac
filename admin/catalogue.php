@@ -3,7 +3,7 @@ require_once __DIR__ . '/_layout.php';
 require_admin();
 
 $pdo = db();
-$categories = ['prestation' => 'Prestations', 'formule' => 'Formules', 'option' => 'Options'];
+$categories = ['prestation' => 'Prestations', 'formule' => 'Formules', 'option' => 'Options', 'frais' => 'Frais'];
 $priceModes = ['fixed' => 'Prix fixe', 'from' => 'À partir de', 'hourly' => 'Par heure', 'unit' => 'À l’unité'];
 $flash = '';
 $error = '';
@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $items = $pdo->query('SELECT * FROM catalog_items ORDER BY category, display_order, id')->fetchAll();
-$grouped = ['prestation'=>[], 'formule'=>[], 'option'=>[]];
+$grouped = ['prestation'=>[], 'formule'=>[], 'option'=>[], 'frais'=>[]];
 foreach ($items as $item) {
     if (isset($grouped[$item['category']])) $grouped[$item['category']][] = $item;
 }
