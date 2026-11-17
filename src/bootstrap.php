@@ -98,6 +98,29 @@ function db(): PDO
         created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )');
 
+    $pdo->exec('CREATE TABLE IF NOT EXISTS commercial_quotes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_number TEXT NOT NULL UNIQUE,
+        source_quote_id INTEGER,
+        status TEXT NOT NULL DEFAULT "draft",
+        client_name TEXT NOT NULL,
+        client_email TEXT,
+        client_phone TEXT,
+        client_address TEXT,
+        event_type TEXT,
+        event_date TEXT,
+        venue TEXT,
+        description TEXT,
+        amount_cents INTEGER NOT NULL DEFAULT 0,
+        deposit_percent INTEGER NOT NULL DEFAULT 30,
+        notes TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(source_quote_id) REFERENCES quotes(id) ON DELETE SET NULL
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_commercial_quotes_source ON commercial_quotes(source_quote_id)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_commercial_quotes_status ON commercial_quotes(status)');
+
     $pdo->exec('CREATE TABLE IF NOT EXISTS login_attempts (
         key_hash TEXT PRIMARY KEY,
         attempts INTEGER NOT NULL DEFAULT 0,
@@ -388,6 +411,32 @@ function event_date_availability(string $date): array
     }
 
     return ['available' => true, 'reason' => 'available', 'message' => ''];
+}
+
+
+function next_commercial_quote_number(PDO $pdo): string
+{
+    $year = date('Y');
+    $prefix = 'DEV-' . $year . '-';
+    $stmt = $pdo->prepare('SELECT quote_number FROM commercial_quotes WHERE quote_number LIKE :prefix ORDER BY quote_number DESC LIMIT 1');
+    $stmt->execute([':prefix' => $prefix . '%']);
+    $last = (string)($stmt->fetchColumn() ?: '');
+    $sequence = 1;
+    if ($last && preg_match('/(\d{3,})$/', $last, $m)) {
+        $sequence = ((int)$m[1]) + 1;
+    }
+    return $prefix . str_pad((string)$sequence, 3, '0', STR_PAD_LEFT);
+}
+
+function commercial_quote_status_label(string $status): string
+{
+    return [
+        'draft' => 'Brouillon',
+        'sent' => 'Envoyé',
+        'accepted' => 'Accepté',
+        'refused' => 'Refusé',
+        'expired' => 'Expiré',
+    ][$status] ?? $status;
 }
 
 function quote_status_label(string $status): string
