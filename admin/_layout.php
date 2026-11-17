@@ -32,7 +32,7 @@ function admin_header(string $title, string $active = ''): void
   <title><?= $newQuoteCount > 0 ? '(' . $newQuoteCount . ') ' : '' ?><?= e($title) ?> — Administration Luka C</title>
   <link rel="stylesheet" href="../assets/css/admin.css?v=20260910-2">
   <link rel="stylesheet" href="../assets/css/admin-content.css?v=20260910-1">
-  <link rel="stylesheet" href="../assets/css/admin-light.css?v=20261117-5">
+  <link rel="stylesheet" href="../assets/css/admin-light.css?v=20261117-6">
 </head>
 <body>
 <div class="admin-shell">
