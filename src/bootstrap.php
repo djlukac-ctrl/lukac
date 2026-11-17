@@ -121,6 +121,21 @@ function db(): PDO
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_commercial_quotes_source ON commercial_quotes(source_quote_id)');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_commercial_quotes_status ON commercial_quotes(status)');
 
+    $pdo->exec('CREATE TABLE IF NOT EXISTS catalog_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        category TEXT NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        price_cents INTEGER NOT NULL DEFAULT 0,
+        price_mode TEXT NOT NULL DEFAULT "fixed",
+        unit_label TEXT,
+        active INTEGER NOT NULL DEFAULT 1,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_catalog_items_category ON catalog_items(category, display_order, id)');
+
     $pdo->exec('CREATE TABLE IF NOT EXISTS login_attempts (
         key_hash TEXT PRIMARY KEY,
         attempts INTEGER NOT NULL DEFAULT 0,
@@ -156,6 +171,7 @@ function db(): PDO
 
     seed_defaults($pdo);
     seed_reviews($pdo);
+    seed_catalog($pdo);
     return $pdo;
 }
 
@@ -224,6 +240,43 @@ function seed_defaults(PDO $pdo): void
         foreach ($months as $month => $status) {
             $stmt->execute([':y' => $year, ':m' => $month, ':s' => $status]);
         }
+    }
+}
+
+function seed_catalog(PDO $pdo): void
+{
+    if ((int)$pdo->query('SELECT COUNT(*) FROM catalog_items')->fetchColumn() > 0) {
+        return;
+    }
+
+    $items = [
+        ['prestation','DJ','Une ambiance sur mesure du début à la fin.',0,'fixed','Par prestation',1],
+        ['prestation','Animations interactives','Karaoké, quiz musical, blind test et animations personnalisées.',0,'fixed','Par prestation',2],
+        ['prestation','Sonorisation de vin d’honneur','Musique d’ambiance et sonorisation adaptée au moment.',0,'fixed','Par prestation',3],
+
+        ['formule','Essentiel','L’essentiel pour une soirée réussie.',0,'fixed','Par événement',10],
+        ['formule','Ambiance','Plus de lumière, plus de dynamisme, plus d’ambiance.',0,'fixed','Par événement',11],
+        ['formule','Expérience','Une mise en scène lumineuse complète pour une soirée inoubliable.',0,'fixed','Par événement',12],
+        ['formule','Pack Instant Magique','Fumée lourde au sol et 2 fontaines d’étincelles froides.',0,'fixed','Par prestation',13],
+        ['formule','Pack Instant Magique Signature','Fumée lourde au sol et 4 fontaines d’étincelles froides.',0,'fixed','Par prestation',14],
+
+        ['option','Fumée lourde','Nuage au sol pour ouverture de bal ou temps fort.',0,'fixed','Par utilisation',20],
+        ['option','Étincelles froides','Gerbes d’étincelles pour entrée, ouverture de bal ou temps fort.',0,'fixed','Par prestation',21],
+        ['option','Éclairage mural','Éclairage d’ambiance réparti autour de la salle.',0,'fixed','Par prestation',22],
+        ['option','Écran & projecteur','Diffusion de vidéos, diaporamas, surprises ou souvenirs.',0,'fixed','Par prestation',23],
+    ];
+
+    $stmt = $pdo->prepare('INSERT INTO catalog_items(category,name,description,price_cents,price_mode,unit_label,active,display_order) VALUES(:category,:name,:description,:price,:mode,:unit,1,:sort)');
+    foreach ($items as [$category,$name,$description,$price,$mode,$unit,$sort]) {
+        $stmt->execute([
+            ':category'=>$category,
+            ':name'=>$name,
+            ':description'=>$description,
+            ':price'=>$price,
+            ':mode'=>$mode,
+            ':unit'=>$unit,
+            ':sort'=>$sort,
+        ]);
     }
 }
 
