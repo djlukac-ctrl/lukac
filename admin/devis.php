@@ -174,7 +174,8 @@ if ($id > 0) {
             </div>          </div>
 
           <div class="djenesis-actions">
-            <a class="btn djenesis-open" href="https://djenesis.net/dj/quotes/create" target="_blank" rel="noopener noreferrer">Créer le devis dans Djenesis ↗</a>
+            <a class="btn btn--primary" href="documents.php?create_from=<?= $id ?>">Créer un devis Luka C →</a>
+            <a class="btn djenesis-open" href="https://djenesis.net/dj/quotes/create" target="_blank" rel="noopener noreferrer">Créer dans Djenesis ↗</a>
           </div>
         </section>
 
