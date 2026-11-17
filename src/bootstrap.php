@@ -173,6 +173,7 @@ function db(): PDO
     seed_defaults($pdo);
     seed_reviews($pdo);
     seed_catalog($pdo);
+    ensure_fee_catalog_items($pdo);
     return $pdo;
 }
 
@@ -276,6 +277,34 @@ function seed_catalog(PDO $pdo): void
             ':unit'=>$unit,
             ':sort'=>$sort,
         ]);
+    }
+}
+
+function ensure_fee_catalog_items(PDO $pdo): void
+{
+    $items = [
+        ['Déplacement', 'Frais kilométriques calculés selon la distance facturée.', 100, 'unit', 'Par km', 90],
+        ['Montage / démontage', 'Temps et manutention nécessaires à l’installation et au rangement du matériel.', 0, 'fixed', 'Par prestation', 91],
+    ];
+
+    $check = $pdo->prepare("SELECT id FROM catalog_items WHERE category='frais' AND name=:name LIMIT 1");
+    $insert = $pdo->prepare(
+        "INSERT INTO catalog_items(category,name,description,price_cents,price_mode,unit_label,active,display_order)
+         VALUES('frais',:name,:description,:price,:mode,:unit,1,:sort)"
+    );
+
+    foreach ($items as [$name,$description,$price,$mode,$unit,$sort]) {
+        $check->execute([':name'=>$name]);
+        if (!$check->fetchColumn()) {
+            $insert->execute([
+                ':name'=>$name,
+                ':description'=>$description,
+                ':price'=>$price,
+                ':mode'=>$mode,
+                ':unit'=>$unit,
+                ':sort'=>$sort,
+            ]);
+        }
     }
 }
 
