@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connexion — Administration Luka C</title><link rel="stylesheet" href="../assets/css/admin.css?v=20260909-1"><link rel="stylesheet" href="../assets/css/admin-light.css?v=20261117-2"></head><body class="login-page">
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connexion — Administration Luka C</title><link rel="stylesheet" href="../assets/css/admin.css?v=20260909-1"><link rel="stylesheet" href="../assets/css/admin-light.css?v=20261117-3"></head><body class="login-page">
 <div class="login-stage" aria-hidden="true">
   <span class="login-beam login-beam--left"></span>
   <span class="login-beam login-beam--right"></span>
