@@ -642,3 +642,94 @@ table strong{color:#fff!important}
   .login-card::before{border-radius:22px}
   .login-brand-wrap img{width:132px!important}
 }
+
+
+/* =========================================================
+   Raffinements connexion admin — présence & profondeur
+   ========================================================= */
+.login-card{
+  width:min(570px,calc(100% - 36px))!important;
+  padding:42px 42px 36px!important;
+  box-shadow:
+    0 34px 110px rgba(0,0,0,.64),
+    0 0 0 1px rgba(227,34,40,.12),
+    0 0 56px rgba(227,34,40,.16),
+    0 0 110px rgba(129,35,255,.06)!important;
+}
+
+.login-card::after{
+  left:8%;
+  right:8%;
+  height:2px;
+  box-shadow:
+    0 0 24px rgba(227,34,40,.85),
+    0 0 54px rgba(227,34,40,.30);
+}
+
+.login-brand-wrap img{
+  width:176px!important;
+  margin-bottom:18px!important;
+  filter:
+    drop-shadow(0 10px 26px rgba(227,34,40,.18))
+    drop-shadow(0 0 10px rgba(241,197,27,.06));
+}
+
+.login-brand-line{
+  width:132px!important;
+  box-shadow:0 0 16px rgba(241,197,27,.42)!important;
+}
+
+.login-kicker{
+  margin-bottom:10px!important;
+  font-size:11px!important;
+}
+
+.login-card h1{
+  font-size:clamp(36px,4vw,48px)!important;
+  margin-bottom:10px!important;
+}
+
+.login-card>p{
+  max-width:390px!important;
+  margin-bottom:28px!important;
+}
+
+.login-card .field input{
+  height:52px!important;
+}
+
+.login-card .btn--primary{
+  min-height:54px!important;
+  font-size:13px!important;
+}
+
+.login-page::after{
+  width:min(1120px,86vw)!important;
+  height:46vh!important;
+  background:
+    radial-gradient(ellipse at center,rgba(227,34,40,.20) 0%,rgba(129,35,255,.10) 34%,transparent 72%)!important;
+  filter:blur(20px)!important;
+}
+
+.login-beam{
+  box-shadow:
+    0 0 22px rgba(227,34,40,.78),
+    0 0 58px rgba(227,34,40,.30)!important;
+}
+
+.login-eq{
+  opacity:.42!important;
+  filter:
+    drop-shadow(0 0 14px rgba(227,34,40,.34))
+    drop-shadow(0 0 28px rgba(227,34,40,.12))!important;
+}
+
+@media(max-width:700px){
+  .login-card{
+    width:min(500px,calc(100% - 28px))!important;
+    padding:30px 22px 26px!important;
+  }
+  .login-brand-wrap img{
+    width:146px!important;
+  }
+}
