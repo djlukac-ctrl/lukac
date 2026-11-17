@@ -41,9 +41,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connexion — Administration Luka C</title><link rel="stylesheet" href="../assets/css/admin.css?v=20260909-1"><link rel="stylesheet" href="../assets/css/admin-light.css?v=20261109-2"></head><body class="login-page">
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Connexion — Administration Luka C</title><link rel="stylesheet" href="../assets/css/admin.css?v=20260909-1"><link rel="stylesheet" href="../assets/css/admin-light.css?v=20261117-1"></head><body class="login-page">
+<div class="login-stage" aria-hidden="true">
+  <span class="login-beam login-beam--left"></span>
+  <span class="login-beam login-beam--right"></span>
+  <span class="login-eq login-eq--left"></span>
+  <span class="login-eq login-eq--right"></span>
+</div>
 <div class="login-card">
-  <img src="../assets/img/logo-lukac.png" alt="Luka C">
+  <div class="login-brand-wrap">
+    <img src="../assets/img/logo-lukac.png" alt="Luka C">
+    <span class="login-brand-line"></span>
+  </div>
+  <div class="login-kicker">Gestion du site <strong>lukac.fr</strong></div>
   <h1>Administration</h1>
   <p>Connecte-toi pour gérer les devis, les disponibilités et le contenu du site.</p>
   <?php if (isset($_GET['setup'])): ?><div class="flash flash--success">Compte administrateur créé. Tu peux maintenant te connecter.</div><?php endif; ?>
