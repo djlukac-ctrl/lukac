@@ -14,6 +14,7 @@ function admin_header(string $title, string $active = ''): void
         'Gestion' => [
             'dashboard' => ['Tableau de bord', 'index.php'],
             'devis' => ['Demandes de devis', 'devis.php'],
+            'documents' => ['Devis & factures', 'documents.php'],
         ],
         'Site' => [
             'contenu' => ['Contenu du site', 'contenu.php'],
@@ -32,7 +33,7 @@ function admin_header(string $title, string $active = ''): void
   <title><?= $newQuoteCount > 0 ? '(' . $newQuoteCount . ') ' : '' ?><?= e($title) ?> — Administration Luka C</title>
   <link rel="stylesheet" href="../assets/css/admin.css?v=20260910-2">
   <link rel="stylesheet" href="../assets/css/admin-content.css?v=20260910-1">
-  <link rel="stylesheet" href="../assets/css/admin-light.css?v=20261117-6">
+  <link rel="stylesheet" href="../assets/css/admin-light.css?v=20261117-7">
 </head>
 <body>
 <div class="admin-shell">
