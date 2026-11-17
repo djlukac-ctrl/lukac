@@ -135,6 +135,7 @@ function db(): PDO
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_catalog_items_category ON catalog_items(category, display_order, id)');
+    $pdo->exec("DELETE FROM catalog_items WHERE category='formule' AND name IN ('Pack Instant Magique','Pack Instant Magique Signature')");
 
     $pdo->exec('CREATE TABLE IF NOT EXISTS login_attempts (
         key_hash TEXT PRIMARY KEY,
@@ -257,8 +258,6 @@ function seed_catalog(PDO $pdo): void
         ['formule','Essentiel','L’essentiel pour une soirée réussie.',0,'fixed','Par événement',10],
         ['formule','Ambiance','Plus de lumière, plus de dynamisme, plus d’ambiance.',0,'fixed','Par événement',11],
         ['formule','Expérience','Une mise en scène lumineuse complète pour une soirée inoubliable.',0,'fixed','Par événement',12],
-        ['formule','Pack Instant Magique','Fumée lourde au sol et 2 fontaines d’étincelles froides.',0,'fixed','Par prestation',13],
-        ['formule','Pack Instant Magique Signature','Fumée lourde au sol et 4 fontaines d’étincelles froides.',0,'fixed','Par prestation',14],
 
         ['option','Fumée lourde','Nuage au sol pour ouverture de bal ou temps fort.',0,'fixed','Par utilisation',20],
         ['option','Étincelles froides','Gerbes d’étincelles pour entrée, ouverture de bal ou temps fort.',0,'fixed','Par prestation',21],
