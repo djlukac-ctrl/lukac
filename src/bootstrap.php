@@ -108,6 +108,12 @@ function db(): PDO
     )');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_prestations_event_date ON prestations(event_date)');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_prestations_source_quote ON prestations(source_quote_id)');
+    ensure_column($pdo, 'prestations', 'total_amount_cents', 'INTEGER');
+    ensure_column($pdo, 'prestations', 'deposit_amount_cents', 'INTEGER');
+    ensure_column($pdo, 'prestations', 'contract_signed', 'INTEGER NOT NULL DEFAULT 0');
+    ensure_column($pdo, 'prestations', 'deposit_received', 'INTEGER NOT NULL DEFAULT 0');
+    ensure_column($pdo, 'prestations', 'contract_signed_at', 'TEXT');
+    ensure_column($pdo, 'prestations', 'deposit_received_at', 'TEXT');
 
     $pdo->exec("
         INSERT OR IGNORE INTO prestations(
