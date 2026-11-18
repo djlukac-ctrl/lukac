@@ -469,8 +469,11 @@ if (isset($_GET['saved'])) $flash = 'Le devis a été enregistré.';
             <div class="docs-form__grid">
               <div class="docs-field">
                 <label for="travel_km">Kilomètres facturés</label>
-                <input id="travel_km" name="travel_km" inputmode="decimal" value="<?= e(rtrim(rtrim(number_format((float)($data['travel_km'] ?? 0), 2, ',', ''), '0'), ',')) ?>">
-                <small>Tarif : <?= e(cents_to_money($travelRateCents)) ?> € / km. Saisis directement le nombre total de kilomètres facturés.</small>
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px">
+                  <input id="travel_km" name="travel_km" inputmode="decimal" value="<?= e(rtrim(rtrim(number_format((float)($data['travel_km'] ?? 0), 2, ',', ''), '0'), ',')) ?>">
+                  <button class="btn" type="button" id="calculateTravel">Calculer</button>
+                </div>
+                <small id="travelStatus">Calcul automatique aller-retour depuis le point de départ Luka C · <?= e(cents_to_money($travelRateCents)) ?> € / km. Le kilométrage reste modifiable manuellement.</small>
               </div>
               <div class="docs-costs">
                 <div class="docs-cost"><span>Déplacement</span><strong id="travelDisplay">0,00 €</strong><small><span id="travelKmDisplay">0</span> km × <?= e(cents_to_money($travelRateCents)) ?> €</small></div>
@@ -539,6 +542,9 @@ if (isset($_GET['saved'])) $flash = 'Le devis a été enregistré.';
   const select = document.getElementById('catalogSelect');
   const addBtn = document.getElementById('addCatalogItem');
   const travelInput = document.getElementById('travel_km');
+  const venueInput = document.getElementById('venue');
+  const calculateTravelBtn = document.getElementById('calculateTravel');
+  const travelStatus = document.getElementById('travelStatus');
 
   if (!lines || !select || !addBtn) return;
 
@@ -587,6 +593,59 @@ if (isset($_GET['saved'])) $flash = 'Le devis a été enregistré.';
       const el = document.getElementById(id);
       if (el) el.textContent = value;
     });
+  }
+
+  async function geocodeAddress(address) {
+    const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=fr&q=' + encodeURIComponent(address);
+    const response = await fetch(url, {headers:{'Accept':'application/json'}});
+    if (!response.ok) throw new Error('geocode');
+    const results = await response.json();
+    if (!Array.isArray(results) || !results[0]) throw new Error('not-found');
+    return {lat:Number(results[0].lat), lon:Number(results[0].lon)};
+  }
+
+  async function calculateTravelDistance() {
+    const venue = String(venueInput?.value || '').trim();
+    if (!venue) {
+      if (travelStatus) travelStatus.textContent = 'Renseigne d’abord le lieu de l’événement pour calculer le déplacement.';
+      return;
+    }
+
+    if (calculateTravelBtn) calculateTravelBtn.disabled = true;
+    if (travelStatus) travelStatus.textContent = 'Calcul de l’itinéraire en cours…';
+
+    try {
+      const originAddress = '65 rue de Verdun, 52290 Eclaron, France';
+      const [origin, destination] = await Promise.all([
+        geocodeAddress(originAddress),
+        geocodeAddress(venue + ', France')
+      ]);
+
+      const routeUrl = 'https://router.project-osrm.org/route/v1/driving/' +
+        origin.lon + ',' + origin.lat + ';' + destination.lon + ',' + destination.lat +
+        '?overview=false';
+      const response = await fetch(routeUrl, {headers:{'Accept':'application/json'}});
+      if (!response.ok) throw new Error('routing');
+      const data = await response.json();
+      const meters = Number(data?.routes?.[0]?.distance || 0);
+      if (!meters) throw new Error('no-route');
+
+      const oneWayKm = meters / 1000;
+      const billedKm = Math.round(oneWayKm * 2);
+      travelInput.value = String(billedKm).replace('.', ',');
+      if (travelStatus) {
+        travelStatus.textContent =
+          'Distance calculée : ' + oneWayKm.toLocaleString('fr-FR',{maximumFractionDigits:1}) +
+          ' km aller · ' + billedKm + ' km aller-retour facturés à ' +
+          (travelRateCents / 100).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' € / km.';
+      }
+      recalc();
+    } catch (error) {
+      if (travelStatus) travelStatus.textContent =
+        'Distance automatique indisponible pour ce lieu. Tu peux saisir le kilométrage manuellement.';
+    } finally {
+      if (calculateTravelBtn) calculateTravelBtn.disabled = false;
+    }
   }
 
   function bindRow(row) {
@@ -639,7 +698,13 @@ if (isset($_GET['saved'])) $flash = 'Le devis a été enregistré.';
   });
 
   travelInput?.addEventListener('input', recalc);
-  recalc();
+  calculateTravelBtn?.addEventListener('click', calculateTravelDistance);
+
+  if (venueInput && travelInput && numberValue(travelInput.value) === 0 && venueInput.value.trim() !== '') {
+    calculateTravelDistance();
+  } else {
+    recalc();
+  }
 })();
 </script>
 
