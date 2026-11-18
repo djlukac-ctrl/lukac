@@ -84,6 +84,7 @@ function db(): PDO
     ensure_column($pdo, 'quotes', 'end_time', 'TEXT');
     ensure_column($pdo, 'quotes', 'services', 'TEXT');
     ensure_column($pdo, 'quotes', 'selections', 'TEXT');
+    ensure_column($pdo, 'quotes', 'followed_up_at', 'TEXT');
 
     $pdo->exec('CREATE TABLE IF NOT EXISTS availability (
         year INTEGER NOT NULL,
