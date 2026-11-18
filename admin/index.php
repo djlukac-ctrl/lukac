@@ -7,7 +7,7 @@ $pdo = db();
 $new = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status='new'")->fetchColumn();
 $accepted = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status='accepted'")->fetchColumn();
 $pending = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status IN ('new','read','sent')")->fetchColumn();
-$nextDate = $pdo->query("SELECT event_date FROM quotes WHERE status='accepted' AND event_date IS NOT NULL AND event_date >= date('now') ORDER BY event_date ASC LIMIT 1")->fetchColumn();
+$nextEvent = $pdo->query("SELECT name, event_type, event_date FROM quotes WHERE status='accepted' AND event_date IS NOT NULL AND event_date >= date('now') ORDER BY event_date ASC LIMIT 1")->fetch();
 $recent = $pdo->query('SELECT * FROM quotes ORDER BY created_at DESC LIMIT 8')->fetchAll();
 
 $todayVisitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE visit_date = date('now','localtime')")->fetchColumn();
@@ -18,8 +18,8 @@ $last30Visitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE vi
 admin_header('Tableau de bord', 'dashboard');
 ?>
 <style>
-.dashboard-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:0 0 26px;padding:26px 28px;border:1px solid rgba(24,23,22,.09);border-radius:20px;background:#fff;box-shadow:0 12px 34px rgba(50,38,28,.04)}
-.dashboard-intro__copy{max-width:670px}.dashboard-intro__eyebrow{display:block;margin-bottom:8px;color:#c93431;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.dashboard-intro h2{margin:0 0 8px;font-size:27px;letter-spacing:-.035em}.dashboard-intro p{margin:0;color:#77706a;font-size:13px;line-height:1.65}
+.dashboard-intro{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 20px;padding:19px 22px;border:1px solid rgba(24,23,22,.09);border-radius:18px;background:#fff;box-shadow:0 10px 28px rgba(50,38,28,.035)}
+.dashboard-intro__copy{max-width:700px}.dashboard-intro__eyebrow{display:block;margin-bottom:6px;color:#c93431;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.dashboard-intro h2{margin:0 0 5px;font-size:24px;letter-spacing:-.035em}.dashboard-intro p{margin:0;color:#77706a;font-size:12px;line-height:1.5}
 .dashboard-intro__actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
 .dashboard-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,.65fr);gap:22px;align-items:start}
 .dashboard-panel{background:#fff;border:1px solid rgba(24,23,22,.09);border-radius:20px;box-shadow:0 12px 34px rgba(50,38,28,.04);overflow:hidden}
@@ -29,14 +29,15 @@ admin_header('Tableau de bord', 'dashboard');
 .dashboard-watch h2,.dashboard-visitors h2{margin:0 0 16px;font-size:18px}
 .dashboard-watch__row{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:13px 0;border-bottom:1px solid rgba(24,23,22,.07)}
 .dashboard-watch__row:last-child{border-bottom:0;padding-bottom:0}.dashboard-watch__row:first-of-type{padding-top:0}
-.dashboard-watch__row span{color:#706963;font-size:12px}.dashboard-watch__row strong{font-size:16px;text-align:right}
+.dashboard-watch__row span{color:#7c746e;font-size:11px}.dashboard-watch__row strong{font-size:20px;line-height:1;font-weight:800;letter-spacing:-.035em;text-align:right}
 .dashboard-watch__alert{color:#c93431!important}
+.dashboard-watch__row--event{align-items:flex-start}.dashboard-watch__event{display:flex;flex-direction:column;align-items:flex-end;gap:4px;max-width:58%;text-align:right}.dashboard-watch__event strong{font-size:16px;line-height:1.15}.dashboard-watch__event small{color:#8a817a;font-size:10px;line-height:1.35}
 .dashboard-visitors{padding:20px 22px}.dashboard-visitors__grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .dashboard-visitor{padding:14px;border:1px solid rgba(24,23,22,.08);border-radius:14px;background:#faf8f5}.dashboard-visitor span{display:block;margin-bottom:5px;color:#7d766f;font-size:10px}.dashboard-visitor strong{font-size:24px;letter-spacing:-.04em}
 .dashboard-shortcuts{padding:20px 22px}.dashboard-shortcuts h2{margin:0 0 14px;font-size:18px}.dashboard-shortcuts__list{display:grid;gap:8px}.dashboard-shortcuts__list a{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;border:1px solid rgba(24,23,22,.08);border-radius:12px;background:#faf8f5;color:#26221f;text-decoration:none;font-size:12px;font-weight:700;transition:.18s}.dashboard-shortcuts__list a:hover{background:#fff;border-color:rgba(201,52,49,.22);transform:translateX(2px)}
 .dashboard-panel .admin-table-wrap{border:0;border-radius:0;box-shadow:none;margin:0}.dashboard-panel table{margin:0}
 @media(max-width:1050px){.dashboard-layout{grid-template-columns:1fr}.dashboard-side{grid-template-columns:1fr 1fr}.dashboard-shortcuts{grid-column:1/-1}}
-@media(max-width:720px){.dashboard-intro{align-items:flex-start;flex-direction:column;padding:22px}.dashboard-intro__actions{justify-content:flex-start}.dashboard-side{grid-template-columns:1fr}.dashboard-shortcuts{grid-column:auto}.dashboard-visitors__grid{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.dashboard-intro{align-items:flex-start;flex-direction:column;padding:18px}.dashboard-intro__actions{justify-content:flex-start}.dashboard-side{grid-template-columns:1fr}.dashboard-shortcuts{grid-column:auto}.dashboard-visitors__grid{grid-template-columns:1fr 1fr}}
 </style>
 
 <section class="dashboard-intro">
@@ -96,9 +97,16 @@ admin_header('Tableau de bord', 'dashboard');
         <span>Devis acceptés</span>
         <strong><?= $accepted ?></strong>
       </div>
-      <div class="dashboard-watch__row">
+      <div class="dashboard-watch__row dashboard-watch__row--event">
         <span>Prochaine prestation acceptée</span>
-        <strong><?= $nextDate ? e(date('d/m/Y', strtotime((string)$nextDate))) : '—' ?></strong>
+        <?php if ($nextEvent): ?>
+          <div class="dashboard-watch__event">
+            <strong><?= e(date('d/m/Y', strtotime((string)$nextEvent['event_date']))) ?></strong>
+            <small><?= e($nextEvent['name']) ?> · <?= e($nextEvent['event_type']) ?></small>
+          </div>
+        <?php else: ?>
+          <strong>—</strong>
+        <?php endif; ?>
       </div>
     </section>
 
