@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':event_date'=>trim((string)($_POST['event_date'] ?? '')) ?: null,
                         ':venue'=>trim((string)($_POST['venue'] ?? '')),
                         ':description'=>trim((string)($_POST['description'] ?? '')),
-                        ':deposit'=>max(0, min(100, (int)($_POST['deposit_percent'] ?? 30))),
+                        ':deposit'=>30,
                         ':travel_km'=>decimal_value((string)($_POST['travel_km'] ?? '0')),
                         ':notes'=>trim((string)($_POST['notes'] ?? '')),
                     ]);
@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ':event_date'=>trim((string)($_POST['event_date'] ?? '')) ?: null,
                         ':venue'=>trim((string)($_POST['venue'] ?? '')),
                         ':description'=>trim((string)($_POST['description'] ?? '')),
-                        ':deposit'=>max(0, min(100, (int)($_POST['deposit_percent'] ?? 30))),
+                        ':deposit'=>30,
                         ':travel_km'=>decimal_value((string)($_POST['travel_km'] ?? '0')),
                         ':notes'=>trim((string)($_POST['notes'] ?? '')),
                         ':id'=>$id,
@@ -480,7 +480,7 @@ if (isset($_GET['saved'])) $flash = 'Le devis a été enregistré.';
           </div>
 
           <div class="docs-form__grid">
-            <div class="docs-field"><label for="deposit_percent">Acompte (%)</label><input id="deposit_percent" name="deposit_percent" type="number" min="0" max="100" value="<?= (int)$data['deposit_percent'] ?>"></div>
+            <div class="docs-field"><label>Acompte</label><input value="Calcul automatique · maximum 30 %" readonly><small>Le solde restant est arrondi à la dizaine, sans jamais dépasser 30 % d’acompte.</small></div>
             <div class="docs-field docs-field--full"><label for="notes">Notes internes / complémentaires</label><textarea id="notes" name="notes"><?= e((string)$data['notes']) ?></textarea></div>
           </div>
 
@@ -500,16 +500,17 @@ if (isset($_GET['saved'])) $flash = 'Le devis a été enregistré.';
       <?php if ($current || $source): ?>
         <?php
         $displayAmount = $current ? (int)$current['amount_cents'] : 0;
-        $displayDepositPercent = (int)($data['deposit_percent'] ?? 30);
-        $displayDeposit = (int)round($displayAmount * $displayDepositPercent / 100);
+        $displayDepositData = calculate_rounded_deposit($displayAmount);
+        $displayDeposit = (int)$displayDepositData['deposit_cents'];
+        $displayBalance = (int)$displayDepositData['balance_cents'];
         ?>
         <div class="docs-summary" style="margin-bottom:18px">
           <div class="docs-summary__item"><span>Prestations + formules + options</span><strong id="itemsSubtotalDisplay">0,00 €</strong></div>
           <div class="docs-summary__item"><span>Déplacement</span><strong id="summaryTravelDisplay">0,00 €</strong></div>
           <div class="docs-summary__item"><span>Montage / démontage</span><strong id="summarySetupDisplay">0,00 €</strong></div>
           <div class="docs-summary__item docs-summary__item--total"><span>Total</span><strong id="grandTotalDisplay"><?= e(cents_to_money($displayAmount)) ?> €</strong></div>
-          <div class="docs-summary__item"><span>Acompte <span id="depositPercentDisplay"><?= $displayDepositPercent ?></span> %</span><strong id="depositDisplay"><?= e(cents_to_money($displayDeposit)) ?> €</strong></div>
-          <div class="docs-summary__item"><span>Solde</span><strong id="balanceDisplay"><?= e(cents_to_money($displayAmount - $displayDeposit)) ?> €</strong></div>
+          <div class="docs-summary__item"><span>Acompte · max. 30 %</span><strong id="depositDisplay"><?= e(cents_to_money($displayDeposit)) ?> €</strong></div>
+          <div class="docs-summary__item"><span>Solde arrondi</span><strong id="balanceDisplay"><?= e(cents_to_money($displayBalance)) ?> €</strong></div>
         </div>
       <?php endif; ?>
 
@@ -538,7 +539,6 @@ if (isset($_GET['saved'])) $flash = 'Le devis a été enregistré.';
   const select = document.getElementById('catalogSelect');
   const addBtn = document.getElementById('addCatalogItem');
   const travelInput = document.getElementById('travel_km');
-  const depositInput = document.getElementById('deposit_percent');
 
   if (!lines || !select || !addBtn) return;
 
@@ -567,9 +567,10 @@ if (isset($_GET['saved'])) $flash = 'Le devis a été enregistré.';
     const travel = Math.round(km * travelRateCents);
     const setup = Math.round(formulaOptions * .20);
     const grand = subtotal + travel + setup;
-    const depositPercent = Math.min(100, Math.max(0, parseInt(depositInput?.value || '0', 10) || 0));
-    const deposit = Math.round(grand * depositPercent / 100);
-    const balance = grand - deposit;
+    const minimumBalance = Math.ceil(grand * .70);
+    let balance = Math.ceil(minimumBalance / 1000) * 1000;
+    if (balance > grand) balance = grand;
+    const deposit = Math.max(0, grand - balance);
 
     const map = {
       itemsSubtotalDisplay: euros(subtotal),
@@ -580,7 +581,6 @@ if (isset($_GET['saved'])) $flash = 'Le devis a été enregistré.';
       grandTotalDisplay: euros(grand),
       depositDisplay: euros(deposit),
       balanceDisplay: euros(balance),
-      depositPercentDisplay: String(depositPercent),
       travelKmDisplay: String(km).replace('.', ',')
     };
     Object.entries(map).forEach(([id,value]) => {
@@ -639,7 +639,6 @@ if (isset($_GET['saved'])) $flash = 'Le devis a été enregistré.';
   });
 
   travelInput?.addEventListener('input', recalc);
-  depositInput?.addEventListener('input', recalc);
   recalc();
 })();
 </script>
