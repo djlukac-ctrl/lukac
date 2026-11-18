@@ -16,6 +16,7 @@ function admin_header(string $title, string $active = ''): void
             'devis' => ['Demandes de devis', 'devis.php', '✉'],
         ],
         'Commercial' => [
+            'prestations' => ['Prestations', 'prestations.php', '◆'],
             'documents' => ['Devis & factures', 'documents.php', '▤'],
             'catalogue' => ['Catalogue', 'catalogue.php', '◇'],
         ],
