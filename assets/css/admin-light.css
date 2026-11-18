@@ -1261,3 +1261,90 @@ tbody tr:hover{
     align-items:flex-start!important;
   }
 }
+
+
+/* =========================================================
+   Navigation admin — structure Pilotage / Commercial / Site
+   ========================================================= */
+.admin-nav{
+  gap:14px!important;
+}
+.admin-nav__group{
+  gap:3px!important;
+}
+.admin-nav__group + .admin-nav__group{
+  margin-top:2px;
+  padding-top:14px!important;
+  border-top:1px solid rgba(255,255,255,.055)!important;
+}
+.admin-nav__label{
+  padding:0 11px 6px!important;
+  color:#625e59!important;
+  font-size:8px!important;
+  letter-spacing:.19em!important;
+}
+.admin-nav__group a{
+  min-height:38px;
+  padding:7px 10px!important;
+  border-radius:11px!important;
+}
+.admin-nav__item-main{
+  display:flex;
+  align-items:center;
+  min-width:0;
+  gap:10px;
+}
+.admin-nav__item-main>span:last-child{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.admin-nav__icon{
+  display:grid;
+  place-items:center;
+  width:24px;
+  height:24px;
+  flex:0 0 24px;
+  border:1px solid rgba(255,255,255,.065);
+  border-radius:8px;
+  background:rgba(255,255,255,.018);
+  color:#77726d;
+  font-size:11px;
+  line-height:1;
+  transition:.18s ease;
+}
+.admin-nav__group a:hover .admin-nav__icon{
+  color:#d8d4cf;
+  border-color:rgba(255,255,255,.11);
+  background:rgba(255,255,255,.035);
+}
+.admin-nav__group a.is-active .admin-nav__icon{
+  color:#fff;
+  background:rgba(227,34,40,.14);
+  border-color:rgba(227,34,40,.28);
+  box-shadow:0 0 14px rgba(227,34,40,.08);
+}
+.admin-nav__group:nth-child(2){
+  position:relative;
+}
+.admin-nav__group:nth-child(2) .admin-nav__label{
+  color:#9d6567!important;
+}
+.admin-nav__group:nth-child(2)::before{
+  content:"";
+  position:absolute;
+  left:7px;
+  top:13px;
+  bottom:4px;
+  width:1px;
+  background:linear-gradient(180deg,rgba(227,34,40,.45),rgba(227,34,40,.06),transparent);
+}
+.admin-nav__group:nth-child(2) a{
+  margin-left:4px;
+}
+.admin-nav__badge{
+  min-width:19px!important;
+  height:19px!important;
+  padding:0 6px!important;
+  font-size:9px!important;
+}
