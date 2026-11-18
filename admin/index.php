@@ -78,13 +78,19 @@ admin_header('Tableau de bord', 'dashboard');
                   $taskLabel = 'À faire : préparer et envoyer le devis';
                   $taskClass = 'dashboard-todo__task--urgent';
               } elseif ($quote['status'] === 'sent') {
-                  $lastActivity = strtotime((string) ($quote['updated_at'] ?: $quote['created_at']));
+                  $referenceDate = !empty($quote['followed_up_at']) ? $quote['followed_up_at'] : ($quote['updated_at'] ?: $quote['created_at']);
+                  $lastActivity = strtotime((string) $referenceDate);
                   $daysSince = $lastActivity ? (int) floor((time() - $lastActivity) / 86400) : 0;
                   if ($daysSince >= 7) {
                       $taskLabel = 'À faire : relancer le client (' . $daysSince . ' jours)';
                       $taskClass = 'dashboard-todo__task--urgent';
                   } else {
-                      $taskLabel = 'En attente de la réponse du client';
+                      $taskLabel = !empty($quote['followed_up_at'])
+                          ? 'Relancé le ' . date('d/m/Y') . ' · en attente du client'
+                          : 'En attente de la réponse du client';
+                      if (!empty($quote['followed_up_at'])) {
+                          $taskLabel = 'Relancé le ' . date('d/m/Y', strtotime($quote['followed_up_at'])) . ' · en attente du client';
+                      }
                       $taskClass = 'dashboard-todo__task--wait';
                   }
               }
