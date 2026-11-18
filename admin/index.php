@@ -200,6 +200,7 @@ admin_header('Tableau de bord', 'dashboard');
     <section class="dashboard-panel dashboard-shortcuts">
       <h2>Accès rapides</h2>
       <div class="dashboard-shortcuts__list">
+        <a href="prestations.php"><span>Prestations à venir</span><span>→</span></a>
         <a href="disponibilites.php"><span>Disponibilités</span><span>→</span></a>
         <a href="avis.php"><span>Avis clients</span><span>→</span></a>
         <a href="options.php"><span>Options</span><span>→</span></a>
