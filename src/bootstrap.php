@@ -121,6 +121,25 @@ function db(): PDO
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_commercial_quotes_source ON commercial_quotes(source_quote_id)');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_commercial_quotes_status ON commercial_quotes(status)');
 
+    ensure_column($pdo, 'commercial_quotes', 'travel_km', 'REAL NOT NULL DEFAULT 0');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS commercial_quote_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quote_id INTEGER NOT NULL,
+        catalog_item_id INTEGER,
+        category TEXT NOT NULL,
+        item_name TEXT NOT NULL,
+        description TEXT,
+        quantity REAL NOT NULL DEFAULT 1,
+        unit_price_cents INTEGER NOT NULL DEFAULT 0,
+        line_total_cents INTEGER NOT NULL DEFAULT 0,
+        display_order INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(quote_id) REFERENCES commercial_quotes(id) ON DELETE CASCADE,
+        FOREIGN KEY(catalog_item_id) REFERENCES catalog_items(id) ON DELETE SET NULL
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_commercial_quote_items_quote ON commercial_quote_items(quote_id, display_order, id)');
+
     $pdo->exec('CREATE TABLE IF NOT EXISTS catalog_items (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         category TEXT NOT NULL,
