@@ -114,6 +114,13 @@ function db(): PDO
     ensure_column($pdo, 'prestations', 'deposit_received', 'INTEGER NOT NULL DEFAULT 0');
     ensure_column($pdo, 'prestations', 'contract_signed_at', 'TEXT');
     ensure_column($pdo, 'prestations', 'deposit_received_at', 'TEXT');
+    ensure_column($pdo, 'prestations', 'schedule_confirmed', 'INTEGER NOT NULL DEFAULT 0');
+    ensure_column($pdo, 'prestations', 'venue_confirmed', 'INTEGER NOT NULL DEFAULT 0');
+    ensure_column($pdo, 'prestations', 'questionnaire_received', 'INTEGER NOT NULL DEFAULT 0');
+    ensure_column($pdo, 'prestations', 'music_received', 'INTEGER NOT NULL DEFAULT 0');
+    ensure_column($pdo, 'prestations', 'equipment_confirmed', 'INTEGER NOT NULL DEFAULT 0');
+    ensure_column($pdo, 'prestations', 'final_contact_done', 'INTEGER NOT NULL DEFAULT 0');
+    ensure_column($pdo, 'prestations', 'balance_received', 'INTEGER NOT NULL DEFAULT 0');
 
     $pdo->exec("
         INSERT OR IGNORE INTO prestations(
