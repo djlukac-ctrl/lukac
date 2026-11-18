@@ -17,6 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
+    if ($action === 'mark_followup' && $id > 0) {
+        $stmt = $pdo->prepare("UPDATE quotes SET followed_up_at=CURRENT_TIMESTAMP, updated_at=CURRENT_TIMESTAMP WHERE id=:id");
+        $stmt->execute([':id' => $id]);
+        header('Location: devis.php?id=' . $id . '&followed_up=1');
+        exit;
+    }
+
     $status = (string) ($_POST['status'] ?? '');
     if ($id > 0 && in_array($status, $quoteStatuses, true)) {
         $stmt = $pdo->prepare('UPDATE quotes SET status=:status, updated_at=CURRENT_TIMESTAMP WHERE id=:id');
@@ -48,6 +55,7 @@ if ($id > 0) {
 
     admin_header('Demande #' . $id, 'devis');
     if (isset($_GET['saved'])): ?><div class="flash flash--success">Statut mis à jour.</div><?php endif; ?>
+    <?php if (isset($_GET['followed_up'])): ?><div class="flash flash--success">Relance enregistrée.</div><?php endif; ?>
     <div class="quote-detail">
       <section class="quote-main">
         <?php
@@ -332,6 +340,12 @@ if ($id > 0) {
             <?php foreach ($quoteStatuses as $status): ?><option value="<?= e($status) ?>" <?= $quote['status'] === $status ? 'selected' : '' ?>><?= e(quote_status_label($status)) ?></option><?php endforeach; ?>
           </select></div>
           <button class="btn btn--primary" type="submit" name="action" value="update_status">Enregistrer le statut</button>
+          <?php if ($quote['status'] === 'sent'): ?>
+            <button class="btn" type="submit" name="action" value="mark_followup">Marquer comme relancé</button>
+            <?php if (!empty($quote['followed_up_at'])): ?>
+              <small style="display:block;color:#8a8179;margin-top:-2px">Dernière relance : <?= e(date('d/m/Y à H:i', strtotime($quote['followed_up_at']))) ?></small>
+            <?php endif; ?>
+          <?php endif; ?>
           <button class="btn btn--danger" type="submit" name="action" value="delete" onclick="return confirm('Supprimer définitivement cette demande de devis ? Cette action est irréversible.');">Supprimer la demande</button>
           <a class="admin-link" href="devis.php">← Retour aux demandes</a>
         </form>
