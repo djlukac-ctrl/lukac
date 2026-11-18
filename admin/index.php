@@ -8,7 +8,7 @@ $new = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status='new'")->fetc
 $accepted = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status='accepted'")->fetchColumn();
 $pending = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status IN ('new','read','sent')")->fetchColumn();
 $nextEvent = $pdo->query("SELECT name, event_type, event_date FROM quotes WHERE status='accepted' AND event_date IS NOT NULL AND event_date >= date('now') ORDER BY event_date ASC LIMIT 1")->fetch();
-$toProcess = $pdo->query("SELECT * FROM quotes WHERE status IN ('new','read','sent')")->fetchAll();
+$quoteActions = $pdo->query("SELECT * FROM quotes WHERE status IN ('new','read','sent')")->fetchAll();
 
 $now = time();
 $actionMeta = static function (array $quote) use ($now): array {
@@ -34,18 +34,58 @@ $actionMeta = static function (array $quote) use ($now): array {
         return ['priority' => 2, 'due_at' => $nextAt, 'days_since' => $daysSince, 'next_at' => $nextAt];
     }
 
-    return ['priority' => 3, 'due_at' => $nextAt, 'days_since' => $daysSince, 'next_at' => $nextAt];
+    return ['priority' => 4, 'due_at' => $nextAt, 'days_since' => $daysSince, 'next_at' => $nextAt];
 };
 
-usort($toProcess, static function (array $a, array $b) use ($actionMeta): int {
-    $metaA = $actionMeta($a);
-    $metaB = $actionMeta($b);
+$toProcess = [];
+foreach ($quoteActions as $quote) {
+    $meta = $actionMeta($quote);
+    $toProcess[] = [
+        'kind' => 'quote',
+        'priority' => $meta['priority'],
+        'due_at' => $meta['due_at'],
+        'data' => $quote,
+        'meta' => $meta,
+    ];
+}
 
-    if ($metaA['priority'] !== $metaB['priority']) {
-        return $metaA['priority'] <=> $metaB['priority'];
+$prestationActions = $pdo->query("
+    SELECT p.id AS prestation_id, q.name, q.event_type, q.event_date, q.venue,
+           p.final_contact_done
+    FROM prestations p
+    INNER JOIN quotes q ON q.id=p.source_quote_id
+    WHERE q.status='accepted'
+      AND q.event_date IS NOT NULL
+      AND q.event_date >= date('now','localtime')
+      AND p.final_contact_done=0
+")->fetchAll();
+
+foreach ($prestationActions as $prep) {
+    $eventAt = strtotime((string)$prep['event_date']);
+    if (!$eventAt) continue;
+
+    $appointmentDueAt = $eventAt - (30 * 86400);
+
+    // Le rendez-vous client devient une action à traiter 30 jours avant la prestation.
+    if ($now >= $appointmentDueAt) {
+        $toProcess[] = [
+            'kind' => 'prestation',
+            'priority' => 3,
+            'due_at' => $appointmentDueAt,
+            'data' => $prep,
+            'meta' => [
+                'event_at' => $eventAt,
+                'appointment_due_at' => $appointmentDueAt,
+            ],
+        ];
     }
+}
 
-    return $metaA['due_at'] <=> $metaB['due_at'];
+usort($toProcess, static function (array $a, array $b): int {
+    if ($a['priority'] !== $b['priority']) {
+        return $a['priority'] <=> $b['priority'];
+    }
+    return $a['due_at'] <=> $b['due_at'];
 });
 
 $toProcess = array_slice($toProcess, 0, 5);
@@ -122,52 +162,79 @@ admin_header('Tableau de bord', 'dashboard');
         <div class="dashboard-todo__empty">Tout est à jour. Aucune demande en attente de traitement.</div>
       <?php else: ?>
         <div class="dashboard-todo__list">
-          <?php foreach ($toProcess as $quote): ?>
-            <?php
-              $taskLabel = '';
-              $taskClass = '';
-              $meta = $actionMeta($quote);
+          <?php foreach ($toProcess as $action): ?>
+            <?php if ($action['kind'] === 'quote'): ?>
+              <?php
+                $quote = $action['data'];
+                $taskLabel = '';
+                $taskClass = '';
+                $meta = $action['meta'];
 
-              if ($quote['status'] === 'new') {
-                  $taskLabel = 'À faire maintenant : lire la nouvelle demande';
-                  $taskClass = 'dashboard-todo__task--urgent';
-              } elseif ($quote['status'] === 'read') {
-                  $taskLabel = 'À faire maintenant : préparer et envoyer le devis';
-                  $taskClass = 'dashboard-todo__task--urgent';
-              } elseif ($quote['status'] === 'sent') {
-                  if ($meta['priority'] === 2) {
-                      $lateDays = max(0, (int) floor(($now - $meta['next_at']) / 86400));
-                      $taskLabel = $lateDays > 0
-                          ? 'À faire : relancer le client · retard de ' . $lateDays . ' jour' . ($lateDays > 1 ? 's' : '')
-                          : 'À faire aujourd’hui : relancer le client';
-                      $taskClass = 'dashboard-todo__task--urgent';
-                  } else {
-                      if (!empty($quote['followed_up_at'])) {
-                          $taskLabel = 'Relancé le ' . date('d/m/Y', strtotime($quote['followed_up_at'])) . ' · prochaine relance le ' . date('d/m/Y', $meta['next_at']);
-                      } else {
-                          $taskLabel = 'En attente du client · relance prévue le ' . date('d/m/Y', $meta['next_at']);
-                      }
-                      $taskClass = 'dashboard-todo__task--wait';
-                  }
-              }
-            ?>
-            <div class="dashboard-todo__item">
-              <div class="dashboard-todo__main">
-                <div class="dashboard-todo__top">
-                  <strong><?= e($quote['name']) ?></strong>
-                  <span class="status status--<?= e($quote['status']) ?>"><?= e(quote_status_label($quote['status'])) ?></span>
+                if ($quote['status'] === 'new') {
+                    $taskLabel = 'À faire maintenant : lire la nouvelle demande';
+                    $taskClass = 'dashboard-todo__task--urgent';
+                } elseif ($quote['status'] === 'read') {
+                    $taskLabel = 'À faire maintenant : préparer et envoyer le devis';
+                    $taskClass = 'dashboard-todo__task--urgent';
+                } elseif ($quote['status'] === 'sent') {
+                    if ($meta['priority'] === 2) {
+                        $lateDays = max(0, (int) floor(($now - $meta['next_at']) / 86400));
+                        $taskLabel = $lateDays > 0
+                            ? 'À faire : relancer le client · retard de ' . $lateDays . ' jour' . ($lateDays > 1 ? 's' : '')
+                            : 'À faire aujourd’hui : relancer le client';
+                        $taskClass = 'dashboard-todo__task--urgent';
+                    } else {
+                        if (!empty($quote['followed_up_at'])) {
+                            $taskLabel = 'Relancé le ' . date('d/m/Y', strtotime($quote['followed_up_at'])) . ' · prochaine relance le ' . date('d/m/Y', $meta['next_at']);
+                        } else {
+                            $taskLabel = 'En attente du client · relance prévue le ' . date('d/m/Y', $meta['next_at']);
+                        }
+                        $taskClass = 'dashboard-todo__task--wait';
+                    }
+                }
+              ?>
+              <div class="dashboard-todo__item">
+                <div class="dashboard-todo__main">
+                  <div class="dashboard-todo__top">
+                    <strong><?= e($quote['name']) ?></strong>
+                    <span class="status status--<?= e($quote['status']) ?>"><?= e(quote_status_label($quote['status'])) ?></span>
+                  </div>
+                  <div class="dashboard-todo__meta">
+                    <span><?= e($quote['event_type']) ?></span>
+                    <span>Événement : <?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'à définir' ?></span>
+                    <span>Reçue le <?= e(date('d/m/Y à H:i', strtotime($quote['created_at']))) ?></span>
+                  </div>
+                  <?php if ($taskLabel): ?>
+                    <div class="dashboard-todo__task <?= e($taskClass) ?>"><?= e($taskLabel) ?></div>
+                  <?php endif; ?>
                 </div>
-                <div class="dashboard-todo__meta">
-                  <span><?= e($quote['event_type']) ?></span>
-                  <span>Événement : <?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'à définir' ?></span>
-                  <span>Reçue le <?= e(date('d/m/Y à H:i', strtotime($quote['created_at']))) ?></span>
-                </div>
-                <?php if ($taskLabel): ?>
-                  <div class="dashboard-todo__task <?= e($taskClass) ?>"><?= e($taskLabel) ?></div>
-                <?php endif; ?>
+                <a class="admin-link dashboard-todo__action" href="devis.php?id=<?= (int) $quote['id'] ?>">Ouvrir →</a>
               </div>
-              <a class="admin-link dashboard-todo__action" href="devis.php?id=<?= (int) $quote['id'] ?>">Ouvrir →</a>
-            </div>
+            <?php else: ?>
+              <?php
+                $prep = $action['data'];
+                $daysUntilEvent = max(0, (int)ceil(($action['meta']['event_at'] - $now) / 86400));
+                $lateDays = max(0, (int)floor(($now - $action['meta']['appointment_due_at']) / 86400));
+                $appointmentLabel = $lateDays > 0
+                    ? 'À faire : prendre rendez-vous / faire le point avec le client · retard de ' . $lateDays . ' jour' . ($lateDays > 1 ? 's' : '')
+                    : 'À faire aujourd’hui : prendre rendez-vous / faire le point avec le client';
+              ?>
+              <div class="dashboard-todo__item">
+                <div class="dashboard-todo__main">
+                  <div class="dashboard-todo__top">
+                    <strong><?= e($prep['name']) ?></strong>
+                    <span class="status status--accepted">Accepté</span>
+                  </div>
+                  <div class="dashboard-todo__meta">
+                    <span><?= e($prep['event_type']) ?></span>
+                    <span>Événement : <?= e(date('d/m/Y', strtotime($prep['event_date']))) ?></span>
+                    <span><?= $daysUntilEvent ?> jour<?= $daysUntilEvent > 1 ? 's' : '' ?> avant la prestation</span>
+                  </div>
+                  <div class="dashboard-todo__task dashboard-todo__task--urgent"><?= e($appointmentLabel) ?></div>
+                </div>
+                <a class="admin-link dashboard-todo__action" href="prestations.php?id=<?= (int)$prep['prestation_id'] ?>">Ouvrir →</a>
+              </div>
+            <?php endif; ?>
           <?php endforeach; ?>
         </div>
       <?php endif; ?>
