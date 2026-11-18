@@ -11,18 +11,20 @@ function admin_header(string $title, string $active = ''): void
     }
 
     $groups = [
-        'Gestion' => [
-            'dashboard' => ['Tableau de bord', 'index.php'],
-            'devis' => ['Demandes de devis', 'devis.php'],
-            'documents' => ['Devis & factures', 'documents.php'],
-            'catalogue' => ['Catalogue', 'catalogue.php'],
+        'Pilotage' => [
+            'dashboard' => ['Tableau de bord', 'index.php', '⌂'],
+            'devis' => ['Demandes de devis', 'devis.php', '✉'],
         ],
-        'Site' => [
-            'contenu' => ['Contenu du site', 'contenu.php'],
-            'disponibilites' => ['Dates réservées', 'disponibilites.php'],
-            'avis' => ['Avis clients', 'avis.php'],
-            'options' => ['Options', 'options.php'],
-            'partenaires' => ['Prestataires partenaires', 'partenaires.php'],
+        'Commercial' => [
+            'documents' => ['Devis & factures', 'documents.php', '▤'],
+            'catalogue' => ['Catalogue', 'catalogue.php', '◇'],
+        ],
+        'Site internet' => [
+            'contenu' => ['Contenu du site', 'contenu.php', '✎'],
+            'disponibilites' => ['Dates réservées', 'disponibilites.php', '◫'],
+            'avis' => ['Avis clients', 'avis.php', '★'],
+            'options' => ['Options', 'options.php', '＋'],
+            'partenaires' => ['Prestataires partenaires', 'partenaires.php', '◎'],
         ],
     ];
     ?>
@@ -34,7 +36,7 @@ function admin_header(string $title, string $active = ''): void
   <title><?= $newQuoteCount > 0 ? '(' . $newQuoteCount . ') ' : '' ?><?= e($title) ?> — Administration Luka C</title>
   <link rel="stylesheet" href="../assets/css/admin.css?v=20260910-2">
   <link rel="stylesheet" href="../assets/css/admin-content.css?v=20260910-1">
-  <link rel="stylesheet" href="../assets/css/admin-light.css?v=20261117-8">
+  <link rel="stylesheet" href="../assets/css/admin-light.css?v=20261118-9">
 </head>
 <body>
 <div class="admin-shell">
@@ -44,9 +46,9 @@ function admin_header(string $title, string $active = ''): void
       <?php foreach ($groups as $groupLabel => $items): ?>
         <div class="admin-nav__group">
           <span class="admin-nav__label"><?= e($groupLabel) ?></span>
-          <?php foreach ($items as $key => [$label, $href]): ?>
+          <?php foreach ($items as $key => [$label, $href, $icon]): ?>
             <a class="<?= $active === $key ? 'is-active' : '' ?>" href="<?= e($href) ?>">
-              <span><?= e($label) ?></span>
+              <span class="admin-nav__item-main"><span class="admin-nav__icon" aria-hidden="true"><?= e($icon) ?></span><span><?= e($label) ?></span></span>
               <?php if ($key === 'devis' && $newQuoteCount > 0): ?><span class="admin-nav__badge"><?= $newQuoteCount ?></span><?php endif; ?>
             </a>
           <?php endforeach; ?>
