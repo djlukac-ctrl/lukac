@@ -267,15 +267,35 @@ if ($source && !$current) {
         )
     )));
 
-    $requestedLookup = [];
+    $requestedNormalized = [];
     foreach ($requestedNames as $requestedName) {
-        $requestedLookup[normalize_catalog_match($requestedName)] = true;
+        $normalized = normalize_catalog_match($requestedName);
+        if ($normalized !== '') $requestedNormalized[] = $normalized;
     }
+
+    $matchesRequestedItem = static function (string $catalogName) use ($requestedNormalized): bool {
+        $catalog = normalize_catalog_match($catalogName);
+        if ($catalog === '') return false;
+
+        foreach ($requestedNormalized as $requested) {
+            if ($requested === $catalog) return true;
+
+            // Tolère les variantes comme "Photobooth 300" / "Photobooth 300 tirages".
+            $short = mb_strlen($requested, 'UTF-8') <= mb_strlen($catalog, 'UTF-8') ? $requested : $catalog;
+            $long = $short === $requested ? $catalog : $requested;
+
+            if (mb_strlen($short, 'UTF-8') >= 6 && str_starts_with($long, $short . ' ')) {
+                return true;
+            }
+        }
+
+        return false;
+    };
 
     $durationHours = source_duration_hours($source['start_time'] ?? null, $source['end_time'] ?? null);
 
     foreach ($catalogItems as $item) {
-        if (!isset($requestedLookup[normalize_catalog_match((string)$item['name'])])) continue;
+        if (!$matchesRequestedItem((string)$item['name'])) continue;
 
         $quantity = $item['price_mode'] === 'hourly' ? $durationHours : 1.0;
         $unitPrice = (int)$item['price_cents'];
