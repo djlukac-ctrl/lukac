@@ -64,9 +64,12 @@ foreach ($prestationActions as $prep) {
     $eventAt = strtotime((string)$prep['event_date']);
     if (!$eventAt) continue;
 
-    $appointmentDueAt = $eventAt - (30 * 86400);
+    $eventType = mb_strtolower(trim((string)($prep['event_type'] ?? '')), 'UTF-8');
+    $isWedding = str_contains($eventType, 'mariage');
+    $appointmentLeadDays = $isWedding ? 90 : 60;
+    $appointmentDueAt = $eventAt - ($appointmentLeadDays * 86400);
 
-    // Le rendez-vous client devient une action à traiter 30 jours avant la prestation.
+    // Mariage : rendez-vous à prévoir 3 mois avant. Autres prestations : 2 mois avant.
     if ($now >= $appointmentDueAt) {
         $toProcess[] = [
             'kind' => 'prestation',
@@ -215,9 +218,10 @@ admin_header('Tableau de bord', 'dashboard');
                 $prep = $action['data'];
                 $daysUntilEvent = max(0, (int)ceil(($action['meta']['event_at'] - $now) / 86400));
                 $lateDays = max(0, (int)floor(($now - $action['meta']['appointment_due_at']) / 86400));
+                $leadLabel = str_contains(mb_strtolower((string)$prep['event_type'], 'UTF-8'), 'mariage') ? '3 mois avant' : '2 mois avant';
                 $appointmentLabel = $lateDays > 0
-                    ? 'À faire : prendre rendez-vous / faire le point avec le client · retard de ' . $lateDays . ' jour' . ($lateDays > 1 ? 's' : '')
-                    : 'À faire aujourd’hui : prendre rendez-vous / faire le point avec le client';
+                    ? 'À faire : prendre rendez-vous / faire le point avec le client · échéance ' . $leadLabel . ' · retard de ' . $lateDays . ' jour' . ($lateDays > 1 ? 's' : '')
+                    : 'À faire aujourd’hui : prendre rendez-vous / faire le point avec le client · échéance ' . $leadLabel;
               ?>
               <div class="dashboard-todo__item">
                 <div class="dashboard-todo__main">
