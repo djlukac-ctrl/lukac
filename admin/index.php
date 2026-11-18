@@ -8,7 +8,7 @@ $new = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status='new'")->fetc
 $accepted = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status='accepted'")->fetchColumn();
 $pending = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status IN ('new','read','sent')")->fetchColumn();
 $nextEvent = $pdo->query("SELECT name, event_type, event_date FROM quotes WHERE status='accepted' AND event_date IS NOT NULL AND event_date >= date('now') ORDER BY event_date ASC LIMIT 1")->fetch();
-$recent = $pdo->query('SELECT * FROM quotes ORDER BY created_at DESC LIMIT 8')->fetchAll();
+$toProcess = $pdo->query("SELECT * FROM quotes WHERE status IN ('new','read','sent') ORDER BY CASE status WHEN 'new' THEN 0 WHEN 'read' THEN 1 ELSE 2 END, created_at DESC LIMIT 5")->fetchAll();
 
 $todayVisitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE visit_date = date('now','localtime')")->fetchColumn();
 $yesterdayVisitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE visit_date = date('now','localtime','-1 day')")->fetchColumn();
@@ -21,7 +21,7 @@ admin_header('Tableau de bord', 'dashboard');
 .dashboard-intro{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 20px;padding:19px 22px;border:1px solid rgba(24,23,22,.09);border-radius:18px;background:#fff;box-shadow:0 10px 28px rgba(50,38,28,.035)}
 .dashboard-intro__copy{max-width:700px}.dashboard-intro__eyebrow{display:block;margin-bottom:6px;color:#c93431;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.dashboard-intro h2{margin:0 0 5px;font-size:24px;letter-spacing:-.035em}.dashboard-intro p{margin:0;color:#77706a;font-size:12px;line-height:1.5}
 .dashboard-intro__actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
-.dashboard-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,.65fr);gap:22px;align-items:start}
+.dashboard-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.75fr);gap:22px;align-items:start}
 .dashboard-panel{background:#fff;border:1px solid rgba(24,23,22,.09);border-radius:20px;box-shadow:0 12px 34px rgba(50,38,28,.04);overflow:hidden}
 .dashboard-panel__head{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:22px 22px 15px}.dashboard-panel__head h2{margin:0;font-size:21px}.dashboard-panel__head p{margin:4px 0 0;color:#85807a;font-size:11px}
 .dashboard-side{display:grid;gap:18px}
@@ -35,6 +35,7 @@ admin_header('Tableau de bord', 'dashboard');
 .dashboard-visitors{padding:20px 22px}.dashboard-visitors__grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .dashboard-visitor{padding:14px;border:1px solid rgba(24,23,22,.08);border-radius:14px;background:#faf8f5}.dashboard-visitor span{display:block;margin-bottom:5px;color:#7d766f;font-size:10px}.dashboard-visitor strong{font-size:24px;letter-spacing:-.04em}
 .dashboard-shortcuts{padding:20px 22px}.dashboard-shortcuts h2{margin:0 0 14px;font-size:18px}.dashboard-shortcuts__list{display:grid;gap:8px}.dashboard-shortcuts__list a{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;border:1px solid rgba(24,23,22,.08);border-radius:12px;background:#faf8f5;color:#26221f;text-decoration:none;font-size:12px;font-weight:700;transition:.18s}.dashboard-shortcuts__list a:hover{background:#fff;border-color:rgba(201,52,49,.22);transform:translateX(2px)}
+.dashboard-todo{padding:0 22px 20px}.dashboard-todo__list{display:grid;gap:9px}.dashboard-todo__item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;padding:14px 15px;border:1px solid rgba(24,23,22,.08);border-radius:14px;background:#faf8f5}.dashboard-todo__main{min-width:0}.dashboard-todo__top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:5px}.dashboard-todo__top strong{font-size:14px}.dashboard-todo__meta{display:flex;gap:8px 14px;flex-wrap:wrap;color:#7d766f;font-size:10px}.dashboard-todo__empty{padding:22px;border:1px dashed rgba(24,23,22,.12);border-radius:14px;color:#77706a;font-size:12px;text-align:center;background:#faf8f5}.dashboard-todo__action{white-space:nowrap}
 .dashboard-panel .admin-table-wrap{border:0;border-radius:0;box-shadow:none;margin:0}.dashboard-panel table{margin:0}
 @media(max-width:1050px){.dashboard-layout{grid-template-columns:1fr}.dashboard-side{grid-template-columns:1fr 1fr}.dashboard-shortcuts{grid-column:1/-1}}
 @media(max-width:720px){.dashboard-intro{align-items:flex-start;flex-direction:column;padding:18px}.dashboard-intro__actions{justify-content:flex-start}.dashboard-side{grid-template-columns:1fr}.dashboard-shortcuts{grid-column:auto}.dashboard-visitors__grid{grid-template-columns:1fr 1fr}}
@@ -56,29 +57,34 @@ admin_header('Tableau de bord', 'dashboard');
   <section class="dashboard-panel">
     <div class="dashboard-panel__head">
       <div>
-        <h2>Dernières demandes de devis</h2>
-        <p>Les 8 demandes les plus récentes.</p>
+        <h2>À traiter</h2>
+        <p>Les demandes qui nécessitent encore une action de ta part.</p>
       </div>
-      <a class="admin-link" href="devis.php">Tout afficher →</a>
+      <a class="admin-link" href="devis.php">Toutes les demandes →</a>
     </div>
-    <div class="admin-table-wrap">
-      <table>
-        <thead><tr><th>Client</th><th>Événement</th><th>Date</th><th>Reçue le</th><th>Statut</th><th></th></tr></thead>
-        <tbody>
-        <?php if (!$recent): ?>
-          <tr><td colspan="6">Aucune demande pour le moment.</td></tr>
-        <?php else: foreach ($recent as $quote): ?>
-          <tr>
-            <td><strong><?= e($quote['name']) ?></strong><br><span style="color:#777"><?= e($quote['email']) ?></span></td>
-            <td><?= e($quote['event_type']) ?></td>
-            <td><?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'À définir' ?></td>
-            <td><?= e(date('d/m/Y H:i', strtotime($quote['created_at']))) ?></td>
-            <td><span class="status status--<?= e($quote['status']) ?>"><?= e(quote_status_label($quote['status'])) ?></span></td>
-            <td><a class="admin-link" href="devis.php?id=<?= (int) $quote['id'] ?>">Ouvrir →</a></td>
-          </tr>
-        <?php endforeach; endif; ?>
-        </tbody>
-      </table>
+    <div class="dashboard-todo">
+      <?php if (!$toProcess): ?>
+        <div class="dashboard-todo__empty">Tout est à jour. Aucune demande en attente de traitement.</div>
+      <?php else: ?>
+        <div class="dashboard-todo__list">
+          <?php foreach ($toProcess as $quote): ?>
+            <div class="dashboard-todo__item">
+              <div class="dashboard-todo__main">
+                <div class="dashboard-todo__top">
+                  <strong><?= e($quote['name']) ?></strong>
+                  <span class="status status--<?= e($quote['status']) ?>"><?= e(quote_status_label($quote['status'])) ?></span>
+                </div>
+                <div class="dashboard-todo__meta">
+                  <span><?= e($quote['event_type']) ?></span>
+                  <span>Événement : <?= $quote['event_date'] ? e(date('d/m/Y', strtotime($quote['event_date']))) : 'à définir' ?></span>
+                  <span>Reçue le <?= e(date('d/m/Y à H:i', strtotime($quote['created_at']))) ?></span>
+                </div>
+              </div>
+              <a class="admin-link dashboard-todo__action" href="devis.php?id=<?= (int) $quote['id'] ?>">Ouvrir →</a>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      <?php endif; ?>
     </div>
   </section>
 
