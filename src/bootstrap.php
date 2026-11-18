@@ -88,6 +88,41 @@ function db(): PDO
     ensure_column($pdo, 'quotes', 'closure_reason', 'TEXT');
     ensure_column($pdo, 'quotes', 'closure_note', 'TEXT');
 
+    $pdo->exec('CREATE TABLE IF NOT EXISTS prestations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        source_quote_id INTEGER NOT NULL UNIQUE,
+        client_name TEXT NOT NULL,
+        client_email TEXT,
+        client_phone TEXT,
+        event_type TEXT,
+        event_date TEXT,
+        venue TEXT,
+        start_time TEXT,
+        end_time TEXT,
+        services TEXT,
+        selections TEXT,
+        notes TEXT,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(source_quote_id) REFERENCES quotes(id) ON DELETE CASCADE
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_prestations_event_date ON prestations(event_date)');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_prestations_source_quote ON prestations(source_quote_id)');
+
+    $pdo->exec("
+        INSERT OR IGNORE INTO prestations(
+            source_quote_id, client_name, client_email, client_phone,
+            event_type, event_date, venue, start_time, end_time,
+            services, selections, created_at, updated_at
+        )
+        SELECT
+            id, name, email, phone,
+            event_type, event_date, venue, start_time, end_time,
+            services, selections, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+        FROM quotes
+        WHERE status='accepted'
+    ");
+
     $pdo->exec('CREATE TABLE IF NOT EXISTS availability (
         year INTEGER NOT NULL,
         month INTEGER NOT NULL,
