@@ -4,7 +4,7 @@ require_admin();
 
 $pdo = db();
 $categories = ['prestation' => 'Prestations', 'formule' => 'Formules', 'option' => 'Options', 'frais' => 'Frais'];
-$priceModes = ['fixed' => 'Prix fixe', 'from' => 'À partir de', 'hourly' => 'Par heure', 'unit' => 'À l’unité'];
+$priceModes = ['fixed' => 'Prix fixe', 'from' => 'À partir de', 'hourly' => 'Par heure', 'unit' => 'À l’unité', 'formula' => 'Calcul automatique'];
 $flash = '';
 $error = '';
 
@@ -178,7 +178,7 @@ if (isset($_GET['created'])) $flash = 'Nouvel élément ajouté au catalogue.';
               <input type="hidden" name="category" value="<?= e($categoryKey) ?>">
 
               <div class="catalogue-field"><label>Nom</label><input name="name" value="<?= e($item['name']) ?>" required></div>
-              <div class="catalogue-field"><label>Prix (€)</label><input name="price" inputmode="decimal" value="<?= e(catalog_cents_to_money((int)$item['price_cents'])) ?>"></div>
+              <div class="catalogue-field"><label>Prix (€)</label><input name="price" inputmode="decimal" value="<?= e(catalog_cents_to_money((int)$item['price_cents'])) ?>" <?= $item['price_mode'] === 'formula' ? 'readonly' : '' ?>></div>
               <div class="catalogue-field"><label>Mode de prix</label><select name="price_mode"><?php foreach ($priceModes as $mode => $modeLabel): ?><option value="<?= e($mode) ?>" <?= $item['price_mode'] === $mode ? 'selected' : '' ?>><?= e($modeLabel) ?></option><?php endforeach; ?></select></div>
               <div class="catalogue-field"><label>Unité / précision</label><input name="unit_label" value="<?= e((string)$item['unit_label']) ?>" placeholder="Ex. Par prestation"></div>
               <div class="catalogue-field catalogue-field--full"><label>Description</label><textarea name="description"><?= e((string)$item['description']) ?></textarea></div>
