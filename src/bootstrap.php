@@ -193,6 +193,7 @@ function db(): PDO
     seed_reviews($pdo);
     seed_catalog($pdo);
     ensure_fee_catalog_items($pdo);
+    ensure_quote_catalog_items($pdo);
     return $pdo;
 }
 
@@ -295,6 +296,22 @@ function seed_catalog(PDO $pdo): void
             ':mode'=>$mode,
             ':unit'=>$unit,
             ':sort'=>$sort,
+        ]);
+    }
+}
+
+function ensure_quote_catalog_items(PDO $pdo): void
+{
+    $check = $pdo->prepare("SELECT id FROM catalog_items WHERE category='option' AND name=:name LIMIT 1");
+    $check->execute([':name'=>'Photobooth 300 tirages']);
+    if (!$check->fetchColumn()) {
+        $stmt = $pdo->prepare(
+            "INSERT INTO catalog_items(category,name,description,price_cents,price_mode,unit_label,active,display_order)
+             VALUES('option',:name,:description,0,'fixed','Par prestation',1,24)"
+        );
+        $stmt->execute([
+            ':name'=>'Photobooth 300 tirages',
+            ':description'=>'Photobooth avec forfait de 300 tirages.',
         ]);
     }
 }
