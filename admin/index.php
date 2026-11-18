@@ -8,7 +8,47 @@ $new = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status='new'")->fetc
 $accepted = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status='accepted'")->fetchColumn();
 $pending = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status IN ('new','read','sent')")->fetchColumn();
 $nextEvent = $pdo->query("SELECT name, event_type, event_date FROM quotes WHERE status='accepted' AND event_date IS NOT NULL AND event_date >= date('now') ORDER BY event_date ASC LIMIT 1")->fetch();
-$toProcess = $pdo->query("SELECT * FROM quotes WHERE status IN ('new','read','sent') ORDER BY CASE WHEN event_date IS NULL OR event_date = '' THEN 1 ELSE 0 END, event_date ASC, created_at ASC LIMIT 5")->fetchAll();
+$toProcess = $pdo->query("SELECT * FROM quotes WHERE status IN ('new','read','sent')")->fetchAll();
+
+$now = time();
+$actionMeta = static function (array $quote) use ($now): array {
+    $createdAt = strtotime((string) ($quote['created_at'] ?? '')) ?: $now;
+
+    if (($quote['status'] ?? '') === 'new') {
+        return ['priority' => 0, 'due_at' => $createdAt, 'days_since' => 0, 'next_at' => null];
+    }
+
+    if (($quote['status'] ?? '') === 'read') {
+        return ['priority' => 1, 'due_at' => $createdAt, 'days_since' => 0, 'next_at' => null];
+    }
+
+    $referenceDate = !empty($quote['followed_up_at'])
+        ? $quote['followed_up_at']
+        : (($quote['updated_at'] ?? '') ?: ($quote['created_at'] ?? ''));
+
+    $referenceAt = strtotime((string) $referenceDate) ?: $createdAt;
+    $nextAt = $referenceAt + (7 * 86400);
+    $daysSince = max(0, (int) floor(($now - $referenceAt) / 86400));
+
+    if ($now >= $nextAt) {
+        return ['priority' => 2, 'due_at' => $nextAt, 'days_since' => $daysSince, 'next_at' => $nextAt];
+    }
+
+    return ['priority' => 3, 'due_at' => $nextAt, 'days_since' => $daysSince, 'next_at' => $nextAt];
+};
+
+usort($toProcess, static function (array $a, array $b) use ($actionMeta): int {
+    $metaA = $actionMeta($a);
+    $metaB = $actionMeta($b);
+
+    if ($metaA['priority'] !== $metaB['priority']) {
+        return $metaA['priority'] <=> $metaB['priority'];
+    }
+
+    return $metaA['due_at'] <=> $metaB['due_at'];
+});
+
+$toProcess = array_slice($toProcess, 0, 5);
 
 $todayVisitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE visit_date = date('now','localtime')")->fetchColumn();
 $yesterdayVisitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE visit_date = date('now','localtime','-1 day')")->fetchColumn();
@@ -58,7 +98,7 @@ admin_header('Tableau de bord', 'dashboard');
     <div class="dashboard-panel__head">
       <div>
         <h2>À traiter</h2>
-        <p>Les demandes qui nécessitent encore une action de ta part.</p>
+        <p>Classées selon la prochaine action à réaliser, de la plus urgente à la moins urgente.</p>
       </div>
       <a class="admin-link" href="devis.php">Toutes les demandes →</a>
     </div>
@@ -71,25 +111,26 @@ admin_header('Tableau de bord', 'dashboard');
             <?php
               $taskLabel = '';
               $taskClass = '';
+              $meta = $actionMeta($quote);
+
               if ($quote['status'] === 'new') {
-                  $taskLabel = 'À faire : lire la nouvelle demande';
+                  $taskLabel = 'À faire maintenant : lire la nouvelle demande';
                   $taskClass = 'dashboard-todo__task--urgent';
               } elseif ($quote['status'] === 'read') {
-                  $taskLabel = 'À faire : préparer et envoyer le devis';
+                  $taskLabel = 'À faire maintenant : préparer et envoyer le devis';
                   $taskClass = 'dashboard-todo__task--urgent';
               } elseif ($quote['status'] === 'sent') {
-                  $referenceDate = !empty($quote['followed_up_at']) ? $quote['followed_up_at'] : ($quote['updated_at'] ?: $quote['created_at']);
-                  $lastActivity = strtotime((string) $referenceDate);
-                  $daysSince = $lastActivity ? (int) floor((time() - $lastActivity) / 86400) : 0;
-                  if ($daysSince >= 7) {
-                      $taskLabel = 'À faire : relancer le client (' . $daysSince . ' jours)';
+                  if ($meta['priority'] === 2) {
+                      $lateDays = max(0, (int) floor(($now - $meta['next_at']) / 86400));
+                      $taskLabel = $lateDays > 0
+                          ? 'À faire : relancer le client · retard de ' . $lateDays . ' jour' . ($lateDays > 1 ? 's' : '')
+                          : 'À faire aujourd’hui : relancer le client';
                       $taskClass = 'dashboard-todo__task--urgent';
                   } else {
-                      $taskLabel = !empty($quote['followed_up_at'])
-                          ? 'Relancé le ' . date('d/m/Y') . ' · en attente du client'
-                          : 'En attente de la réponse du client';
                       if (!empty($quote['followed_up_at'])) {
-                          $taskLabel = 'Relancé le ' . date('d/m/Y', strtotime($quote['followed_up_at'])) . ' · en attente du client';
+                          $taskLabel = 'Relancé le ' . date('d/m/Y', strtotime($quote['followed_up_at'])) . ' · prochaine relance le ' . date('d/m/Y', $meta['next_at']);
+                      } else {
+                          $taskLabel = 'En attente du client · relance prévue le ' . date('d/m/Y', $meta['next_at']);
                       }
                       $taskClass = 'dashboard-todo__task--wait';
                   }
