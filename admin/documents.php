@@ -228,6 +228,68 @@ $catalogItems = $pdo->query(
               display_order,id"
 )->fetchAll();
 
+function normalize_catalog_match(string $value): string
+{
+    $value = trim(mb_strtolower($value, 'UTF-8'));
+    $value = str_replace(['’', '‘', '`'], "'", $value);
+    return preg_replace('/\s+/u', ' ', $value) ?: '';
+}
+
+function source_duration_hours(?string $start, ?string $end): float
+{
+    $start = trim((string)$start);
+    $end = trim((string)$end);
+    if ($start === '' || $end === '') return 1.0;
+
+    $toMinutes = static function (string $time): ?int {
+        if (!preg_match('/^(\d{1,2}):(\d{2})$/', $time, $m)) return null;
+        $h = (int)$m[1];
+        $min = (int)$m[2];
+        if ($h > 23 || $min > 59) return null;
+        return $h * 60 + $min;
+    };
+
+    $startMinutes = $toMinutes($start);
+    $endMinutes = $toMinutes($end);
+    if ($startMinutes === null || $endMinutes === null) return 1.0;
+    if ($endMinutes <= $startMinutes) $endMinutes += 24 * 60;
+
+    $hours = ($endMinutes - $startMinutes) / 60;
+    return $hours > 0 ? round($hours, 2) : 1.0;
+}
+
+if ($source && !$current) {
+    $requestedNames = array_values(array_filter(array_map(
+        'trim',
+        array_merge(
+            explode('|', (string)($source['services'] ?? '')),
+            explode('|', (string)($source['selections'] ?? ''))
+        )
+    )));
+
+    $requestedLookup = [];
+    foreach ($requestedNames as $requestedName) {
+        $requestedLookup[normalize_catalog_match($requestedName)] = true;
+    }
+
+    $durationHours = source_duration_hours($source['start_time'] ?? null, $source['end_time'] ?? null);
+
+    foreach ($catalogItems as $item) {
+        if (!isset($requestedLookup[normalize_catalog_match((string)$item['name'])])) continue;
+
+        $quantity = $item['price_mode'] === 'hourly' ? $durationHours : 1.0;
+        $unitPrice = (int)$item['price_cents'];
+        $currentItems[] = [
+            'catalog_item_id'=>(int)$item['id'],
+            'category'=>$item['category'],
+            'item_name'=>$item['name'],
+            'quantity'=>$quantity,
+            'unit_price_cents'=>$unitPrice,
+            'line_total_cents'=>(int)round($quantity * $unitPrice),
+        ];
+    }
+}
+
 $catalogForJs = [];
 foreach ($catalogItems as $item) {
     $catalogForJs[] = [
@@ -307,7 +369,11 @@ if (isset($_GET['saved'])) $flash = 'Le devis a été enregistré.';
           'event_type'=>$source['event_type'],
           'event_date'=>$source['event_date'],
           'venue'=>$source['venue'],
-          'description'=>trim(($source['services'] ?? '') . "\n" . ($source['selections'] ?? '')),
+          'description'=>trim(
+              'Horaires : ' . (($source['start_time'] ?? '') ?: 'À définir') . ' → ' . (($source['end_time'] ?? '') ?: 'À définir') . "\n" .
+              'Invités : ' . (($source['guest_count'] ?? '') ?: 'Non renseigné') . "\n" .
+              'Recommandé par : ' . (($source['referral'] ?? '') ?: 'Non renseigné')
+          ),
           'deposit_percent'=>30,
           'travel_km'=>0,
           'notes'=>'',
