@@ -557,6 +557,28 @@ function calculate_setup_teardown_cents(int $formulaOptionsSubtotalCents): int
     return max(0, (int) round($formulaOptionsSubtotalCents * 0.20));
 }
 
+function calculate_rounded_deposit(int $totalCents): array
+{
+    $totalCents = max(0, $totalCents);
+    if ($totalCents === 0) {
+        return ['deposit_cents'=>0, 'balance_cents'=>0];
+    }
+
+    $minimumBalance = (int) ceil($totalCents * 0.70);
+    $roundedBalance = (int) (ceil($minimumBalance / 1000) * 1000);
+
+    if ($roundedBalance > $totalCents) {
+        $roundedBalance = $totalCents;
+    }
+
+    $deposit = max(0, $totalCents - $roundedBalance);
+
+    return [
+        'deposit_cents'=>$deposit,
+        'balance_cents'=>$roundedBalance,
+    ];
+}
+
 function next_commercial_quote_number(PDO $pdo): string
 {
     $year = date('Y');
