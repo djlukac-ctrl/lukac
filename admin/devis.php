@@ -4,6 +4,13 @@ require_admin();
 $pdo = db();
 
 $quoteStatuses = ['new','read','sent','accepted','refused'];
+$closureReasons = [
+    'event_cancelled' => 'Événement annulé',
+    'other_provider' => 'Autre prestataire choisi',
+    'budget' => 'Budget',
+    'no_reply' => 'Sans réponse',
+    'other' => 'Autre',
+];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verify_csrf($_POST['csrf'] ?? null);
@@ -25,9 +32,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $status = (string) ($_POST['status'] ?? '');
+    $closureReason = trim((string) ($_POST['closure_reason'] ?? ''));
+    $closureNote = trim((string) ($_POST['closure_note'] ?? ''));
+
     if ($id > 0 && in_array($status, $quoteStatuses, true)) {
-        $stmt = $pdo->prepare('UPDATE quotes SET status=:status, updated_at=CURRENT_TIMESTAMP WHERE id=:id');
-        $stmt->execute([':status' => $status, ':id' => $id]);
+        if ($status === 'refused') {
+            if (!isset($closureReasons[$closureReason])) {
+                header('Location: devis.php?id=' . $id . '&closure_error=1');
+                exit;
+            }
+            $stmt = $pdo->prepare('UPDATE quotes SET status=:status, closure_reason=:closure_reason, closure_note=:closure_note, updated_at=CURRENT_TIMESTAMP WHERE id=:id');
+            $stmt->execute([
+                ':status' => $status,
+                ':closure_reason' => $closureReason,
+                ':closure_note' => $closureNote !== '' ? $closureNote : null,
+                ':id' => $id,
+            ]);
+        } else {
+            $stmt = $pdo->prepare('UPDATE quotes SET status=:status, closure_reason=NULL, closure_note=NULL, updated_at=CURRENT_TIMESTAMP WHERE id=:id');
+            $stmt->execute([':status' => $status, ':id' => $id]);
+        }
+
         header('Location: devis.php?id=' . $id . '&saved=1');
         exit;
     }
@@ -56,6 +81,7 @@ if ($id > 0) {
     admin_header('Demande #' . $id, 'devis');
     if (isset($_GET['saved'])): ?><div class="flash flash--success">Statut mis à jour.</div><?php endif; ?>
     <?php if (isset($_GET['followed_up'])): ?><div class="flash flash--success">Relance enregistrée.</div><?php endif; ?>
+    <?php if (isset($_GET['closure_error'])): ?><div class="flash flash--error">Choisis un motif avant de clôturer la demande.</div><?php endif; ?>
     <div class="quote-detail">
       <section class="quote-main">
         <?php
@@ -328,6 +354,24 @@ if ($id > 0) {
               });
             });
           })();
+
+          (() => {
+            const statusSelect = document.getElementById('status');
+            const reasonField = document.getElementById('closure-reason-field');
+            const noteField = document.getElementById('closure-note-field');
+            if (!statusSelect || !reasonField || !noteField) return;
+
+            const syncClosureFields = () => {
+              const show = statusSelect.value === 'refused';
+              reasonField.hidden = !show;
+              noteField.hidden = !show;
+              const reasonSelect = document.getElementById('closure_reason');
+              if (reasonSelect) reasonSelect.required = show;
+            };
+
+            statusSelect.addEventListener('change', syncClosureFields);
+            syncClosureFields();
+          })();
         </script>
       </section>
 
@@ -339,6 +383,29 @@ if ($id > 0) {
           <div class="field"><label for="status">Statut</label><select id="status" name="status">
             <?php foreach ($quoteStatuses as $status): ?><option value="<?= e($status) ?>" <?= $quote['status'] === $status ? 'selected' : '' ?>><?= e(quote_status_label($status)) ?></option><?php endforeach; ?>
           </select></div>
+
+          <div class="field" id="closure-reason-field" <?= $quote['status'] === 'refused' ? '' : 'hidden' ?>>
+            <label for="closure_reason">Motif de clôture</label>
+            <select id="closure_reason" name="closure_reason">
+              <option value="">Choisir un motif</option>
+              <?php foreach ($closureReasons as $reasonKey => $reasonLabel): ?>
+                <option value="<?= e($reasonKey) ?>" <?= ($quote['closure_reason'] ?? '') === $reasonKey ? 'selected' : '' ?>><?= e($reasonLabel) ?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+
+          <div class="field" id="closure-note-field" <?= $quote['status'] === 'refused' ? '' : 'hidden' ?>>
+            <label for="closure_note">Note complémentaire <span style="font-weight:400;color:#8a8179">(facultatif)</span></label>
+            <textarea id="closure_note" name="closure_note" rows="3" placeholder="Ex. Le client m’a confirmé que la soirée est annulée."><?= e((string)($quote['closure_note'] ?? '')) ?></textarea>
+          </div>
+
+          <?php if ($quote['status'] === 'refused' && !empty($quote['closure_reason']) && isset($closureReasons[$quote['closure_reason']])): ?>
+            <div style="padding:10px 12px;border:1px solid rgba(201,52,49,.10);border-radius:12px;background:#fff8f7;color:#6a625b;font-size:11px;line-height:1.5">
+              <strong style="color:#c93431">Motif :</strong> <?= e($closureReasons[$quote['closure_reason']]) ?>
+              <?php if (!empty($quote['closure_note'])): ?><br><?= nl2br(e($quote['closure_note'])) ?><?php endif; ?>
+            </div>
+          <?php endif; ?>
+
           <button class="btn btn--primary" type="submit" name="action" value="update_status">Enregistrer le statut</button>
           <?php if ($quote['status'] === 'sent'): ?>
             <button class="btn" type="submit" name="action" value="mark_followup">Marquer comme relancé</button>
