@@ -284,7 +284,7 @@ function ensure_fee_catalog_items(PDO $pdo): void
 {
     $items = [
         ['Déplacement', 'Frais kilométriques calculés selon la distance facturée.', 100, 'unit', 'Par km', 90],
-        ['Montage / démontage', 'Temps et manutention nécessaires à l’installation et au rangement du matériel.', 0, 'fixed', 'Par prestation', 91],
+        ['Montage / démontage', 'Calcul automatique : 20 % du total de la formule et des options sélectionnées.', 0, 'formula', '20 % formule + options', 91],
     ];
 
     $check = $pdo->prepare("SELECT id FROM catalog_items WHERE category='frais' AND name=:name LIMIT 1");
@@ -295,7 +295,8 @@ function ensure_fee_catalog_items(PDO $pdo): void
 
     foreach ($items as [$name,$description,$price,$mode,$unit,$sort]) {
         $check->execute([':name'=>$name]);
-        if (!$check->fetchColumn()) {
+        $existingId = (int)($check->fetchColumn() ?: 0);
+        if (!$existingId) {
             $insert->execute([
                 ':name'=>$name,
                 ':description'=>$description,
@@ -304,6 +305,26 @@ function ensure_fee_catalog_items(PDO $pdo): void
                 ':unit'=>$unit,
                 ':sort'=>$sort,
             ]);
+        } elseif ($name === 'Montage / démontage') {
+            $update = $pdo->prepare(
+                "UPDATE catalog_items
+                 SET description=:description, price_cents=0, price_mode='formula',
+                     unit_label=:unit, updated_at=CURRENT_TIMESTAMP
+                 WHERE id=:id"
+            );
+            $update->execute([
+                ':description'=>$description,
+                ':unit'=>$unit,
+                ':id'=>$existingId,
+            ]);
+        } elseif ($name === 'Déplacement') {
+            $update = $pdo->prepare(
+                "UPDATE catalog_items
+                 SET price_cents=100, price_mode='unit', unit_label='Par km',
+                     updated_at=CURRENT_TIMESTAMP
+                 WHERE id=:id"
+            );
+            $update->execute([':id'=>$existingId]);
         }
     }
 }
@@ -494,6 +515,11 @@ function event_date_availability(string $date): array
     return ['available' => true, 'reason' => 'available', 'message' => ''];
 }
 
+
+function calculate_setup_teardown_cents(int $formulaOptionsSubtotalCents): int
+{
+    return max(0, (int) round($formulaOptionsSubtotalCents * 0.20));
+}
 
 function next_commercial_quote_number(PDO $pdo): string
 {
