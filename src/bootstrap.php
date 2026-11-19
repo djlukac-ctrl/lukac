@@ -121,6 +121,9 @@ function db(): PDO
     ensure_column($pdo, 'prestations', 'equipment_confirmed', 'INTEGER NOT NULL DEFAULT 0');
     ensure_column($pdo, 'prestations', 'final_contact_done', 'INTEGER NOT NULL DEFAULT 0');
     ensure_column($pdo, 'prestations', 'balance_received', 'INTEGER NOT NULL DEFAULT 0');
+    ensure_column($pdo, 'prestations', 'client_meeting_status', "TEXT NOT NULL DEFAULT 'todo'");
+    ensure_column($pdo, 'prestations', 'client_meeting_at', 'TEXT');
+    ensure_column($pdo, 'prestations', 'client_meeting_notes', 'TEXT');
 
     $pdo->exec("
         INSERT OR IGNORE INTO prestations(
