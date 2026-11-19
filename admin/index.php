@@ -51,13 +51,13 @@ foreach ($quoteActions as $quote) {
 
 $prestationActions = $pdo->query("
     SELECT p.id AS prestation_id, q.name, q.event_type, q.event_date, q.venue,
-           p.final_contact_done
+           p.final_contact_done, p.client_meeting_status, p.client_meeting_at
     FROM prestations p
     INNER JOIN quotes q ON q.id=p.source_quote_id
     WHERE q.status='accepted'
       AND q.event_date IS NOT NULL
       AND q.event_date >= date('now','localtime')
-      AND p.final_contact_done=0
+      AND COALESCE(p.client_meeting_status,'todo') != 'done'
 ")->fetchAll();
 
 foreach ($prestationActions as $prep) {
@@ -69,8 +69,26 @@ foreach ($prestationActions as $prep) {
     $appointmentLeadDays = $isWedding ? 90 : 60;
     $appointmentDueAt = $eventAt - ($appointmentLeadDays * 86400);
 
-    // Mariage : rendez-vous à prévoir 3 mois avant. Autres prestations : 2 mois avant.
-    if ($now >= $appointmentDueAt) {
+    $meetingStatus = (string)($prep['client_meeting_status'] ?? 'todo');
+
+    if ($meetingStatus === 'planned' && !empty($prep['client_meeting_at'])) {
+        $meetingAt = strtotime((string)$prep['client_meeting_at']);
+        if ($meetingAt && $meetingAt >= $now) {
+            $toProcess[] = [
+                'kind' => 'prestation',
+                'priority' => 4,
+                'due_at' => $meetingAt,
+                'data' => $prep,
+                'meta' => [
+                    'event_at' => $eventAt,
+                    'appointment_due_at' => $appointmentDueAt,
+                    'meeting_at' => $meetingAt,
+                    'meeting_status' => 'planned',
+                ],
+            ];
+        }
+    } elseif ($now >= $appointmentDueAt) {
+        // Mariage : rendez-vous à prévoir 3 mois avant. Autres prestations : 2 mois avant.
         $toProcess[] = [
             'kind' => 'prestation',
             'priority' => 3,
@@ -79,6 +97,8 @@ foreach ($prestationActions as $prep) {
             'meta' => [
                 'event_at' => $eventAt,
                 'appointment_due_at' => $appointmentDueAt,
+                'meeting_at' => null,
+                'meeting_status' => 'todo',
             ],
         ];
     }
@@ -217,11 +237,18 @@ admin_header('Tableau de bord', 'dashboard');
               <?php
                 $prep = $action['data'];
                 $daysUntilEvent = max(0, (int)ceil(($action['meta']['event_at'] - $now) / 86400));
-                $lateDays = max(0, (int)floor(($now - $action['meta']['appointment_due_at']) / 86400));
                 $leadLabel = str_contains(mb_strtolower((string)$prep['event_type'], 'UTF-8'), 'mariage') ? '3 mois avant' : '2 mois avant';
-                $appointmentLabel = $lateDays > 0
-                    ? 'À faire : prendre rendez-vous / faire le point avec le client · échéance ' . $leadLabel . ' · retard de ' . $lateDays . ' jour' . ($lateDays > 1 ? 's' : '')
-                    : 'À faire aujourd’hui : prendre rendez-vous / faire le point avec le client · échéance ' . $leadLabel;
+                $meetingPlanned = ($action['meta']['meeting_status'] ?? 'todo') === 'planned';
+                if ($meetingPlanned && !empty($action['meta']['meeting_at'])) {
+                    $appointmentLabel = 'Rendez-vous prévu le ' . date('d/m/Y à H:i', $action['meta']['meeting_at']);
+                    $appointmentClass = 'dashboard-todo__task--wait';
+                } else {
+                    $lateDays = max(0, (int)floor(($now - $action['meta']['appointment_due_at']) / 86400));
+                    $appointmentLabel = $lateDays > 0
+                        ? 'À faire : prendre rendez-vous / faire le point avec le client · échéance ' . $leadLabel . ' · retard de ' . $lateDays . ' jour' . ($lateDays > 1 ? 's' : '')
+                        : 'À faire aujourd’hui : prendre rendez-vous / faire le point avec le client · échéance ' . $leadLabel;
+                    $appointmentClass = 'dashboard-todo__task--urgent';
+                }
               ?>
               <div class="dashboard-todo__item">
                 <div class="dashboard-todo__main">
@@ -234,7 +261,7 @@ admin_header('Tableau de bord', 'dashboard');
                     <span>Événement : <?= e(date('d/m/Y', strtotime($prep['event_date']))) ?></span>
                     <span><?= $daysUntilEvent ?> jour<?= $daysUntilEvent > 1 ? 's' : '' ?> avant la prestation</span>
                   </div>
-                  <div class="dashboard-todo__task dashboard-todo__task--urgent"><?= e($appointmentLabel) ?></div>
+                  <div class="dashboard-todo__task <?= e($appointmentClass) ?>"><?= e($appointmentLabel) ?></div>
                 </div>
                 <a class="admin-link dashboard-todo__action" href="prestations.php?id=<?= (int)$prep['prestation_id'] ?>">Ouvrir →</a>
               </div>
