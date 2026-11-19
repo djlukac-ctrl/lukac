@@ -23,6 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $equipmentConfirmed = isset($_POST['equipment_confirmed']) ? 1 : 0;
         $finalContactDone = isset($_POST['final_contact_done']) ? 1 : 0;
         $balanceReceived = isset($_POST['balance_received']) ? 1 : 0;
+        $clientMeetingStatus = (string)($_POST['client_meeting_status'] ?? 'todo');
+        if (!in_array($clientMeetingStatus, ['todo','planned','done'], true)) $clientMeetingStatus = 'todo';
+        $clientMeetingAtRaw = trim((string)($_POST['client_meeting_at'] ?? ''));
+        $clientMeetingAt = $clientMeetingAtRaw !== '' ? str_replace('T', ' ', $clientMeetingAtRaw) . ':00' : null;
+        $clientMeetingNotes = trim((string)($_POST['client_meeting_notes'] ?? ''));
+        if ($clientMeetingStatus !== 'planned') $clientMeetingAt = null;
+        if ($clientMeetingStatus === 'done') $finalContactDone = 1;
         $notes = trim((string)($_POST['notes'] ?? ''));
 
         if ($totalCents !== null && $depositCents !== null && $depositCents > $totalCents) {
@@ -52,6 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 equipment_confirmed=:equipment_confirmed,
                 final_contact_done=:final_contact_done,
                 balance_received=:balance_received,
+                client_meeting_status=:client_meeting_status,
+                client_meeting_at=:client_meeting_at,
+                client_meeting_notes=:client_meeting_notes,
                 notes=:notes,
                 updated_at=CURRENT_TIMESTAMP
             WHERE id=:id
@@ -68,6 +78,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':equipment_confirmed'=>$equipmentConfirmed,
             ':final_contact_done'=>$finalContactDone,
             ':balance_received'=>$balanceReceived,
+            ':client_meeting_status'=>$clientMeetingStatus,
+            ':client_meeting_at'=>$clientMeetingAt,
+            ':client_meeting_notes'=>$clientMeetingNotes !== '' ? $clientMeetingNotes : null,
             ':notes'=>$notes !== '' ? $notes : null,
             ':id'=>$id,
         ]);
@@ -151,7 +164,7 @@ if ($detailId > 0) {
     .detail-side{padding:22px;position:sticky;top:22px}.tracking-form{display:grid;gap:12px}.tracking-form .field label{color:#aaa}.tracking-form input[type=text],.tracking-form textarea{width:100%;box-sizing:border-box}
     .tracking-check{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.02)}.tracking-check input{width:17px;height:17px}.tracking-check span{font-size:12px;font-weight:700}.tracking-check small{display:block;color:#888;font-weight:400;margin-top:2px}
     .money-preview{display:grid;grid-template-columns:1fr 1fr;gap:9px}.money-box{padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.02)}.money-box span{display:block;color:#777;font-size:9px;margin-bottom:4px}.money-box strong{font-size:17px}
-    .prep-card{margin-top:20px;padding:18px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:rgba(255,255,255,.02)}.prep-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.prep-head strong{font-size:14px}.prep-head span{font-size:11px;color:#aaa}.prep-progress{height:7px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:14px}.prep-progress>span{display:block;height:100%;background:linear-gradient(90deg,#c93431,#ff4d4d);border-radius:999px}.prep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.prep-item{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(255,255,255,.018)}.prep-item input{width:16px;height:16px}.prep-item span{font-size:11px;font-weight:700}
+    .meeting-card{padding:15px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.02);display:grid;gap:11px}.meeting-card h3{margin:0;font-size:14px}.meeting-status{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.meeting-status label{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border:1px solid rgba(255,255,255,.08);border-radius:10px;font-size:10px;font-weight:700;cursor:pointer}.meeting-status input{width:14px;height:14px}.meeting-date[hidden]{display:none}.prep-card{margin-top:20px;padding:18px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:rgba(255,255,255,.02)}.prep-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.prep-head strong{font-size:14px}.prep-head span{font-size:11px;color:#aaa}.prep-progress{height:7px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:14px}.prep-progress>span{display:block;height:100%;background:linear-gradient(90deg,#c93431,#ff4d4d);border-radius:999px}.prep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.prep-item{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(255,255,255,.018)}.prep-item input{width:16px;height:16px}.prep-item span{font-size:11px;font-weight:700}
     .detail-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
     @media(max-width:950px){.prestation-detail{grid-template-columns:1fr}.detail-side{position:static}}@media(max-width:650px){.detail-grid,.money-preview{grid-template-columns:1fr}}
     </style>
@@ -205,6 +218,25 @@ if ($detailId > 0) {
             <span>Acompte reçu<small><?= !empty($prestation['deposit_received_at']) ? 'Enregistré le ' . e(date('d/m/Y', strtotime($prestation['deposit_received_at']))) : 'À confirmer lorsque le paiement est reçu.' ?></small></span>
           </label>
 
+          <div class="meeting-card">
+            <h3>Rendez-vous client</h3>
+            <div class="meeting-status">
+              <label><input type="radio" name="client_meeting_status" value="todo" <?= ($prestation['client_meeting_status'] ?? 'todo') === 'todo' ? 'checked' : '' ?>>À prendre</label>
+              <label><input type="radio" name="client_meeting_status" value="planned" <?= ($prestation['client_meeting_status'] ?? 'todo') === 'planned' ? 'checked' : '' ?>>Planifié</label>
+              <label><input type="radio" name="client_meeting_status" value="done" <?= ($prestation['client_meeting_status'] ?? 'todo') === 'done' ? 'checked' : '' ?>>Réalisé</label>
+            </div>
+
+            <div class="field meeting-date" id="meeting-date-field" <?= ($prestation['client_meeting_status'] ?? 'todo') === 'planned' ? '' : 'hidden' ?>>
+              <label for="client_meeting_at">Date et heure du rendez-vous</label>
+              <input id="client_meeting_at" name="client_meeting_at" type="datetime-local" value="<?= !empty($prestation['client_meeting_at']) ? e(date('Y-m-d\TH:i', strtotime($prestation['client_meeting_at']))) : '' ?>">
+            </div>
+
+            <div class="field">
+              <label for="client_meeting_notes">Notes du rendez-vous</label>
+              <textarea id="client_meeting_notes" name="client_meeting_notes" rows="3" placeholder="Ex. points à aborder, lieu du rendez-vous..."><?= e((string)($prestation['client_meeting_notes'] ?? '')) ?></textarea>
+            </div>
+          </div>
+
           <div class="money-preview">
             <div class="money-box"><span>Encaissé</span><strong><?= number_format($receivedCents / 100, 2, ',', ' ') ?> €</strong></div>
             <div class="money-box"><span>Reste à encaisser</span><strong><?= $remainingCents !== null ? number_format($remainingCents / 100, 2, ',', ' ') . ' €' : '—' ?></strong></div>
@@ -236,6 +268,22 @@ if ($detailId > 0) {
         </form>
       </aside>
     </div>
+    <script>
+    (() => {
+      const radios = document.querySelectorAll('input[name="client_meeting_status"]');
+      const dateField = document.getElementById('meeting-date-field');
+      const dateInput = document.getElementById('client_meeting_at');
+      if (!radios.length || !dateField || !dateInput) return;
+      const syncMeeting = () => {
+        const selected = document.querySelector('input[name="client_meeting_status"]:checked');
+        const planned = selected && selected.value === 'planned';
+        dateField.hidden = !planned;
+        dateInput.required = planned;
+      };
+      radios.forEach(radio => radio.addEventListener('change', syncMeeting));
+      syncMeeting();
+    })();
+    </script>
     <?php
     admin_footer();
     exit;
