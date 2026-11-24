@@ -118,21 +118,6 @@ $yesterdayVisitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE
 $last7Visitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE visit_date >= date('now','localtime','-6 day')")->fetchColumn();
 $last30Visitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE visit_date >= date('now','localtime','-29 day')")->fetchColumn();
 
-$preparationAlerts = $pdo->query("
-    SELECT p.id, q.name, q.event_type, q.event_date,
-           p.contract_signed, p.deposit_received, p.schedule_confirmed, p.venue_confirmed,
-           p.questionnaire_received, p.music_received, p.equipment_confirmed,
-           p.final_contact_done, p.balance_received
-    FROM prestations p
-    INNER JOIN quotes q ON q.id=p.source_quote_id
-    WHERE q.status='accepted'
-      AND q.event_date IS NOT NULL
-      AND q.event_date >= date('now','localtime')
-      AND q.event_date <= date('now','localtime','+60 day')
-    ORDER BY q.event_date ASC
-    LIMIT 4
-")->fetchAll();
-
 admin_header('Tableau de bord', 'dashboard');
 ?>
 <style>
@@ -152,7 +137,7 @@ admin_header('Tableau de bord', 'dashboard');
 .dashboard-watch__row--event{align-items:flex-start}.dashboard-watch__event{display:flex;flex-direction:column;align-items:flex-end;gap:4px;max-width:58%;text-align:right}.dashboard-watch__event strong{font-size:16px;line-height:1.15}.dashboard-watch__event small{color:#8a817a;font-size:10px;line-height:1.35}
 .dashboard-visitors{padding:20px 22px}.dashboard-visitors__grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .dashboard-visitor{padding:14px;border:1px solid rgba(24,23,22,.08);border-radius:14px;background:#faf8f5}.dashboard-visitor span{display:block;margin-bottom:5px;color:#7d766f;font-size:10px}.dashboard-visitor strong{font-size:24px;letter-spacing:-.04em}
-.dashboard-prep{padding:20px 22px}.dashboard-prep h2{margin:0 0 6px;font-size:18px}.dashboard-prep>p{margin:0 0 13px;color:#858585;font-size:10px}.dashboard-prep__list{display:grid;gap:8px}.dashboard-prep__item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 11px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(255,255,255,.02)}.dashboard-prep__item strong{display:block;font-size:11px}.dashboard-prep__item span{display:block;margin-top:3px;color:#858585;font-size:9px}.dashboard-prep__count{color:#ff7c7c!important;font-weight:800;white-space:nowrap}.dashboard-shortcuts{padding:20px 22px}.dashboard-shortcuts h2{margin:0 0 14px;font-size:18px}.dashboard-shortcuts__list{display:grid;gap:8px}.dashboard-shortcuts__list a{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;border:1px solid rgba(24,23,22,.08);border-radius:12px;background:#faf8f5;color:#26221f;text-decoration:none;font-size:12px;font-weight:700;transition:.18s}.dashboard-shortcuts__list a:hover{background:#fff;border-color:rgba(201,52,49,.22);transform:translateX(2px)}
+.dashboard-shortcuts{padding:20px 22px}.dashboard-shortcuts h2{margin:0 0 14px;font-size:18px}.dashboard-shortcuts__list{display:grid;gap:8px}.dashboard-shortcuts__list a{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;border:1px solid rgba(24,23,22,.08);border-radius:12px;background:#faf8f5;color:#26221f;text-decoration:none;font-size:12px;font-weight:700;transition:.18s}.dashboard-shortcuts__list a:hover{background:#fff;border-color:rgba(201,52,49,.22);transform:translateX(2px)}
 .dashboard-todo{padding:0 18px 18px}.dashboard-todo__list{display:grid;gap:8px}.dashboard-todo__item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;padding:12px 14px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.018));transition:.18s ease}.dashboard-todo__item:hover{border-color:rgba(255,66,66,.18);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025));transform:translateY(-1px)}.dashboard-todo__main{min-width:0}.dashboard-todo__top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:5px}.dashboard-todo__top strong{font-size:14px;color:#f7f7f7}.dashboard-todo__meta{display:flex;gap:7px 13px;flex-wrap:wrap;color:#8e8e8e;font-size:10px;line-height:1.4}.dashboard-todo__task{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:6px 9px;border:1px solid rgba(255,255,255,.07);border-radius:9px;background:rgba(255,255,255,.025);color:#d8d8d8;font-size:10px;font-weight:700}.dashboard-todo__task--urgent{border-color:rgba(255,70,70,.18);background:rgba(255,70,70,.07);color:#ff7777}.dashboard-todo__task--wait{color:#aaa}.dashboard-todo__empty{padding:20px;border:1px dashed rgba(255,255,255,.09);border-radius:13px;color:#8d8d8d;font-size:12px;text-align:center;background:rgba(255,255,255,.02)}.dashboard-todo__action{white-space:nowrap;color:#cfcfcf}.dashboard-todo__action:hover{color:#fff}
 .dashboard-panel .admin-table-wrap{border:0;border-radius:0;box-shadow:none;margin:0}.dashboard-panel table{margin:0}
 @media(max-width:1050px){.dashboard-layout{grid-template-columns:1fr}.dashboard-side{grid-template-columns:1fr 1fr}.dashboard-shortcuts{grid-column:1/-1}}
@@ -309,32 +294,6 @@ admin_header('Tableau de bord', 'dashboard');
         <div class="dashboard-visitor"><span>30 jours</span><strong><?= $last30Visitors ?></strong></div>
       </div>
     </section>
-
-    <?php if ($preparationAlerts): ?>
-      <section class="dashboard-panel dashboard-prep">
-        <h2>Préparation des prochaines prestations</h2>
-        <p>Prestations prévues dans les 60 prochains jours.</p>
-        <div class="dashboard-prep__list">
-          <?php foreach ($preparationAlerts as $prep): ?>
-            <?php
-              $prepFields = ['contract_signed','deposit_received','schedule_confirmed','venue_confirmed','questionnaire_received','music_received','equipment_confirmed','final_contact_done','balance_received'];
-              $prepDone = 0;
-              foreach ($prepFields as $prepField) {
-                  if (!empty($prep[$prepField])) $prepDone++;
-              }
-              $prepRemaining = count($prepFields) - $prepDone;
-            ?>
-            <a class="dashboard-prep__item" href="prestations.php?id=<?= (int)$prep['id'] ?>">
-              <span>
-                <strong><?= e($prep['name']) ?></strong>
-                <span><?= e(date('d/m/Y', strtotime($prep['event_date']))) ?> · <?= e($prep['event_type']) ?></span>
-              </span>
-              <span class="dashboard-prep__count"><?= $prepRemaining > 0 ? $prepRemaining . ' à finaliser' : 'Prête ✓' ?></span>
-            </a>
-          <?php endforeach; ?>
-        </div>
-      </section>
-    <?php endif; ?>
 
     <section class="dashboard-panel dashboard-shortcuts">
       <h2>Accès rapides</h2>
