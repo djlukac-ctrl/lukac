@@ -9,6 +9,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = (int)($_POST['id'] ?? 0);
     $action = (string)($_POST['action'] ?? 'save');
 
+    if ($action === 'create_manual') {
+        $clientName = trim((string)($_POST['client_name'] ?? ''));
+        $clientEmail = trim((string)($_POST['client_email'] ?? ''));
+        $clientPhone = trim((string)($_POST['client_phone'] ?? ''));
+        $eventType = trim((string)($_POST['event_type'] ?? ''));
+        $eventDate = trim((string)($_POST['event_date'] ?? ''));
+        $venue = trim((string)($_POST['venue'] ?? ''));
+        $startTime = trim((string)($_POST['start_time'] ?? ''));
+        $endTime = trim((string)($_POST['end_time'] ?? ''));
+        $notes = trim((string)($_POST['notes'] ?? ''));
+        $totalRaw = str_replace(',', '.', trim((string)($_POST['total_amount'] ?? '')));
+        $depositRaw = str_replace(',', '.', trim((string)($_POST['deposit_amount'] ?? '')));
+        $totalCents = $totalRaw !== '' ? max(0, (int)round(((float)$totalRaw) * 100)) : null;
+        $depositCents = $depositRaw !== '' ? max(0, (int)round(((float)$depositRaw) * 100)) : null;
+        $contractSigned = isset($_POST['contract_signed']) ? 1 : 0;
+        $depositReceived = isset($_POST['deposit_received']) ? 1 : 0;
+
+        if ($clientName === '' || $eventType === '' || $eventDate === '') {
+            header('Location: prestations.php?new=1&error=missing');
+            exit;
+        }
+
+        if ($totalCents !== null && $depositCents !== null && $depositCents > $totalCents) {
+            $depositCents = $totalCents;
+        }
+
+        $stmt = $pdo->prepare("
+            INSERT INTO prestations(
+                source_quote_id, client_name, client_email, client_phone,
+                event_type, event_date, venue, start_time, end_time, notes,
+                total_amount_cents, deposit_amount_cents,
+                contract_signed, deposit_received,
+                contract_signed_at, deposit_received_at,
+                client_meeting_status, created_at, updated_at
+            ) VALUES(
+                NULL, :client_name, :client_email, :client_phone,
+                :event_type, :event_date, :venue, :start_time, :end_time, :notes,
+                :total, :deposit,
+                :contract_signed, :deposit_received,
+                CASE WHEN :contract_signed = 1 THEN CURRENT_TIMESTAMP ELSE NULL END,
+                CASE WHEN :deposit_received = 1 THEN CURRENT_TIMESTAMP ELSE NULL END,
+                'todo', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+            )
+        ");
+        $stmt->execute([
+            ':client_name'=>$clientName,
+            ':client_email'=>$clientEmail !== '' ? $clientEmail : null,
+            ':client_phone'=>$clientPhone !== '' ? $clientPhone : null,
+            ':event_type'=>$eventType,
+            ':event_date'=>$eventDate,
+            ':venue'=>$venue !== '' ? $venue : null,
+            ':start_time'=>$startTime !== '' ? $startTime : null,
+            ':end_time'=>$endTime !== '' ? $endTime : null,
+            ':notes'=>$notes !== '' ? $notes : null,
+            ':total'=>$totalCents,
+            ':deposit'=>$depositCents,
+            ':contract_signed'=>$contractSigned,
+            ':deposit_received'=>$depositReceived,
+        ]);
+
+        $newId = (int)$pdo->lastInsertId();
+        header('Location: prestations.php?id=' . $newId . '&created=1');
+        exit;
+    }
+
     if ($id > 0 && $action === 'save') {
         $totalRaw = str_replace(',', '.', trim((string)($_POST['total_amount'] ?? '')));
         $depositRaw = str_replace(',', '.', trim((string)($_POST['deposit_amount'] ?? '')));
@@ -68,13 +133,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$isNewManual = isset($_GET['new']);
+if ($isNewManual) {
+    admin_header('Ajouter une prestation', 'prestations');
+    ?>
+    <style>
+    .manual-wrap{max-width:920px;margin:0 auto}.manual-card{padding:24px;border:1px solid rgba(255,255,255,.08);border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.018));box-shadow:0 12px 34px rgba(0,0,0,.12)}
+    .manual-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:22px}.manual-head h2{margin:0 0 5px;font-size:22px}.manual-head p{margin:0;color:#858585;font-size:11px}.manual-form{display:grid;gap:16px}.manual-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.manual-form .field label{color:#aaa}.manual-form input,.manual-form textarea{width:100%;box-sizing:border-box}.manual-checks{display:grid;grid-template-columns:1fr 1fr;gap:10px}.manual-check{display:flex;align-items:center;gap:9px;padding:11px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.02);font-size:11px;font-weight:700}.manual-actions{display:flex;gap:10px;flex-wrap:wrap}.manual-error{margin-bottom:15px;padding:10px 12px;border:1px solid rgba(255,80,80,.18);border-radius:10px;background:rgba(255,80,80,.07);color:#ff8c8c;font-size:11px}
+    @media(max-width:700px){.manual-grid,.manual-checks{grid-template-columns:1fr}}
+    </style>
+    <div class="manual-wrap">
+      <section class="manual-card">
+        <div class="manual-head">
+          <div>
+            <h2>Ajouter une prestation réservée</h2>
+            <p>Pour une réservation déjà confirmée en dehors du site, par exemple depuis Djenesis.</p>
+          </div>
+          <a class="admin-link" href="prestations.php">← Retour</a>
+        </div>
+
+        <?php if (($_GET['error'] ?? '') === 'missing'): ?>
+          <div class="manual-error">Nom du client, type d’événement et date sont obligatoires.</div>
+        <?php endif; ?>
+
+        <form method="post" class="manual-form">
+          <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+          <input type="hidden" name="action" value="create_manual">
+
+          <div class="manual-grid">
+            <div class="field"><label for="client_name">Nom du client *</label><input id="client_name" name="client_name" required></div>
+            <div class="field"><label for="event_type">Type d’événement *</label><input id="event_type" name="event_type" placeholder="Mariage, anniversaire, soirée..." required></div>
+            <div class="field"><label for="event_date">Date *</label><input id="event_date" name="event_date" type="date" required></div>
+            <div class="field"><label for="venue">Lieu</label><input id="venue" name="venue"></div>
+            <div class="field"><label for="start_time">Heure de début</label><input id="start_time" name="start_time" type="time"></div>
+            <div class="field"><label for="end_time">Heure de fin</label><input id="end_time" name="end_time" type="time"></div>
+            <div class="field"><label for="client_email">E-mail</label><input id="client_email" name="client_email" type="email"></div>
+            <div class="field"><label for="client_phone">Téléphone</label><input id="client_phone" name="client_phone"></div>
+            <div class="field"><label for="total_amount">Montant total</label><input id="total_amount" name="total_amount" inputmode="decimal" placeholder="Ex. 950,00"></div>
+            <div class="field"><label for="deposit_amount">Acompte</label><input id="deposit_amount" name="deposit_amount" inputmode="decimal" placeholder="Ex. 285,00"></div>
+          </div>
+
+          <div class="manual-checks">
+            <label class="manual-check"><input type="checkbox" name="contract_signed" value="1">Contrat signé</label>
+            <label class="manual-check"><input type="checkbox" name="deposit_received" value="1">Acompte reçu</label>
+          </div>
+
+          <div class="field"><label for="notes">Notes</label><textarea id="notes" name="notes" rows="4" placeholder="Informations utiles sur cette réservation..."></textarea></div>
+
+          <div class="manual-actions">
+            <button class="btn btn--primary" type="submit">Ajouter la prestation</button>
+            <a class="btn" href="prestations.php">Annuler</a>
+          </div>
+        </form>
+      </section>
+    </div>
+    <?php
+    admin_footer();
+    exit;
+}
+
 $detailId = (int)($_GET['id'] ?? 0);
 if ($detailId > 0) {
     $stmt = $pdo->prepare("
-        SELECT p.*, q.id AS quote_id, q.name, q.email, q.phone, q.event_type, q.event_date,
-               q.venue, q.start_time, q.end_time, q.services, q.selections
+        SELECT p.*, q.id AS quote_id,
+               COALESCE(q.name, p.client_name) AS name,
+               COALESCE(q.email, p.client_email) AS email,
+               COALESCE(q.phone, p.client_phone) AS phone,
+               COALESCE(q.event_type, p.event_type) AS event_type,
+               COALESCE(q.event_date, p.event_date) AS event_date,
+               COALESCE(q.venue, p.venue) AS venue,
+               COALESCE(q.start_time, p.start_time) AS start_time,
+               COALESCE(q.end_time, p.end_time) AS end_time,
+               COALESCE(q.services, p.services) AS services,
+               COALESCE(q.selections, p.selections) AS selections
         FROM prestations p
-        INNER JOIN quotes q ON q.id=p.source_quote_id
+        LEFT JOIN quotes q ON q.id=p.source_quote_id
         WHERE p.id=:id
         LIMIT 1
     ");
@@ -86,15 +219,18 @@ if ($detailId > 0) {
         exit('Prestation introuvable');
     }
 
-    $commercialStmt = $pdo->prepare("
-        SELECT quote_number, amount_cents
-        FROM commercial_quotes
-        WHERE source_quote_id=:quote_id
-        ORDER BY id DESC
-        LIMIT 1
-    ");
-    $commercialStmt->execute([':quote_id'=>$prestation['quote_id']]);
-    $commercialQuote = $commercialStmt->fetch() ?: null;
+    $commercialQuote = null;
+    if (!empty($prestation['quote_id'])) {
+        $commercialStmt = $pdo->prepare("
+            SELECT quote_number, amount_cents
+            FROM commercial_quotes
+            WHERE source_quote_id=:quote_id
+            ORDER BY id DESC
+            LIMIT 1
+        ");
+        $commercialStmt->execute([':quote_id'=>$prestation['quote_id']]);
+        $commercialQuote = $commercialStmt->fetch() ?: null;
+    }
 
     $defaultTotalCents = $prestation['total_amount_cents'];
     if ($defaultTotalCents === null && $commercialQuote) {
@@ -129,6 +265,7 @@ if ($detailId > 0) {
     @media(max-width:950px){.prestation-detail{grid-template-columns:1fr}.detail-side{position:static}}@media(max-width:650px){.detail-grid,.money-preview{grid-template-columns:1fr}}
     </style>
 
+    <?php if (isset($_GET['created'])): ?><div class="flash flash--success">Prestation ajoutée manuellement.</div><?php endif; ?>
     <?php if (isset($_GET['saved'])): ?><div class="flash flash--success">Suivi de la prestation enregistré.</div><?php endif; ?>
 
     <div class="prestation-detail">
@@ -144,8 +281,12 @@ if ($detailId > 0) {
         </div>
 
         <div class="detail-actions">
-          <a class="btn" href="devis.php?id=<?= (int)$prestation['quote_id'] ?>">Voir la demande →</a>
-          <a class="btn" href="documents.php?create_from=<?= (int)$prestation['quote_id'] ?>">Documents →</a>
+          <?php if (!empty($prestation['quote_id'])): ?>
+            <a class="btn" href="devis.php?id=<?= (int)$prestation['quote_id'] ?>">Voir la demande →</a>
+            <a class="btn" href="documents.php?create_from=<?= (int)$prestation['quote_id'] ?>">Documents →</a>
+          <?php else: ?>
+            <span class="follow-pill is-done">Ajoutée manuellement</span>
+          <?php endif; ?>
           <a class="admin-link" href="prestations.php">← Retour aux prestations</a>
         </div>
       </section>
@@ -236,16 +377,16 @@ $upcoming = $pdo->query("
     SELECT
         p.*,
         q.id AS quote_id,
-        q.name,
-        q.email,
-        q.phone,
-        q.event_type,
-        q.event_date,
-        q.venue,
-        q.start_time,
-        q.end_time,
-        q.services,
-        q.selections,
+        COALESCE(q.name, p.client_name) AS name,
+        COALESCE(q.email, p.client_email) AS email,
+        COALESCE(q.phone, p.client_phone) AS phone,
+        COALESCE(q.event_type, p.event_type) AS event_type,
+        COALESCE(q.event_date, p.event_date) AS event_date,
+        COALESCE(q.venue, p.venue) AS venue,
+        COALESCE(q.start_time, p.start_time) AS start_time,
+        COALESCE(q.end_time, p.end_time) AS end_time,
+        COALESCE(q.services, p.services) AS services,
+        COALESCE(q.selections, p.selections) AS selections,
         (
             SELECT cq.amount_cents
             FROM commercial_quotes cq
@@ -254,13 +395,17 @@ $upcoming = $pdo->query("
             LIMIT 1
         ) AS commercial_amount_cents
     FROM prestations p
-    INNER JOIN quotes q ON q.id = p.source_quote_id
-    WHERE q.status = 'accepted'
-      AND (q.event_date IS NULL OR q.event_date = '' OR q.event_date >= date('now','localtime'))
+    LEFT JOIN quotes q ON q.id = p.source_quote_id
+    WHERE (p.source_quote_id IS NULL OR q.status = 'accepted')
+      AND (
+        COALESCE(q.event_date, p.event_date) IS NULL
+        OR COALESCE(q.event_date, p.event_date) = ''
+        OR COALESCE(q.event_date, p.event_date) >= date('now','localtime')
+      )
     ORDER BY
-      CASE WHEN q.event_date IS NULL OR q.event_date = '' THEN 1 ELSE 0 END,
-      q.event_date ASC,
-      q.name ASC
+      CASE WHEN COALESCE(q.event_date, p.event_date) IS NULL OR COALESCE(q.event_date, p.event_date) = '' THEN 1 ELSE 0 END,
+      COALESCE(q.event_date, p.event_date) ASC,
+      COALESCE(q.name, p.client_name) ASC
 ")->fetchAll();
 
 $datedUpcoming = array_values(array_filter($upcoming, static fn(array $row): bool => !empty($row['event_date'])));
@@ -321,7 +466,10 @@ admin_header('Prestations', 'prestations');
       <h2>Prestations à venir</h2>
       <p>Suivi des contrats, acomptes et informations utiles avant chaque événement.</p>
     </div>
-    <a class="admin-link" href="devis.php?status=accepted">Demandes acceptées →</a>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <a class="btn btn--primary" href="prestations.php?new=1">+ Ajouter une prestation</a>
+      <a class="admin-link" href="devis.php?status=accepted">Demandes acceptées →</a>
+    </div>
   </div>
 
   <?php if (!$upcoming): ?>
