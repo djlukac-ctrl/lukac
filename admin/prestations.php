@@ -16,20 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $depositCents = $depositRaw !== '' ? max(0, (int)round(((float)$depositRaw) * 100)) : null;
         $contractSigned = isset($_POST['contract_signed']) ? 1 : 0;
         $depositReceived = isset($_POST['deposit_received']) ? 1 : 0;
-        $scheduleConfirmed = isset($_POST['schedule_confirmed']) ? 1 : 0;
-        $venueConfirmed = isset($_POST['venue_confirmed']) ? 1 : 0;
-        $questionnaireReceived = isset($_POST['questionnaire_received']) ? 1 : 0;
-        $musicReceived = isset($_POST['music_received']) ? 1 : 0;
-        $equipmentConfirmed = isset($_POST['equipment_confirmed']) ? 1 : 0;
-        $finalContactDone = isset($_POST['final_contact_done']) ? 1 : 0;
-        $balanceReceived = isset($_POST['balance_received']) ? 1 : 0;
         $clientMeetingStatus = (string)($_POST['client_meeting_status'] ?? 'todo');
         if (!in_array($clientMeetingStatus, ['todo','planned','done'], true)) $clientMeetingStatus = 'todo';
         $clientMeetingAtRaw = trim((string)($_POST['client_meeting_at'] ?? ''));
         $clientMeetingAt = $clientMeetingAtRaw !== '' ? str_replace('T', ' ', $clientMeetingAtRaw) . ':00' : null;
         $clientMeetingNotes = trim((string)($_POST['client_meeting_notes'] ?? ''));
         if ($clientMeetingStatus !== 'planned') $clientMeetingAt = null;
-        if ($clientMeetingStatus === 'done') $finalContactDone = 1;
         $notes = trim((string)($_POST['notes'] ?? ''));
 
         if ($totalCents !== null && $depositCents !== null && $depositCents > $totalCents) {
@@ -52,13 +44,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     WHEN :deposit_received = 0 THEN NULL
                     ELSE deposit_received_at
                 END,
-                schedule_confirmed=:schedule_confirmed,
-                venue_confirmed=:venue_confirmed,
-                questionnaire_received=:questionnaire_received,
-                music_received=:music_received,
-                equipment_confirmed=:equipment_confirmed,
-                final_contact_done=:final_contact_done,
-                balance_received=:balance_received,
                 client_meeting_status=:client_meeting_status,
                 client_meeting_at=:client_meeting_at,
                 client_meeting_notes=:client_meeting_notes,
@@ -71,13 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':deposit'=>$depositCents,
             ':contract_signed'=>$contractSigned,
             ':deposit_received'=>$depositReceived,
-            ':schedule_confirmed'=>$scheduleConfirmed,
-            ':venue_confirmed'=>$venueConfirmed,
-            ':questionnaire_received'=>$questionnaireReceived,
-            ':music_received'=>$musicReceived,
-            ':equipment_confirmed'=>$equipmentConfirmed,
-            ':final_contact_done'=>$finalContactDone,
-            ':balance_received'=>$balanceReceived,
             ':client_meeting_status'=>$clientMeetingStatus,
             ':client_meeting_at'=>$clientMeetingAt,
             ':client_meeting_notes'=>$clientMeetingNotes !== '' ? $clientMeetingNotes : null,
@@ -134,23 +112,6 @@ if ($detailId > 0) {
     $selections = array_values(array_filter(array_map('trim', explode('|', (string)($prestation['selections'] ?? '')))));
     $details = array_merge($services, $selections);
 
-    $checklistItems = [
-        'contract_signed' => 'Contrat signé',
-        'deposit_received' => 'Acompte reçu',
-        'schedule_confirmed' => 'Horaires confirmés',
-        'venue_confirmed' => 'Lieu confirmé',
-        'questionnaire_received' => 'Questionnaire client reçu',
-        'music_received' => 'Musiques importantes reçues',
-        'equipment_confirmed' => 'Matériel / options confirmés',
-        'final_contact_done' => 'Dernier contact client effectué',
-        'balance_received' => 'Solde reçu',
-    ];
-    $checklistDone = 0;
-    foreach ($checklistItems as $field => $_label) {
-        if (!empty($prestation[$field])) $checklistDone++;
-    }
-    $checklistTotal = count($checklistItems);
-    $checklistPercent = $checklistTotal > 0 ? (int)round(($checklistDone / $checklistTotal) * 100) : 0;
 
     admin_header('Prestation — ' . $prestation['name'], 'prestations');
     ?>
@@ -164,8 +125,7 @@ if ($detailId > 0) {
     .detail-side{padding:22px;position:sticky;top:22px}.tracking-form{display:grid;gap:12px}.tracking-form .field label{color:#aaa}.tracking-form input[type=text],.tracking-form textarea{width:100%;box-sizing:border-box}
     .tracking-check{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.02)}.tracking-check input{width:17px;height:17px}.tracking-check span{font-size:12px;font-weight:700}.tracking-check small{display:block;color:#888;font-weight:400;margin-top:2px}
     .money-preview{display:grid;grid-template-columns:1fr 1fr;gap:9px}.money-box{padding:12px;border:1px solid rgba(255,255,255,.07);border-radius:12px;background:rgba(255,255,255,.02)}.money-box span{display:block;color:#777;font-size:9px;margin-bottom:4px}.money-box strong{font-size:17px}
-    .meeting-card{padding:15px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.02);display:grid;gap:11px}.meeting-card h3{margin:0;font-size:14px}.meeting-status{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.meeting-status label{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border:1px solid rgba(255,255,255,.08);border-radius:10px;font-size:10px;font-weight:700;cursor:pointer}.meeting-status input{width:14px;height:14px}.meeting-date[hidden]{display:none}.prep-card{margin-top:20px;padding:18px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:rgba(255,255,255,.02)}.prep-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.prep-head strong{font-size:14px}.prep-head span{font-size:11px;color:#aaa}.prep-progress{height:7px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;margin-bottom:14px}.prep-progress>span{display:block;height:100%;background:linear-gradient(90deg,#c93431,#ff4d4d);border-radius:999px}.prep-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.prep-item{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(255,255,255,.018)}.prep-item input{width:16px;height:16px}.prep-item span{font-size:11px;font-weight:700}
-    .detail-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .meeting-card{padding:15px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.02);display:grid;gap:11px}.meeting-card h3{margin:0;font-size:14px}.meeting-status{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.meeting-status label{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border:1px solid rgba(255,255,255,.08);border-radius:10px;font-size:10px;font-weight:700;cursor:pointer}.meeting-status input{width:14px;height:14px}.meeting-date[hidden]{display:none}    .detail-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
     @media(max-width:950px){.prestation-detail{grid-template-columns:1fr}.detail-side{position:static}}@media(max-width:650px){.detail-grid,.money-preview{grid-template-columns:1fr}}
     </style>
 
@@ -240,23 +200,6 @@ if ($detailId > 0) {
           <div class="money-preview">
             <div class="money-box"><span>Encaissé</span><strong><?= number_format($receivedCents / 100, 2, ',', ' ') ?> €</strong></div>
             <div class="money-box"><span>Reste à encaisser</span><strong><?= $remainingCents !== null ? number_format($remainingCents / 100, 2, ',', ' ') . ' €' : '—' ?></strong></div>
-          </div>
-
-          <div class="prep-card">
-            <div class="prep-head">
-              <strong>Checklist de préparation</strong>
-              <span><?= $checklistDone ?> / <?= $checklistTotal ?> · <?= $checklistPercent ?> %</span>
-            </div>
-            <div class="prep-progress"><span style="width:<?= $checklistPercent ?>%"></span></div>
-            <div class="prep-grid">
-              <label class="prep-item"><input type="checkbox" name="schedule_confirmed" value="1" <?= !empty($prestation['schedule_confirmed']) ? 'checked' : '' ?>><span>Horaires confirmés</span></label>
-              <label class="prep-item"><input type="checkbox" name="venue_confirmed" value="1" <?= !empty($prestation['venue_confirmed']) ? 'checked' : '' ?>><span>Lieu confirmé</span></label>
-              <label class="prep-item"><input type="checkbox" name="questionnaire_received" value="1" <?= !empty($prestation['questionnaire_received']) ? 'checked' : '' ?>><span>Questionnaire reçu</span></label>
-              <label class="prep-item"><input type="checkbox" name="music_received" value="1" <?= !empty($prestation['music_received']) ? 'checked' : '' ?>><span>Musiques importantes reçues</span></label>
-              <label class="prep-item"><input type="checkbox" name="equipment_confirmed" value="1" <?= !empty($prestation['equipment_confirmed']) ? 'checked' : '' ?>><span>Matériel / options confirmés</span></label>
-              <label class="prep-item"><input type="checkbox" name="final_contact_done" value="1" <?= !empty($prestation['final_contact_done']) ? 'checked' : '' ?>><span>Dernier contact client effectué</span></label>
-              <label class="prep-item"><input type="checkbox" name="balance_received" value="1" <?= !empty($prestation['balance_received']) ? 'checked' : '' ?>><span>Solde reçu</span></label>
-            </div>
           </div>
 
           <div class="field">
@@ -391,13 +334,6 @@ admin_header('Prestations', 'prestations');
           $selections = array_values(array_filter(array_map('trim', explode('|', (string)($row['selections'] ?? '')))));
           $detailParts = array_merge($services, $selections);
           $detailText = $detailParts ? implode(' · ', $detailParts) : 'Prestation à préciser';
-          $prepFields = ['contract_signed','deposit_received','schedule_confirmed','venue_confirmed','questionnaire_received','music_received','equipment_confirmed','final_contact_done','balance_received'];
-          $prepDone = 0;
-          foreach ($prepFields as $prepField) {
-              if (!empty($row[$prepField])) $prepDone++;
-          }
-          $prepTotal = count($prepFields);
-          $prepPercent = $prepTotal > 0 ? (int)round(($prepDone / $prepTotal) * 100) : 0;
         ?>
         <article class="prestation-row">
           <div class="prestation-date">
@@ -421,7 +357,7 @@ admin_header('Prestations', 'prestations');
               <span class="follow-pill <?= !empty($row['deposit_received']) ? 'is-done' : 'is-todo' ?>"><?= !empty($row['deposit_received']) ? 'Acompte reçu' : 'Acompte à recevoir' ?></span>
             </div>
             <div class="prestation-money">
-              <?= $row['effective_amount_cents'] !== null && $row['effective_amount_cents'] > 0 ? e(number_format($row['effective_amount_cents'] / 100, 2, ',', ' ')) . ' €' : 'Montant à renseigner' ?> · Préparation <?= $prepDone ?>/<?= $prepTotal ?> (<?= $prepPercent ?> %)
+              <?= $row['effective_amount_cents'] !== null && $row['effective_amount_cents'] > 0 ? e(number_format($row['effective_amount_cents'] / 100, 2, ',', ' ')) . ' €' : 'Montant à renseigner' ?>
             </div>
           </div>
 
