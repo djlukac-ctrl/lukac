@@ -319,6 +319,20 @@ function db(): PDO
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_site_visitors_date ON site_visitors(visit_date)');
 
     seed_defaults($pdo);
+
+    $stmt = $pdo->prepare("UPDATE content SET value=:new, updated_at=CURRENT_TIMESTAMP WHERE content_key=:key AND value=:old");
+    $stmt->execute([
+        ':new'=>'DJ & Animateur',
+        ':key'=>'prestations.animations.title',
+        ':old'=>'Animations interactives',
+    ]);
+    $stmt->execute([
+        ':new'=>'Une prestation DJ complète, enrichie d’animations au micro et de moments participatifs pour faire vivre votre soirée et créer une ambiance conviviale avec vos invités.',
+        ':key'=>'prestations.animations.desc',
+        ':old'=>'Faites participer vos invités et créez de vrais temps forts au cours de la soirée, sans casser le rythme ni surcharger l’animation.',
+    ]);
+    $pdo->exec("UPDATE catalog_items SET name='DJ & Animateur', description='Prestation DJ avec animation au micro, jeux, quiz, blind test ou karaoké selon les envies.', updated_at=CURRENT_TIMESTAMP WHERE category='prestation' AND name='Animations interactives'");
+
     seed_reviews($pdo);
     seed_catalog($pdo);
     ensure_fee_catalog_items($pdo);
@@ -339,8 +353,8 @@ function default_content(): array
         'prestations.dj.title' => 'DJ',
         'prestations.dj.desc' => 'Une ambiance sur mesure du début à la fin. Je m’adapte à votre événement et à vos invités pour créer une soirée dynamique, fluide et inoubliable.',
         'prestations.dj.items' => "Mariages, anniversaires et soirées privées\nProgrammation musicale préparée avec vous\nAdaptation en direct selon l’ambiance",
-        'prestations.animations.title' => 'Animations interactives',
-        'prestations.animations.desc' => 'Faites participer vos invités et créez de vrais temps forts au cours de la soirée, sans casser le rythme ni surcharger l’animation.',
+        'prestations.animations.title' => 'DJ & Animateur',
+        'prestations.animations.desc' => 'Une prestation DJ complète, enrichie d’animations au micro et de moments participatifs pour faire vivre votre soirée et créer une ambiance conviviale avec vos invités.',
         'prestations.animations.items' => "Karaoké\nQuiz musical et blind test\nJeux et animations personnalisées selon vos envies",
         'prestations.cocktail.title' => 'Sonorisation de vin d’honneur',
         'prestations.cocktail.desc' => 'Je m’occupe de la diffusion musicale pour accompagner vos moments clés avec élégance, tout en gardant un volume adapté aux échanges entre invités.',
