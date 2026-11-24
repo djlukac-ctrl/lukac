@@ -118,12 +118,66 @@ $yesterdayVisitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE
 $last7Visitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE visit_date >= date('now','localtime','-6 day')")->fetchColumn();
 $last30Visitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE visit_date >= date('now','localtime','-29 day')")->fetchColumn();
 
+$calendarRows = $pdo->query("
+    SELECT p.id AS prestation_id, q.name, q.event_type, q.event_date, q.venue,
+           p.client_meeting_status, p.client_meeting_at
+    FROM prestations p
+    INNER JOIN quotes q ON q.id=p.source_quote_id
+    WHERE q.status='accepted'
+      AND (
+          q.event_date IS NOT NULL
+          OR (p.client_meeting_status='planned' AND p.client_meeting_at IS NOT NULL)
+      )
+    ORDER BY q.event_date ASC
+")->fetchAll();
+
+$calendarEvents = [];
+foreach ($calendarRows as $row) {
+    if (!empty($row['event_date'])) {
+        $calendarEvents[] = [
+            'type' => 'prestation',
+            'date' => $row['event_date'],
+            'time' => null,
+            'title' => $row['name'],
+            'subtitle' => trim(($row['event_type'] ?: 'Prestation') . (!empty($row['venue']) ? ' · ' . $row['venue'] : '')),
+            'href' => 'prestations.php?id=' . (int)$row['prestation_id'],
+        ];
+    }
+
+    if (($row['client_meeting_status'] ?? '') === 'planned' && !empty($row['client_meeting_at'])) {
+        $meetingAt = strtotime((string)$row['client_meeting_at']);
+        if ($meetingAt) {
+            $calendarEvents[] = [
+                'type' => 'meeting',
+                'date' => date('Y-m-d', $meetingAt),
+                'time' => date('H:i', $meetingAt),
+                'title' => $row['name'],
+                'subtitle' => 'Rendez-vous client',
+                'href' => 'prestations.php?id=' . (int)$row['prestation_id'],
+            ];
+        }
+    }
+}
+
+$calendarJson = json_encode(
+    $calendarEvents,
+    JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+);
+
 admin_header('Tableau de bord', 'dashboard');
 ?>
 <style>
 .dashboard-intro{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 20px;padding:19px 22px;border:1px solid rgba(24,23,22,.09);border-radius:18px;background:#fff;box-shadow:0 10px 28px rgba(50,38,28,.035)}
 .dashboard-intro__copy{max-width:700px}.dashboard-intro__eyebrow{display:block;margin-bottom:6px;color:#c93431;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}.dashboard-intro h2{margin:0 0 5px;font-size:24px;letter-spacing:-.035em}.dashboard-intro p{margin:0;color:#77706a;font-size:12px;line-height:1.5}
 .dashboard-intro__actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+.dashboard-calendar{margin:0 0 22px;border:1px solid rgba(255,255,255,.08);border-radius:20px;background:#111;overflow:hidden;box-shadow:0 14px 36px rgba(0,0,0,.1)}
+.dashboard-calendar__head{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,.07)}
+.dashboard-calendar__title span{display:block;margin-bottom:4px;color:#8b8b8b;font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.dashboard-calendar__title h2{margin:0;color:#f7f7f7;font-size:20px;letter-spacing:-.025em}
+.dashboard-calendar__controls{display:flex;align-items:center;gap:7px}.calendar-nav{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:34px;padding:0 10px;border:1px solid rgba(255,255,255,.09);border-radius:10px;background:rgba(255,255,255,.035);color:#ddd;font:inherit;font-size:11px;cursor:pointer}.calendar-nav:hover{border-color:rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff}.calendar-nav--today{padding:0 12px}
+.calendar-legend{display:flex;gap:14px;flex-wrap:wrap;padding:10px 20px;border-bottom:1px solid rgba(255,255,255,.06);color:#929292;font-size:9px}.calendar-legend span{display:inline-flex;align-items:center;gap:6px}.calendar-dot{width:7px;height:7px;border-radius:50%;background:#c93431}.calendar-dot--meeting{background:#8d8d8d}
+.calendar-scroll{overflow-x:auto}.calendar-weekdays,.calendar-grid{min-width:720px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}.calendar-weekdays{border-bottom:1px solid rgba(255,255,255,.07)}.calendar-weekdays div{padding:9px 10px;color:#777;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.calendar-day{min-height:112px;padding:9px;border-right:1px solid rgba(255,255,255,.055);border-bottom:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.008)}.calendar-day:nth-child(7n){border-right:0}.calendar-day.is-outside{background:rgba(255,255,255,.003)}.calendar-day.is-outside .calendar-day__num{color:#3d3d3d}.calendar-day.is-today{background:rgba(201,52,49,.045)}.calendar-day__num{display:flex;align-items:center;justify-content:center;width:24px;height:24px;margin-bottom:6px;border-radius:50%;color:#aaa;font-size:10px;font-weight:800}.calendar-day.is-today .calendar-day__num{background:#c93431;color:#fff}
+.calendar-event{display:block;margin-top:5px;padding:6px 7px;border:1px solid rgba(201,52,49,.18);border-left:2px solid #c93431;border-radius:7px;background:rgba(201,52,49,.07);color:#eee;text-decoration:none;line-height:1.25}.calendar-event:hover{background:rgba(201,52,49,.12)}.calendar-event--meeting{border-color:rgba(255,255,255,.1);border-left-color:#929292;background:rgba(255,255,255,.045)}.calendar-event--meeting:hover{background:rgba(255,255,255,.075)}.calendar-event strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:9px}.calendar-event span{display:block;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#8d8d8d;font-size:8px}.calendar-empty{padding:18px 20px;color:#777;font-size:11px}
 .dashboard-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.75fr);gap:22px;align-items:start}
 .dashboard-panel{background:#fff;border:1px solid rgba(24,23,22,.09);border-radius:20px;box-shadow:0 12px 34px rgba(50,38,28,.04);overflow:hidden}
 .dashboard-panel__head{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:22px 22px 15px}.dashboard-panel__head h2{margin:0;font-size:21px}.dashboard-panel__head p{margin:4px 0 0;color:#85807a;font-size:11px}
@@ -141,7 +195,7 @@ admin_header('Tableau de bord', 'dashboard');
 .dashboard-todo{padding:0 18px 18px}.dashboard-todo__list{display:grid;gap:8px}.dashboard-todo__item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;padding:12px 14px;border:1px solid rgba(255,255,255,.07);border-radius:13px;background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.018));transition:.18s ease}.dashboard-todo__item:hover{border-color:rgba(255,66,66,.18);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.025));transform:translateY(-1px)}.dashboard-todo__main{min-width:0}.dashboard-todo__top{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:5px}.dashboard-todo__top strong{font-size:14px;color:#f7f7f7}.dashboard-todo__meta{display:flex;gap:7px 13px;flex-wrap:wrap;color:#8e8e8e;font-size:10px;line-height:1.4}.dashboard-todo__task{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:6px 9px;border:1px solid rgba(255,255,255,.07);border-radius:9px;background:rgba(255,255,255,.025);color:#d8d8d8;font-size:10px;font-weight:700}.dashboard-todo__task--urgent{border-color:rgba(255,70,70,.18);background:rgba(255,70,70,.07);color:#ff7777}.dashboard-todo__task--wait{color:#aaa}.dashboard-todo__empty{padding:20px;border:1px dashed rgba(255,255,255,.09);border-radius:13px;color:#8d8d8d;font-size:12px;text-align:center;background:rgba(255,255,255,.02)}.dashboard-todo__action{white-space:nowrap;color:#cfcfcf}.dashboard-todo__action:hover{color:#fff}
 .dashboard-panel .admin-table-wrap{border:0;border-radius:0;box-shadow:none;margin:0}.dashboard-panel table{margin:0}
 @media(max-width:1050px){.dashboard-layout{grid-template-columns:1fr}.dashboard-side{grid-template-columns:1fr 1fr}.dashboard-shortcuts{grid-column:1/-1}}
-@media(max-width:720px){.dashboard-intro{align-items:flex-start;flex-direction:column;padding:18px}.dashboard-intro__actions{justify-content:flex-start}.dashboard-side{grid-template-columns:1fr}.dashboard-shortcuts{grid-column:auto}.dashboard-visitors__grid{grid-template-columns:1fr 1fr}}
+@media(max-width:720px){.dashboard-calendar__head{align-items:flex-start;flex-direction:column}.dashboard-calendar__controls{width:100%;justify-content:space-between}.dashboard-intro{align-items:flex-start;flex-direction:column;padding:18px}.dashboard-intro__actions{justify-content:flex-start}.dashboard-side{grid-template-columns:1fr}.dashboard-shortcuts{grid-column:auto}.dashboard-visitors__grid{grid-template-columns:1fr 1fr}}
 </style>
 
 <section class="dashboard-intro">
@@ -153,6 +207,30 @@ admin_header('Tableau de bord', 'dashboard');
   <div class="dashboard-intro__actions">
     <a class="btn btn--primary" href="devis.php">Voir les demandes</a>
     <a class="btn" href="disponibilites.php">Gérer les disponibilités</a>
+  </div>
+</section>
+
+<section class="dashboard-calendar" aria-label="Calendrier des rendez-vous et prestations">
+  <div class="dashboard-calendar__head">
+    <div class="dashboard-calendar__title">
+      <span>Planning</span>
+      <h2 id="calendar-month-label">Calendrier</h2>
+    </div>
+    <div class="dashboard-calendar__controls">
+      <button class="calendar-nav" type="button" id="calendar-prev" aria-label="Mois précédent">←</button>
+      <button class="calendar-nav calendar-nav--today" type="button" id="calendar-today">Aujourd’hui</button>
+      <button class="calendar-nav" type="button" id="calendar-next" aria-label="Mois suivant">→</button>
+    </div>
+  </div>
+  <div class="calendar-legend">
+    <span><i class="calendar-dot" aria-hidden="true"></i>Prestation</span>
+    <span><i class="calendar-dot calendar-dot--meeting" aria-hidden="true"></i>Rendez-vous client</span>
+  </div>
+  <div class="calendar-scroll">
+    <div class="calendar-weekdays" aria-hidden="true">
+      <div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div><div>Ven</div><div>Sam</div><div>Dim</div>
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
   </div>
 </section>
 
@@ -306,5 +384,93 @@ admin_header('Tableau de bord', 'dashboard');
     </section>
   </aside>
 </div>
+
+<script>
+(() => {
+  const events = <?= $calendarJson ?: '[]' ?>;
+  const grid = document.getElementById('calendar-grid');
+  const label = document.getElementById('calendar-month-label');
+  const prev = document.getElementById('calendar-prev');
+  const next = document.getElementById('calendar-next');
+  const todayButton = document.getElementById('calendar-today');
+  if (!grid || !label || !prev || !next || !todayButton) return;
+
+  const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  let current = new Date(today.getFullYear(), today.getMonth(), 1);
+
+  const pad = value => String(value).padStart(2, '0');
+  const keyFor = date => date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
+
+  const grouped = events.reduce((acc, event) => {
+    if (!acc[event.date]) acc[event.date] = [];
+    acc[event.date].push(event);
+    return acc;
+  }, {});
+
+  Object.values(grouped).forEach(dayEvents => {
+    dayEvents.sort((a, b) => {
+      if (a.type !== b.type) return a.type === 'meeting' ? -1 : 1;
+      return String(a.time || '').localeCompare(String(b.time || ''));
+    });
+  });
+
+  const render = () => {
+    label.textContent = monthNames[current.getMonth()] + ' ' + current.getFullYear();
+    grid.innerHTML = '';
+
+    const first = new Date(current.getFullYear(), current.getMonth(), 1);
+    const mondayIndex = (first.getDay() + 6) % 7;
+    const start = new Date(first);
+    start.setDate(first.getDate() - mondayIndex);
+
+    for (let i = 0; i < 42; i++) {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
+      const key = keyFor(date);
+      const cell = document.createElement('div');
+      cell.className = 'calendar-day';
+      if (date.getMonth() !== current.getMonth()) cell.classList.add('is-outside');
+      if (date.getTime() === today.getTime()) cell.classList.add('is-today');
+
+      const num = document.createElement('div');
+      num.className = 'calendar-day__num';
+      num.textContent = date.getDate();
+      cell.appendChild(num);
+
+      (grouped[key] || []).forEach(event => {
+        const link = document.createElement('a');
+        link.className = 'calendar-event' + (event.type === 'meeting' ? ' calendar-event--meeting' : '');
+        link.href = event.href;
+
+        const strong = document.createElement('strong');
+        strong.textContent = (event.time ? event.time + ' · ' : '') + event.title;
+        const span = document.createElement('span');
+        span.textContent = event.subtitle || '';
+        link.append(strong, span);
+        cell.appendChild(link);
+      });
+
+      grid.appendChild(cell);
+    }
+  };
+
+  prev.addEventListener('click', () => {
+    current = new Date(current.getFullYear(), current.getMonth() - 1, 1);
+    render();
+  });
+  next.addEventListener('click', () => {
+    current = new Date(current.getFullYear(), current.getMonth() + 1, 1);
+    render();
+  });
+  todayButton.addEventListener('click', () => {
+    current = new Date(today.getFullYear(), today.getMonth(), 1);
+    render();
+  });
+
+  render();
+})();
+</script>
 
 <?php admin_footer(); ?>
