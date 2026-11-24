@@ -270,39 +270,52 @@ if ($source && !$current) {
     $requestedNormalized = [];
     foreach ($requestedNames as $requestedName) {
         $normalized = normalize_catalog_match($requestedName);
-        if ($normalized !== '') $requestedNormalized[] = $normalized;
+        if ($normalized !== '') {
+            $requestedNormalized[] = [
+                'normalized' => $normalized,
+                'original' => $requestedName,
+            ];
+        }
     }
 
-    $matchesRequestedItem = static function (string $catalogName) use ($requestedNormalized): bool {
+    $matchedRequestedItem = static function (string $catalogName) use ($requestedNormalized): ?string {
         $catalog = normalize_catalog_match($catalogName);
-        if ($catalog === '') return false;
+        if ($catalog === '') return null;
 
-        foreach ($requestedNormalized as $requested) {
-            if ($requested === $catalog) return true;
+        // Priorité à une correspondance exacte.
+        foreach ($requestedNormalized as $requestedItem) {
+            if ($requestedItem['normalized'] === $catalog) {
+                return $requestedItem['original'];
+            }
+        }
 
-            // Tolère les variantes comme "Photobooth 300" / "Photobooth 300 tirages".
+        // Tolère les variantes comme "Photobooth 300" / "Photobooth 300 tirages"
+        // et conserve le libellé précis choisi par le client (ex. "Étincelles froides — 2 jets").
+        foreach ($requestedNormalized as $requestedItem) {
+            $requested = $requestedItem['normalized'];
             $short = mb_strlen($requested, 'UTF-8') <= mb_strlen($catalog, 'UTF-8') ? $requested : $catalog;
             $long = $short === $requested ? $catalog : $requested;
 
             if (mb_strlen($short, 'UTF-8') >= 6 && str_starts_with($long, $short . ' ')) {
-                return true;
+                return $requestedItem['original'];
             }
         }
 
-        return false;
+        return null;
     };
 
     $durationHours = source_duration_hours($source['start_time'] ?? null, $source['end_time'] ?? null);
 
     foreach ($catalogItems as $item) {
-        if (!$matchesRequestedItem((string)$item['name'])) continue;
+        $requestedLabel = $matchedRequestedItem((string)$item['name']);
+        if ($requestedLabel === null) continue;
 
         $quantity = $item['price_mode'] === 'hourly' ? $durationHours : 1.0;
         $unitPrice = (int)$item['price_cents'];
         $currentItems[] = [
             'catalog_item_id'=>(int)$item['id'],
             'category'=>$item['category'],
-            'item_name'=>$item['name'],
+            'item_name'=>$requestedLabel,
             'quantity'=>$quantity,
             'unit_price_cents'=>$unitPrice,
             'line_total_cents'=>(int)round($quantity * $unitPrice),
