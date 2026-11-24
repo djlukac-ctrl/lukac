@@ -19,7 +19,7 @@ $definitions = [
         'prestations.dj.desc' => ['Description', 'textarea'],
         'prestations.dj.items' => ['Points clés — 1 ligne par point', 'textarea'],
     ],
-    'Prestations — Animations interactives' => [
+    'Prestations — DJ & Animateur' => [
         'prestations.animations.title' => ['Titre', 'text'],
         'prestations.animations.desc' => ['Description', 'textarea'],
         'prestations.animations.items' => ['Points clés — 1 ligne par point', 'textarea'],
@@ -64,7 +64,7 @@ $definitions = [
 $imageSlots = [
     'Accueil' => ['home_hero' => ['home.hero.image', 'Photo principale de l’accueil']],
     'Prestations — DJ' => ['prestations_dj' => ['prestations.dj.image', 'Image de la prestation DJ']],
-    'Prestations — Animations interactives' => ['prestations_animations' => ['prestations.animations.image', 'Image des animations']],
+    'Prestations — DJ & Animateur' => ['prestations_animations' => ['prestations.animations.image', 'Image des animations']],
     'Prestations — Vin d’honneur' => ['prestations_cocktail' => ['prestations.cocktail.image', 'Image du vin d’honneur']],
     'Formule Essentiel' => ['formules_essentiel' => ['formules.essentiel.image', 'Image de la formule Essentiel']],
     'Formule Ambiance' => ['formules_ambiance' => ['formules.ambiance.image', 'Image de la formule Ambiance']],
@@ -90,7 +90,7 @@ $pages = [
     'prestations' => [
         'label' => 'Prestations',
         'description' => 'Introduction et contenu des prestations DJ, animations et vin d’honneur.',
-        'groups' => ['Prestations — introduction', 'Prestations — DJ', 'Prestations — Animations interactives', 'Prestations — Vin d’honneur'],
+        'groups' => ['Prestations — introduction', 'Prestations — DJ', 'Prestations — DJ & Animateur', 'Prestations — Vin d’honneur'],
     ],
     'formules' => [
         'label' => 'Formules',
