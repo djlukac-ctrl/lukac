@@ -90,7 +90,7 @@ function db(): PDO
 
     $pdo->exec('CREATE TABLE IF NOT EXISTS prestations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        source_quote_id INTEGER NOT NULL UNIQUE,
+        source_quote_id INTEGER UNIQUE,
         client_name TEXT NOT NULL,
         client_email TEXT,
         client_phone TEXT,
@@ -124,6 +124,81 @@ function db(): PDO
     ensure_column($pdo, 'prestations', 'client_meeting_status', "TEXT NOT NULL DEFAULT 'todo'");
     ensure_column($pdo, 'prestations', 'client_meeting_at', 'TEXT');
     ensure_column($pdo, 'prestations', 'client_meeting_notes', 'TEXT');
+
+    // Les prestations peuvent désormais être ajoutées manuellement, sans demande de devis source.
+    $prestationColumns = $pdo->query('PRAGMA table_info(prestations)')->fetchAll();
+    foreach ($prestationColumns as $prestationColumn) {
+        if (($prestationColumn['name'] ?? '') === 'source_quote_id' && (int)($prestationColumn['notnull'] ?? 0) === 1) {
+            $pdo->beginTransaction();
+            try {
+                $pdo->exec('CREATE TABLE prestations_new (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    source_quote_id INTEGER UNIQUE,
+                    client_name TEXT NOT NULL,
+                    client_email TEXT,
+                    client_phone TEXT,
+                    event_type TEXT,
+                    event_date TEXT,
+                    venue TEXT,
+                    start_time TEXT,
+                    end_time TEXT,
+                    services TEXT,
+                    selections TEXT,
+                    notes TEXT,
+                    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    total_amount_cents INTEGER,
+                    deposit_amount_cents INTEGER,
+                    contract_signed INTEGER NOT NULL DEFAULT 0,
+                    deposit_received INTEGER NOT NULL DEFAULT 0,
+                    contract_signed_at TEXT,
+                    deposit_received_at TEXT,
+                    schedule_confirmed INTEGER NOT NULL DEFAULT 0,
+                    venue_confirmed INTEGER NOT NULL DEFAULT 0,
+                    questionnaire_received INTEGER NOT NULL DEFAULT 0,
+                    music_received INTEGER NOT NULL DEFAULT 0,
+                    equipment_confirmed INTEGER NOT NULL DEFAULT 0,
+                    final_contact_done INTEGER NOT NULL DEFAULT 0,
+                    balance_received INTEGER NOT NULL DEFAULT 0,
+                    client_meeting_status TEXT NOT NULL DEFAULT "todo",
+                    client_meeting_at TEXT,
+                    client_meeting_notes TEXT,
+                    FOREIGN KEY(source_quote_id) REFERENCES quotes(id) ON DELETE CASCADE
+                )');
+                $pdo->exec('
+                    INSERT INTO prestations_new (
+                        id, source_quote_id, client_name, client_email, client_phone,
+                        event_type, event_date, venue, start_time, end_time, services,
+                        selections, notes, created_at, updated_at, total_amount_cents,
+                        deposit_amount_cents, contract_signed, deposit_received,
+                        contract_signed_at, deposit_received_at, schedule_confirmed,
+                        venue_confirmed, questionnaire_received, music_received,
+                        equipment_confirmed, final_contact_done, balance_received,
+                        client_meeting_status, client_meeting_at, client_meeting_notes
+                    )
+                    SELECT
+                        id, source_quote_id, client_name, client_email, client_phone,
+                        event_type, event_date, venue, start_time, end_time, services,
+                        selections, notes, created_at, updated_at, total_amount_cents,
+                        deposit_amount_cents, contract_signed, deposit_received,
+                        contract_signed_at, deposit_received_at, schedule_confirmed,
+                        venue_confirmed, questionnaire_received, music_received,
+                        equipment_confirmed, final_contact_done, balance_received,
+                        client_meeting_status, client_meeting_at, client_meeting_notes
+                    FROM prestations
+                ');
+                $pdo->exec('DROP TABLE prestations');
+                $pdo->exec('ALTER TABLE prestations_new RENAME TO prestations');
+                $pdo->exec('CREATE INDEX IF NOT EXISTS idx_prestations_event_date ON prestations(event_date)');
+                $pdo->exec('CREATE INDEX IF NOT EXISTS idx_prestations_source_quote ON prestations(source_quote_id)');
+                $pdo->commit();
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                throw $e;
+            }
+            break;
+        }
+    }
 
     $pdo->exec("
         INSERT OR IGNORE INTO prestations(
