@@ -13,7 +13,7 @@ $selectedServices = [];
 $selectedSelections = [];
 $selectedSpark = '';
 
-$serviceOptions = ['DJ', 'Animations', 'Karaoké', "Sonorisation de vin d’honneur et cérémonie laïque"];
+$serviceOptions = ['DJ', 'DJ & Animateur', 'Karaoké', "Sonorisation de vin d’honneur et cérémonie laïque"];
 $formulaOptions = ['Essentiel', 'Ambiance', 'Expérience'];
 $extraOptions = [
     'Photobooth 150 tirages', 'Photobooth 300 tirages',
@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <?php
             $serviceDescriptions = [
               'DJ' => 'Une programmation musicale adaptée à votre événement et à vos invités.',
-              'Animations' => 'Des animations interactives pour faire participer vos invités.',
+              'DJ & Animateur' => 'Une prestation DJ complète avec animation au micro, jeux, quiz, blind test ou karaoké selon vos envies.',
               'Karaoké' => 'Un moment convivial et participatif autour de vos chansons préférées.',
               "Sonorisation de vin d’honneur et cérémonie laïque" => 'Sonorisation et ambiance musicale pour accompagner ces moments clés.',
             ];
@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="quote-choice-grid quote-choice-grid--services">
             <?php foreach($serviceOptions as $option): ?>
               <label class="quote-choice-card quote-choice-card--service">
-                <input type="checkbox" name="services[]" value="<?= e($option) ?>" <?= in_array($option,$selectedServices,true)?'checked':'' ?>>
+                <input type="<?= in_array($option, ['DJ','DJ & Animateur'], true) ? 'radio' : 'checkbox' ?>" name="services[]" value="<?= e($option) ?>" <?= in_array($option,$selectedServices,true)?'checked':'' ?>>
                 <strong><?= e($serviceLabels[$option] ?? $option) ?></strong>
                 <small><?= e($serviceDescriptions[$option] ?? '') ?></small>
               </label>
