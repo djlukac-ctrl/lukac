@@ -7,7 +7,19 @@ $pdo = db();
 $new = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status='new'")->fetchColumn();
 $accepted = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status='accepted'")->fetchColumn();
 $pending = (int) $pdo->query("SELECT COUNT(*) FROM quotes WHERE status IN ('new','read','sent')")->fetchColumn();
-$nextEvent = $pdo->query("SELECT name, event_type, event_date FROM quotes WHERE status='accepted' AND event_date IS NOT NULL AND event_date >= date('now') ORDER BY event_date ASC LIMIT 1")->fetch();
+$nextEvent = $pdo->query("
+    SELECT
+      COALESCE(q.name,p.client_name) AS name,
+      COALESCE(q.event_type,p.event_type) AS event_type,
+      COALESCE(q.event_date,p.event_date) AS event_date
+    FROM prestations p
+    LEFT JOIN quotes q ON q.id=p.source_quote_id
+    WHERE (p.source_quote_id IS NULL OR q.status='accepted')
+      AND COALESCE(q.event_date,p.event_date) IS NOT NULL
+      AND COALESCE(q.event_date,p.event_date) >= date('now','localtime')
+    ORDER BY COALESCE(q.event_date,p.event_date) ASC
+    LIMIT 1
+")->fetch();
 $quoteActions = $pdo->query("SELECT * FROM quotes WHERE status IN ('new','read','sent')")->fetchAll();
 
 $now = time();
@@ -50,13 +62,18 @@ foreach ($quoteActions as $quote) {
 }
 
 $prestationActions = $pdo->query("
-    SELECT p.id AS prestation_id, q.name, q.event_type, q.event_date, q.venue,
+    SELECT
+           p.id AS prestation_id,
+           COALESCE(q.name,p.client_name) AS name,
+           COALESCE(q.event_type,p.event_type) AS event_type,
+           COALESCE(q.event_date,p.event_date) AS event_date,
+           COALESCE(q.venue,p.venue) AS venue,
            p.final_contact_done, p.client_meeting_status, p.client_meeting_at
     FROM prestations p
-    INNER JOIN quotes q ON q.id=p.source_quote_id
-    WHERE q.status='accepted'
-      AND q.event_date IS NOT NULL
-      AND q.event_date >= date('now','localtime')
+    LEFT JOIN quotes q ON q.id=p.source_quote_id
+    WHERE (p.source_quote_id IS NULL OR q.status='accepted')
+      AND COALESCE(q.event_date,p.event_date) IS NOT NULL
+      AND COALESCE(q.event_date,p.event_date) >= date('now','localtime')
       AND COALESCE(p.client_meeting_status,'todo') != 'done'
 ")->fetchAll();
 
@@ -119,16 +136,21 @@ $last7Visitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE vis
 $last30Visitors = (int) $pdo->query("SELECT COUNT(*) FROM site_visitors WHERE visit_date >= date('now','localtime','-29 day')")->fetchColumn();
 
 $calendarRows = $pdo->query("
-    SELECT p.id AS prestation_id, q.name, q.event_type, q.event_date, q.venue,
+    SELECT
+           p.id AS prestation_id,
+           COALESCE(q.name,p.client_name) AS name,
+           COALESCE(q.event_type,p.event_type) AS event_type,
+           COALESCE(q.event_date,p.event_date) AS event_date,
+           COALESCE(q.venue,p.venue) AS venue,
            p.client_meeting_status, p.client_meeting_at
     FROM prestations p
-    INNER JOIN quotes q ON q.id=p.source_quote_id
-    WHERE q.status='accepted'
+    LEFT JOIN quotes q ON q.id=p.source_quote_id
+    WHERE (p.source_quote_id IS NULL OR q.status='accepted')
       AND (
-          q.event_date IS NOT NULL
+          COALESCE(q.event_date,p.event_date) IS NOT NULL
           OR (p.client_meeting_status='planned' AND p.client_meeting_at IS NOT NULL)
       )
-    ORDER BY q.event_date ASC
+    ORDER BY COALESCE(q.event_date,p.event_date) ASC
 ")->fetchAll();
 
 $calendarEvents = [];
