@@ -102,14 +102,14 @@ if (homeMain && homeHero && reviewsSection && homePrestations) {
           <legend>Quelle(s) prestation(s) souhaitez-vous ? *</legend>
           <div class="home-quote__choice-grid home-quote__choice-grid--services">
             <label class="home-quote__choice-card home-quote__choice-card--service">
-              <input type="checkbox" name="services[]" value="DJ">
+              <input type="radio" name="services[]" value="DJ">
               <strong>DJ</strong>
               <small>Une programmation musicale adaptée à votre événement et à vos invités.</small>
             </label>
             <label class="home-quote__choice-card home-quote__choice-card--service">
-              <input type="checkbox" name="services[]" value="Animations">
-              <strong>Animations</strong>
-              <small>Des animations interactives pour faire participer vos invités.</small>
+              <input type="radio" name="services[]" value="DJ & Animateur">
+              <strong>DJ & Animateur</strong>
+              <small>Une prestation DJ complète avec animation au micro, jeux, quiz, blind test ou karaoké selon vos envies.</small>
             </label>
             <label class="home-quote__choice-card home-quote__choice-card--service">
               <input type="checkbox" name="services[]" value="Karaoké">
