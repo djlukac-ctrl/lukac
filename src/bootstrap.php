@@ -300,6 +300,7 @@ function db(): PDO
         updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
     )');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_equipment_category ON equipment(category, name)');
+    ensure_column($pdo, 'equipment', 'quantity', 'INTEGER NOT NULL DEFAULT 1');
 
     $pdo->exec('CREATE TABLE IF NOT EXISTS equipment_settings (
         setting_key TEXT PRIMARY KEY,
@@ -316,6 +317,7 @@ function db(): PDO
         FOREIGN KEY(equipment_id) REFERENCES equipment(id) ON DELETE CASCADE
     )');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_formula_equipment_formula ON formula_equipment(formula_name)');
+    ensure_column($pdo, 'formula_equipment', 'quantity', 'INTEGER NOT NULL DEFAULT 1');
 
     $pdo->exec('CREATE TABLE IF NOT EXISTS login_attempts (
         key_hash TEXT PRIMARY KEY,
@@ -483,13 +485,13 @@ function sync_formula_prices_from_equipment(PDO $pdo): void
     $sumStmt = $pdo->prepare(
         "SELECT COALESCE(SUM(
             CASE
-                WHEN e.category = 'Autre' THEN ROUND(e.purchase_price_cents * 0.02)
-                ELSE ROUND(e.purchase_price_cents * 0.05)
+                WHEN e.category = 'Autre' THEN ROUND(e.purchase_price_cents * fe.quantity * 0.02)
+                ELSE ROUND(e.purchase_price_cents * fe.quantity * 0.05)
             END
         ), 0)
          FROM formula_equipment fe
          INNER JOIN equipment e ON e.id = fe.equipment_id
-         WHERE fe.formula_name = :formula AND e.active = 1"
+         WHERE fe.formula_name = :formula AND e.active = 1 AND fe.quantity > 0"
     );
     $updateStmt = $pdo->prepare(
         "UPDATE catalog_items
