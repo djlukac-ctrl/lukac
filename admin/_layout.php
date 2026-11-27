@@ -19,6 +19,7 @@ function admin_header(string $title, string $active = ''): void
             'prestations' => ['Prestations', 'prestations.php', '◆'],
             'documents' => ['Devis & factures', 'documents.php', '▤'],
             'catalogue' => ['Catalogue', 'catalogue.php', '◇'],
+            'materiel' => ['Matériel', 'materiel.php', '▣'],
         ],
         'Site internet' => [
             'contenu' => ['Contenu du site', 'contenu.php', '✎'],
