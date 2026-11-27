@@ -80,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $purchaseDate = trim((string) ($_POST['purchase_date'] ?? ''));
         $purchasePrice = equipment_money_to_cents((string) ($_POST['purchase_price'] ?? '0'));
         $currentValue = equipment_money_to_cents((string) ($_POST['current_value'] ?? '0'));
+        $quantity = max(1, min(999, (int)($_POST['quantity'] ?? 1)));
         $condition = (string) ($_POST['condition_status'] ?? 'good');
         $notes = trim((string) ($_POST['notes'] ?? ''));
         $active = isset($_POST['active']) ? 1 : 0;
@@ -98,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'UPDATE equipment SET
                         name=:name, category=:category, purchase_date=:purchase_date,
                         purchase_price_cents=:purchase_price, current_value_cents=:current_value,
-                        condition_status=:condition_status,
+                        quantity=:quantity, condition_status=:condition_status,
                         notes=:notes, active=:active, updated_at=CURRENT_TIMESTAMP
                      WHERE id=:id'
                 );
@@ -108,6 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':purchase_date'=>$purchaseDate ?: null,
                     ':purchase_price'=>$purchasePrice,
                     ':current_value'=>$currentValue,
+                    ':quantity'=>$quantity,
                     ':condition_status'=>$condition,
                     ':notes'=>$notes,
                     ':active'=>$active,
@@ -120,10 +122,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare(
                 'INSERT INTO equipment(
                     name, category, purchase_date, purchase_price_cents, current_value_cents,
-                    condition_status, notes, active
+                    quantity, condition_status, notes, active
                  ) VALUES(
                     :name, :category, :purchase_date, :purchase_price, :current_value,
-                    :condition_status, :notes, :active
+                    :quantity, :condition_status, :notes, :active
                  )'
             );
             $stmt->execute([
@@ -132,6 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':purchase_date'=>$purchaseDate ?: null,
                 ':purchase_price'=>$purchasePrice,
                 ':current_value'=>$currentValue,
+                ':quantity'=>$quantity,
                 ':condition_status'=>$condition,
                 ':notes'=>$notes,
                 ':active'=>$active,
@@ -147,21 +150,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!in_array($formula, $allowedFormulas, true)) {
             $error = 'Formule invalide.';
         } else {
-            $ids = array_values(array_unique(array_filter(array_map('intval', $_POST['equipment_ids'] ?? []), static fn($id) => $id > 0)));
+            $quantities = $_POST['equipment_qty'] ?? [];
+            if (!is_array($quantities)) $quantities = [];
 
             $pdo->beginTransaction();
             try {
                 $delete = $pdo->prepare('DELETE FROM formula_equipment WHERE formula_name=:formula');
                 $delete->execute([':formula'=>$formula]);
 
-                if ($ids) {
-                    $check = $pdo->prepare('SELECT id FROM equipment WHERE id=:id LIMIT 1');
-                    $insert = $pdo->prepare('INSERT OR IGNORE INTO formula_equipment(formula_name, equipment_id) VALUES(:formula,:equipment)');
-                    foreach ($ids as $equipmentId) {
-                        $check->execute([':id'=>$equipmentId]);
-                        if (!$check->fetchColumn()) continue;
-                        $insert->execute([':formula'=>$formula, ':equipment'=>$equipmentId]);
-                    }
+                $check = $pdo->prepare('SELECT quantity FROM equipment WHERE id=:id AND active=1 LIMIT 1');
+                $insert = $pdo->prepare('INSERT INTO formula_equipment(formula_name, equipment_id, quantity) VALUES(:formula,:equipment,:quantity)');
+                foreach ($quantities as $equipmentIdRaw => $quantityRaw) {
+                    $equipmentId = (int)$equipmentIdRaw;
+                    $requestedQuantity = max(0, (int)$quantityRaw);
+                    if ($equipmentId <= 0 || $requestedQuantity <= 0) continue;
+
+                    $check->execute([':id'=>$equipmentId]);
+                    $ownedQuantity = (int)($check->fetchColumn() ?: 0);
+                    if ($ownedQuantity <= 0) continue;
+
+                    $usedQuantity = min($requestedQuantity, $ownedQuantity);
+                    $insert->execute([
+                        ':formula'=>$formula,
+                        ':equipment'=>$equipmentId,
+                        ':quantity'=>$usedQuantity,
+                    ]);
                 }
 
                 sync_formula_prices_from_equipment($pdo);
@@ -189,10 +202,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $items = $pdo->query('SELECT * FROM equipment ORDER BY active DESC, category ASC, name ASC')->fetchAll();
 $formulaNames = ['Essentiel', 'Ambiance', 'Expérience'];
 $formulaLinks = ['Essentiel'=>[], 'Ambiance'=>[], 'Expérience'=>[]];
-$linkRows = $pdo->query('SELECT formula_name, equipment_id FROM formula_equipment')->fetchAll();
+$linkRows = $pdo->query('SELECT formula_name, equipment_id, quantity FROM formula_equipment')->fetchAll();
 foreach ($linkRows as $linkRow) {
     if (isset($formulaLinks[$linkRow['formula_name']])) {
-        $formulaLinks[$linkRow['formula_name']][] = (int)$linkRow['equipment_id'];
+        $formulaLinks[$linkRow['formula_name']][(int)$linkRow['equipment_id']] = max(1, (int)$linkRow['quantity']);
     }
 }
 
@@ -202,11 +215,12 @@ foreach ($formulaNames as $formulaName) {
     $sum = 0;
     foreach ($items as $equipmentItem) {
         if ((int)$equipmentItem['active'] !== 1) continue;
-        if (!in_array((int)$equipmentItem['id'], $formulaLinks[$formulaName], true)) continue;
+        $usedQuantity = (int)($formulaLinks[$formulaName][(int)$equipmentItem['id']] ?? 0);
+        if ($usedQuantity <= 0) continue;
         $purchasePrice = (int)$equipmentItem['purchase_price_cents'];
-        $sum += $purchasePrice;
+        $sum += $purchasePrice * $usedQuantity;
         $rate = $equipmentItem['category'] === 'Autre' ? 0.02 : 0.05;
-        $formulaPrices[$formulaName] = ($formulaPrices[$formulaName] ?? 0) + (int) round($purchasePrice * $rate);
+        $formulaPrices[$formulaName] = ($formulaPrices[$formulaName] ?? 0) + (int) round($purchasePrice * $usedQuantity * $rate);
     }
     $formulaPurchaseTotals[$formulaName] = $sum;
     $formulaPrices[$formulaName] = $formulaPrices[$formulaName] ?? 0;
@@ -220,6 +234,7 @@ $watchCount = 0;
 
 foreach ($items as &$item) {
     $purchase = (int) $item['purchase_price_cents'];
+    $ownedQuantity = max(1, (int)($item['quantity'] ?? 1));
     $manualCurrent = (int) $item['current_value_cents'];
     $autoCurrent = equipment_auto_current_value($purchase, $item['purchase_date'] ?? null, (string)$item['condition_status']);
     $current = $manualCurrent > 0 ? $manualCurrent : $autoCurrent;
@@ -227,12 +242,12 @@ foreach ($items as &$item) {
     $item['_current_value_is_manual'] = $manualCurrent > 0;
     $pricingRate = $item['category'] === 'Autre' ? 0.02 : 0.05;
     $item['_pricing_rate'] = $pricingRate;
-    $item['_pricing_base_cents'] = (int) round($purchase * $pricingRate);
+    $item['_pricing_base_cents'] = (int) round($purchase * $ownedQuantity * $pricingRate);
 
     if ((int) $item['active'] === 1) {
         $activeCount++;
-        $totalPurchase += $purchase;
-        $totalCurrent += $current;
+        $totalPurchase += $purchase * $ownedQuantity;
+        $totalCurrent += $current * $ownedQuantity;
         if (in_array($item['condition_status'], ['watch', 'replace'], true)) $watchCount++;
     }
 }
@@ -275,7 +290,7 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
 .formula-builder__head{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.055)}.formula-builder__head span{display:block;color:#ff4a50;font-size:8px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.formula-builder__head h2{margin:4px 0 0;color:#fff;font-size:18px}.formula-builder__head p{margin:6px 0 0;color:#77726c;font-size:10px;line-height:1.5}
 .formula-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
 .formula-card{padding:17px;border-right:1px solid rgba(255,255,255,.055)}.formula-card:last-child{border-right:0}.formula-card__top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:13px}.formula-card__top h3{margin:0;color:#fff;font-size:15px}.formula-card__price{text-align:right}.formula-card__price strong{display:block;color:#ff5b61;font-size:21px}.formula-card__price span{display:block;margin-top:2px;color:#6f6964;font-size:8px}
-.formula-card__equipment{display:grid;gap:7px;max-height:280px;overflow:auto;padding-right:3px}.formula-equipment-option{display:flex;align-items:flex-start;gap:9px;padding:8px 9px;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:#09090c;color:#aaa6a0;font-size:9px;line-height:1.35}.formula-equipment-option input{margin-top:2px;accent-color:#e32228}.formula-equipment-option strong{display:block;color:#e8e4df;font-size:10px}.formula-equipment-option small{display:block;margin-top:2px;color:#6f6964;font-size:8px}
+.formula-card__equipment{display:grid;gap:7px;max-height:280px;overflow:auto;padding-right:3px}.formula-equipment-option{display:flex;align-items:flex-start;gap:9px;padding:8px 9px;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:#09090c;color:#aaa6a0;font-size:9px;line-height:1.35}.formula-equipment-option input{margin-top:2px;accent-color:#e32228}.formula-equipment-option__qty{width:58px!important;flex:0 0 58px;margin:0!important;padding:6px 7px!important;text-align:center}.formula-equipment-option strong{display:block;color:#e8e4df;font-size:10px}.formula-equipment-option small{display:block;margin-top:2px;color:#6f6964;font-size:8px}
 .formula-card__footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:13px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05)}.formula-card__footer span{color:#77726c;font-size:8px}
 @media(max-width:1050px){.formula-grid{grid-template-columns:1fr}.formula-card{border-right:0;border-bottom:1px solid rgba(255,255,255,.055)}.formula-card:last-child{border-bottom:0}}
 @media(max-width:1250px){.equipment-metrics{grid-template-columns:repeat(2,1fr)}}
@@ -312,7 +327,7 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
   <div class="formula-builder__head">
     <span>Tarification automatique</span>
     <h2>Matériel utilisé dans les formules</h2>
-    <p>Coche le matériel réellement prévu dans chaque formule. Le calcul applique 5 % sur le matériel standard et 2 % sur les articles classés « Autre ».</p>
+    <p>Indique la quantité utilisée de chaque matériel dans chaque formule. Le calcul applique 5 % sur le matériel standard et 2 % sur les articles classés « Autre ».</p>
   </div>
   <div class="formula-grid">
     <?php foreach ($formulaNames as $formulaName): ?>
@@ -334,11 +349,16 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
           <?php foreach ($items as $equipmentItem): ?>
             <?php if (!(int)$equipmentItem['active']) continue; $hasActiveEquipment = true; ?>
             <label class="formula-equipment-option">
-              <input type="checkbox" name="equipment_ids[]" value="<?= (int)$equipmentItem['id'] ?>" <?= in_array((int)$equipmentItem['id'], $formulaLinks[$formulaName], true) ? 'checked' : '' ?>>
+              <?php
+                $equipmentId = (int)$equipmentItem['id'];
+                $ownedQuantity = max(1, (int)($equipmentItem['quantity'] ?? 1));
+                $usedQuantity = (int)($formulaLinks[$formulaName][$equipmentId] ?? 0);
+                $formulaRate = $equipmentItem['category'] === 'Autre' ? .02 : .05;
+              ?>
+              <input class="formula-equipment-option__qty" type="number" name="equipment_qty[<?= $equipmentId ?>]" min="0" max="<?= $ownedQuantity ?>" value="<?= $usedQuantity ?>">
               <span>
-                <strong><?= e($equipmentItem['name']) ?></strong>
-                <?php $formulaRate = $equipmentItem['category'] === 'Autre' ? .02 : .05; ?>
-                <small><?= e($equipmentItem['category']) ?> · achat <?= e(equipment_money((int)$equipmentItem['purchase_price_cents'])) ?> € · base <?= $equipmentItem['category'] === 'Autre' ? '2 %' : '5 %' ?> <?= e(equipment_money((int)round((int)$equipmentItem['purchase_price_cents'] * $formulaRate))) ?> €</small>
+                <strong><?= e($equipmentItem['name']) ?> · <?= $ownedQuantity ?> possédé<?= $ownedQuantity > 1 ? 's' : '' ?></strong>
+                <small><?= e($equipmentItem['category']) ?> · <?= e(equipment_money((int)$equipmentItem['purchase_price_cents'])) ?> € / unité · base <?= $equipmentItem['category'] === 'Autre' ? '2 %' : '5 %' ?> : <?= e(equipment_money((int)round((int)$equipmentItem['purchase_price_cents'] * $formulaRate))) ?> € / unité</small>
               </span>
             </label>
           <?php endforeach; ?>
@@ -346,7 +366,8 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
         </div>
 
         <div class="formula-card__footer">
-          <span><?= count($formulaLinks[$formulaName]) ?> article<?= count($formulaLinks[$formulaName]) > 1 ? 's' : '' ?> sélectionné<?= count($formulaLinks[$formulaName]) > 1 ? 's' : '' ?></span>
+          <?php $formulaUnitCount = array_sum($formulaLinks[$formulaName]); ?>
+          <span><?= $formulaUnitCount ?> unité<?= $formulaUnitCount > 1 ? 's' : '' ?> utilisée<?= $formulaUnitCount > 1 ? 's' : '' ?></span>
           <button class="btn btn--primary" type="submit">Enregistrer la formule</button>
         </div>
       </form>
@@ -369,12 +390,12 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
       <details class="equipment-item <?= !(int)$item['active'] ? 'is-disabled' : '' ?>" id="item-<?= (int)$item['id'] ?>">
         <summary class="equipment-summary">
           <div class="equipment-name">
-            <strong><?= e($item['name']) ?></strong>
+            <strong><?= e($item['name']) ?><?= (int)($item['quantity'] ?? 1) > 1 ? ' · ×' . (int)$item['quantity'] : '' ?></strong>
             <span><?= e($item['category']) ?><?= $item['purchase_date'] ? ' · acheté le ' . e((new DateTimeImmutable($item['purchase_date']))->format('d/m/Y')) : '' ?></span>
           </div>
-          <div class="equipment-value"><span>Achat</span><strong><?= e(equipment_money((int)$item['purchase_price_cents'])) ?> €</strong></div>
+          <div class="equipment-value"><span>Achat / unité</span><strong><?= e(equipment_money((int)$item['purchase_price_cents'])) ?> €</strong></div>
           <div class="equipment-value equipment-value--pricing"><span>Base tarifaire · <?= $item['category'] === 'Autre' ? '2 %' : '5 %' ?></span><strong><?= e(equipment_money((int)$item['_pricing_base_cents'])) ?> €</strong></div>
-          <div class="equipment-value"><span>Valeur actuelle<?= $item['_current_value_is_manual'] ? ' · manuelle' : ' · auto' ?></span><strong><?= e(equipment_money((int)$item['_current_value_cents'])) ?> €</strong></div>
+          <div class="equipment-value"><span>Valeur actuelle totale<?= $item['_current_value_is_manual'] ? ' · manuelle' : ' · auto' ?></span><strong><?= e(equipment_money((int)$item['_current_value_cents'] * max(1,(int)($item['quantity'] ?? 1)))) ?> €</strong></div>
           <div class="equipment-state <?= in_array($item['condition_status'], ['watch','replace'], true) ? 'equipment-state--' . e($item['condition_status']) : '' ?>"><?= e($conditions[$item['condition_status']] ?? $item['condition_status']) ?></div>
         </summary>
 
@@ -387,8 +408,9 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
             <div class="equipment-field"><label>Nom</label><input name="name" value="<?= e($item['name']) ?>" required></div>
             <div class="equipment-field"><label>Catégorie</label><select name="category"><?php foreach ($categories as $category): ?><option <?= $item['category'] === $category ? 'selected' : '' ?>><?= e($category) ?></option><?php endforeach; ?></select></div>
             <div class="equipment-field"><label>Date d’achat</label><input name="purchase_date" type="date" value="<?= e((string)$item['purchase_date']) ?>"></div>
-            <div class="equipment-field"><label>Prix d’achat (€)</label><input name="purchase_price" inputmode="decimal" value="<?= e(equipment_money((int)$item['purchase_price_cents'])) ?>"></div>
-            <div class="equipment-field"><label>Valeur actuelle manuelle (€) · facultatif</label><input name="current_value" inputmode="decimal" value="<?= (int)$item['current_value_cents'] > 0 ? e(equipment_money((int)$item['current_value_cents'])) : '' ?>" placeholder="Laisser vide = calcul automatique"></div>
+            <div class="equipment-field"><label>Prix d’achat / unité (€)</label><input name="purchase_price" inputmode="decimal" value="<?= e(equipment_money((int)$item['purchase_price_cents'])) ?>"></div>
+            <div class="equipment-field"><label>Quantité possédée</label><input name="quantity" type="number" min="1" max="999" value="<?= max(1,(int)($item['quantity'] ?? 1)) ?>"></div>
+            <div class="equipment-field"><label>Valeur actuelle manuelle / unité (€) · facultatif</label><input name="current_value" inputmode="decimal" value="<?= (int)$item['current_value_cents'] > 0 ? e(equipment_money((int)$item['current_value_cents'])) : '' ?>" placeholder="Laisser vide = calcul automatique"></div>
             <div class="equipment-field"><label>État</label><select name="condition_status"><?php foreach ($conditions as $key=>$label): ?><option value="<?= e($key) ?>" <?= $item['condition_status'] === $key ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?></select></div>
             <div class="equipment-field equipment-field--full"><label>Notes</label><textarea name="notes" placeholder="Référence, entretien, accessoires, prochain remplacement…"><?= e((string)$item['notes']) ?></textarea></div>
 
@@ -421,8 +443,9 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
             <div class="equipment-field"><label>Nom</label><input name="name" required placeholder="Ex. Pioneer XDJ-RX3"></div>
             <div class="equipment-field"><label>Catégorie</label><select name="category"><?php foreach ($categories as $category): ?><option><?= e($category) ?></option><?php endforeach; ?></select></div>
             <div class="equipment-field"><label>Date d’achat</label><input name="purchase_date" type="date"></div>
-            <div class="equipment-field"><label>Prix d’achat (€)</label><input name="purchase_price" inputmode="decimal" value="0,00"></div>
-            <div class="equipment-field"><label>Valeur actuelle manuelle (€) · facultatif</label><input name="current_value" inputmode="decimal" placeholder="Laisser vide = calcul automatique"></div>
+            <div class="equipment-field"><label>Prix d’achat / unité (€)</label><input name="purchase_price" inputmode="decimal" value="0,00"></div>
+            <div class="equipment-field"><label>Quantité possédée</label><input name="quantity" type="number" min="1" max="999" value="1"></div>
+            <div class="equipment-field"><label>Valeur actuelle manuelle / unité (€) · facultatif</label><input name="current_value" inputmode="decimal" placeholder="Laisser vide = calcul automatique"></div>
             <div class="equipment-field"><label>État</label><select name="condition_status"><?php foreach ($conditions as $key=>$label): ?><option value="<?= e($key) ?>" <?= $key === 'good' ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?></select></div>
             <div class="equipment-field equipment-field--full"><label>Notes</label><textarea name="notes" placeholder="Référence, entretien, accessoires…"></textarea></div>
 
