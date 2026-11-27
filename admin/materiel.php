@@ -37,6 +37,35 @@ function equipment_age_years(?string $purchaseDate): float
     }
 }
 
+function equipment_auto_current_value(int $purchasePriceCents, ?string $purchaseDate, string $condition): int
+{
+    if ($purchasePriceCents <= 0) return 0;
+
+    $age = equipment_age_years($purchaseDate);
+    if (!$purchaseDate) {
+        $ratio = 0.65;
+    } elseif ($age < 1) {
+        $ratio = 0.80;
+    } elseif ($age < 2) {
+        $ratio = 0.65;
+    } elseif ($age < 3) {
+        $ratio = 0.50;
+    } elseif ($age < 5) {
+        $ratio = 0.35;
+    } else {
+        $ratio = 0.20;
+    }
+
+    $conditionMultiplier = [
+        'excellent' => 1.10,
+        'good' => 1.00,
+        'watch' => 0.85,
+        'replace' => 0.65,
+    ][$condition] ?? 1.00;
+
+    return min($purchasePriceCents, max(0, (int) round($purchasePriceCents * $ratio * $conditionMultiplier)));
+}
+
 $flash = '';
 $error = '';
 
@@ -152,7 +181,9 @@ $watchCount = 0;
 
 foreach ($items as &$item) {
     $purchase = (int) $item['purchase_price_cents'];
-    $current = (int) $item['current_value_cents'];
+    $manualCurrent = (int) $item['current_value_cents'];
+    $autoCurrent = equipment_auto_current_value($purchase, $item['purchase_date'] ?? null, (string)$item['condition_status']);
+    $current = $manualCurrent > 0 ? $manualCurrent : $autoCurrent;
     $years = max(1, (int) $item['depreciation_years']);
     $ageYears = equipment_age_years($item['purchase_date'] ?? null);
     $annualDep = (int) round($purchase / $years);
@@ -165,6 +196,8 @@ foreach ($items as &$item) {
     $item['_age_years'] = $ageYears;
     $item['_annual_depreciation_cents'] = $annualDep;
     $item['_book_value_cents'] = $bookValue;
+    $item['_current_value_cents'] = $current;
+    $item['_current_value_is_manual'] = $manualCurrent > 0;
 
     if ((int) $item['active'] === 1) {
         $activeCount++;
@@ -222,7 +255,7 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
 <?php if ($error): ?><div class="flash flash--error"><?= e($error) ?></div><?php endif; ?>
 
 <p class="equipment-intro">
-  Suis ici la valeur de ton parc matériel et son amortissement. L’objectif est de savoir ce que ton matériel représente réellement dans le coût de chaque prestation, afin d’ajuster tes tarifs avec une base plus solide.
+  Suis ici la valeur de ton parc matériel et son amortissement. La valeur actuelle est calculée automatiquement à partir du prix d’achat, de l’âge et de l’état du matériel. Tu peux toujours saisir une valeur manuelle si tu connais mieux sa cote réelle.
 </p>
 
 <div class="equipment-metrics">
@@ -234,7 +267,7 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
   <div class="equipment-metric">
     <span>Valeur actuelle estimée</span>
     <strong><?= e(equipment_money($totalCurrent)) ?> €</strong>
-    <small>Valeur que tu estimes aujourd’hui pour le matériel actif.</small>
+    <small>Estimation automatique selon l’âge et l’état, sauf valeur manuelle renseignée.</small>
   </div>
   <div class="equipment-metric">
     <span>Valeur comptable théorique</span>
@@ -282,7 +315,7 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
             <span><?= e($item['category']) ?><?= $item['purchase_date'] ? ' · acheté le ' . e((new DateTimeImmutable($item['purchase_date']))->format('d/m/Y')) : '' ?></span>
           </div>
           <div class="equipment-value"><span>Achat</span><strong><?= e(equipment_money((int)$item['purchase_price_cents'])) ?> €</strong></div>
-          <div class="equipment-value"><span>Valeur actuelle</span><strong><?= e(equipment_money((int)$item['current_value_cents'])) ?> €</strong></div>
+          <div class="equipment-value"><span>Valeur actuelle<?= $item['_current_value_is_manual'] ? ' · manuelle' : ' · auto' ?></span><strong><?= e(equipment_money((int)$item['_current_value_cents'])) ?> €</strong></div>
           <div class="equipment-value"><span>Amort. / an</span><strong><?= e(equipment_money((int)$item['_annual_depreciation_cents'])) ?> €</strong></div>
           <div class="equipment-state <?= in_array($item['condition_status'], ['watch','replace'], true) ? 'equipment-state--' . e($item['condition_status']) : '' ?>"><?= e($conditions[$item['condition_status']] ?? $item['condition_status']) ?></div>
         </summary>
@@ -297,7 +330,7 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
             <div class="equipment-field"><label>Catégorie</label><select name="category"><?php foreach ($categories as $category): ?><option <?= $item['category'] === $category ? 'selected' : '' ?>><?= e($category) ?></option><?php endforeach; ?></select></div>
             <div class="equipment-field"><label>Date d’achat</label><input name="purchase_date" type="date" value="<?= e((string)$item['purchase_date']) ?>"></div>
             <div class="equipment-field"><label>Prix d’achat (€)</label><input name="purchase_price" inputmode="decimal" value="<?= e(equipment_money((int)$item['purchase_price_cents'])) ?>"></div>
-            <div class="equipment-field"><label>Valeur actuelle (€)</label><input name="current_value" inputmode="decimal" value="<?= e(equipment_money((int)$item['current_value_cents'])) ?>"></div>
+            <div class="equipment-field"><label>Valeur actuelle manuelle (€) · facultatif</label><input name="current_value" inputmode="decimal" value="<?= (int)$item['current_value_cents'] > 0 ? e(equipment_money((int)$item['current_value_cents'])) : '' ?>" placeholder="Laisser vide = calcul automatique"></div>
             <div class="equipment-field"><label>Amortissement</label><select name="depreciation_years"><?php for ($y=1;$y<=10;$y++): ?><option value="<?= $y ?>" <?= (int)$item['depreciation_years'] === $y ? 'selected' : '' ?>><?= $y ?> an<?= $y > 1 ? 's' : '' ?></option><?php endfor; ?></select></div>
             <div class="equipment-field"><label>État</label><select name="condition_status"><?php foreach ($conditions as $key=>$label): ?><option value="<?= e($key) ?>" <?= $item['condition_status'] === $key ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?></select></div>
             <div class="equipment-field equipment-field--full"><label>Notes</label><textarea name="notes" placeholder="Référence, entretien, accessoires, prochain remplacement…"><?= e((string)$item['notes']) ?></textarea></div>
@@ -332,7 +365,7 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
             <div class="equipment-field"><label>Catégorie</label><select name="category"><?php foreach ($categories as $category): ?><option><?= e($category) ?></option><?php endforeach; ?></select></div>
             <div class="equipment-field"><label>Date d’achat</label><input name="purchase_date" type="date"></div>
             <div class="equipment-field"><label>Prix d’achat (€)</label><input name="purchase_price" inputmode="decimal" value="0,00"></div>
-            <div class="equipment-field"><label>Valeur actuelle (€)</label><input name="current_value" inputmode="decimal" value="0,00"></div>
+            <div class="equipment-field"><label>Valeur actuelle manuelle (€) · facultatif</label><input name="current_value" inputmode="decimal" placeholder="Laisser vide = calcul automatique"></div>
             <div class="equipment-field"><label>Amortissement</label><select name="depreciation_years"><?php for ($y=1;$y<=10;$y++): ?><option value="<?= $y ?>" <?= $y === 5 ? 'selected' : '' ?>><?= $y ?> an<?= $y > 1 ? 's' : '' ?></option><?php endfor; ?></select></div>
             <div class="equipment-field"><label>État</label><select name="condition_status"><?php foreach ($conditions as $key=>$label): ?><option value="<?= e($key) ?>" <?= $key === 'good' ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?></select></div>
             <div class="equipment-field equipment-field--full"><label>Notes</label><textarea name="notes" placeholder="Référence, entretien, accessoires…"></textarea></div>
