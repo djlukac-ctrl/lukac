@@ -211,6 +211,7 @@ foreach ($items as &$item) {
 unset($item);
 
 $costPerEvent = (int) round($totalAnnualDepreciation / $annualEvents);
+$pricingBaseCents = (int) round($totalPurchase * 0.05);
 
 admin_header('Matériel', 'materiel');
 
@@ -221,7 +222,7 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
 ?>
 <style>
 .equipment-intro{max-width:900px;margin:-6px 0 22px;color:#aaa6a0;font-size:13px;line-height:1.7}
-.equipment-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.equipment-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:18px}
 .equipment-metric{padding:18px;border:1px solid rgba(255,255,255,.08);border-radius:17px;background:linear-gradient(180deg,rgba(18,18,21,.98),rgba(10,10,13,.98));box-shadow:0 14px 32px rgba(0,0,0,.13)}
 .equipment-metric span{display:block;color:#77726c;font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
 .equipment-metric strong{display:block;margin-top:8px;color:#fff;font-size:24px;letter-spacing:-.03em}.equipment-metric small{display:block;margin-top:5px;color:#77726c;font-size:9px;line-height:1.4}
@@ -247,7 +248,8 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
 .equipment-actions__buttons{display:flex;gap:8px}.equipment-delete{border:1px solid rgba(227,34,40,.18);border-radius:9px;background:transparent;color:#d76a6d;padding:9px 11px;cursor:pointer}
 .equipment-add{padding:14px 18px;border-top:1px dashed rgba(255,255,255,.07)}.equipment-add details{border:1px dashed rgba(255,255,255,.09);border-radius:13px}.equipment-add summary{padding:12px 14px;cursor:pointer;color:#aaa6a0;font-size:11px;font-weight:700}.equipment-add__body{padding:0 14px 14px}
 .equipment-empty{padding:28px 18px;text-align:center;color:#77726c;font-size:11px}
-@media(max-width:1150px){.equipment-metrics{grid-template-columns:repeat(2,1fr)}.equipment-summary{grid-template-columns:minmax(0,1fr) repeat(2,.7fr) auto}.equipment-summary .equipment-value:nth-of-type(3){display:none}.equipment-form{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1250px){.equipment-metrics{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:1150px){.equipment-summary{grid-template-columns:minmax(0,1fr) repeat(2,.7fr) auto}.equipment-summary .equipment-value:nth-of-type(3){display:none}.equipment-form{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.equipment-metrics{grid-template-columns:1fr}.equipment-settings{align-items:stretch;flex-direction:column}.equipment-settings form{align-items:stretch}.equipment-summary{grid-template-columns:1fr auto}.equipment-summary .equipment-value{display:none}.equipment-form{grid-template-columns:1fr}.equipment-field--full,.equipment-actions{grid-column:auto}.equipment-actions{align-items:flex-start;flex-direction:column}}
 </style>
 
@@ -255,7 +257,7 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
 <?php if ($error): ?><div class="flash flash--error"><?= e($error) ?></div><?php endif; ?>
 
 <p class="equipment-intro">
-  Suis ici la valeur de ton parc matériel et son amortissement. La valeur actuelle est calculée automatiquement à partir du prix d’achat, de l’âge et de l’état du matériel. Tu peux toujours saisir une valeur manuelle si tu connais mieux sa cote réelle.
+  Suis ici la valeur de ton parc matériel, son amortissement et ta base tarifaire. Ta méthode actuelle est intégrée : 5 % de la valeur d’achat du matériel actif sert de référence pour construire tes tarifs. La valeur actuelle reste calculée automatiquement à partir de l’âge et de l’état.
 </p>
 
 <div class="equipment-metrics">
@@ -275,7 +277,12 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
     <small>Calcul linéaire selon la date d’achat et la durée choisie.</small>
   </div>
   <div class="equipment-metric equipment-metric--accent">
-    <span>Coût matériel / prestation</span>
+    <span>Base tarifaire matériel · 5 %</span>
+    <strong><?= e(equipment_money($pricingBaseCents)) ?> €</strong>
+    <small>5 % de la valeur d’achat du parc actif. C’est ta méthode actuelle de calcul tarifaire.</small>
+  </div>
+  <div class="equipment-metric">
+    <span>Amortissement / prestation</span>
     <strong><?= e(equipment_money($costPerEvent)) ?> €</strong>
     <small><?= e(equipment_money($totalAnnualDepreciation)) ?> € d’amortissement annuel ÷ <?= $annualEvents ?> prestations.</small>
   </div>
