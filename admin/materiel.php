@@ -132,13 +132,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':purchase_date'=>$purchaseDate ?: null,
                 ':purchase_price'=>$purchasePrice,
                 ':current_value'=>$currentValue,
-                ':depreciation_years'=>$depreciationYears,
                 ':condition_status'=>$condition,
                 ':notes'=>$notes,
                 ':active'=>$active,
             ]);
             header('Location: materiel.php?created=1');
             exit;
+        }
+    }
+
+    if ($action === 'save_formula_equipment') {
+        $formula = (string) ($_POST['formula'] ?? '');
+        $allowedFormulas = ['Essentiel', 'Ambiance', 'Expérience'];
+        if (!in_array($formula, $allowedFormulas, true)) {
+            $error = 'Formule invalide.';
+        } else {
+            $ids = array_values(array_unique(array_filter(array_map('intval', $_POST['equipment_ids'] ?? []), static fn($id) => $id > 0)));
+
+            $pdo->beginTransaction();
+            try {
+                $delete = $pdo->prepare('DELETE FROM formula_equipment WHERE formula_name=:formula');
+                $delete->execute([':formula'=>$formula]);
+
+                if ($ids) {
+                    $check = $pdo->prepare('SELECT id FROM equipment WHERE id=:id LIMIT 1');
+                    $insert = $pdo->prepare('INSERT OR IGNORE INTO formula_equipment(formula_name, equipment_id) VALUES(:formula,:equipment)');
+                    foreach ($ids as $equipmentId) {
+                        $check->execute([':id'=>$equipmentId]);
+                        if (!$check->fetchColumn()) continue;
+                        $insert->execute([':formula'=>$formula, ':equipment'=>$equipmentId]);
+                    }
+                }
+
+                sync_formula_prices_from_equipment($pdo);
+                $pdo->commit();
+                header('Location: materiel.php?formula_saved=1#formules');
+                exit;
+            } catch (Throwable $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                throw $e;
+            }
         }
     }
 
@@ -154,6 +187,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $items = $pdo->query('SELECT * FROM equipment ORDER BY active DESC, category ASC, name ASC')->fetchAll();
+$formulaNames = ['Essentiel', 'Ambiance', 'Expérience'];
+$formulaLinks = ['Essentiel'=>[], 'Ambiance'=>[], 'Expérience'=>[]];
+$linkRows = $pdo->query('SELECT formula_name, equipment_id FROM formula_equipment')->fetchAll();
+foreach ($linkRows as $linkRow) {
+    if (isset($formulaLinks[$linkRow['formula_name']])) {
+        $formulaLinks[$linkRow['formula_name']][] = (int)$linkRow['equipment_id'];
+    }
+}
+
+$formulaPrices = [];
+$formulaPurchaseTotals = [];
+foreach ($formulaNames as $formulaName) {
+    $sum = 0;
+    foreach ($items as $equipmentItem) {
+        if ((int)$equipmentItem['active'] !== 1) continue;
+        if (!in_array((int)$equipmentItem['id'], $formulaLinks[$formulaName], true)) continue;
+        $sum += (int)$equipmentItem['purchase_price_cents'];
+    }
+    $formulaPurchaseTotals[$formulaName] = $sum;
+    $formulaPrices[$formulaName] = (int) round($sum * 0.05);
+}
+
 
 $totalPurchase = 0;
 $totalCurrent = 0;
@@ -184,6 +239,7 @@ admin_header('Matériel', 'materiel');
 if (isset($_GET['saved'])) $flash = 'Matériel mis à jour.';
 if (isset($_GET['created'])) $flash = 'Matériel ajouté.';
 if (isset($_GET['deleted'])) $flash = 'Matériel supprimé.';
+if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré et tarif recalculé.';
 ?>
 <style>
 .equipment-intro{max-width:900px;margin:-6px 0 22px;color:#aaa6a0;font-size:13px;line-height:1.7}
@@ -210,6 +266,13 @@ if (isset($_GET['deleted'])) $flash = 'Matériel supprimé.';
 .equipment-actions__buttons{display:flex;gap:8px}.equipment-delete{border:1px solid rgba(227,34,40,.18);border-radius:9px;background:transparent;color:#d76a6d;padding:9px 11px;cursor:pointer}
 .equipment-add{padding:14px 18px;border-top:1px dashed rgba(255,255,255,.07)}.equipment-add details{border:1px dashed rgba(255,255,255,.09);border-radius:13px}.equipment-add summary{padding:12px 14px;cursor:pointer;color:#aaa6a0;font-size:11px;font-weight:700}.equipment-add__body{padding:0 14px 14px}
 .equipment-empty{padding:28px 18px;text-align:center;color:#77726c;font-size:11px}
+.formula-builder{margin:0 0 20px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:linear-gradient(180deg,rgba(18,18,21,.96),rgba(12,12,15,.96));overflow:hidden}
+.formula-builder__head{padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.055)}.formula-builder__head span{display:block;color:#ff4a50;font-size:8px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.formula-builder__head h2{margin:4px 0 0;color:#fff;font-size:18px}.formula-builder__head p{margin:6px 0 0;color:#77726c;font-size:10px;line-height:1.5}
+.formula-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.formula-card{padding:17px;border-right:1px solid rgba(255,255,255,.055)}.formula-card:last-child{border-right:0}.formula-card__top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:13px}.formula-card__top h3{margin:0;color:#fff;font-size:15px}.formula-card__price{text-align:right}.formula-card__price strong{display:block;color:#ff5b61;font-size:21px}.formula-card__price span{display:block;margin-top:2px;color:#6f6964;font-size:8px}
+.formula-card__equipment{display:grid;gap:7px;max-height:280px;overflow:auto;padding-right:3px}.formula-equipment-option{display:flex;align-items:flex-start;gap:9px;padding:8px 9px;border:1px solid rgba(255,255,255,.06);border-radius:10px;background:#09090c;color:#aaa6a0;font-size:9px;line-height:1.35}.formula-equipment-option input{margin-top:2px;accent-color:#e32228}.formula-equipment-option strong{display:block;color:#e8e4df;font-size:10px}.formula-equipment-option small{display:block;margin-top:2px;color:#6f6964;font-size:8px}
+.formula-card__footer{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:13px;padding-top:12px;border-top:1px solid rgba(255,255,255,.05)}.formula-card__footer span{color:#77726c;font-size:8px}
+@media(max-width:1050px){.formula-grid{grid-template-columns:1fr}.formula-card{border-right:0;border-bottom:1px solid rgba(255,255,255,.055)}.formula-card:last-child{border-bottom:0}}
 @media(max-width:1250px){.equipment-metrics{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:1150px){.equipment-summary{grid-template-columns:minmax(0,1fr) repeat(2,.7fr) auto}.equipment-summary .equipment-value:nth-of-type(3){display:none}.equipment-form{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.equipment-metrics{grid-template-columns:1fr}.equipment-summary{grid-template-columns:1fr auto}.equipment-summary .equipment-value{display:none}.equipment-form{grid-template-columns:1fr}.equipment-field--full,.equipment-actions{grid-column:auto}.equipment-actions{align-items:flex-start;flex-direction:column}}
@@ -239,6 +302,51 @@ if (isset($_GET['deleted'])) $flash = 'Matériel supprimé.';
     <small>Chaque matériel affiche sa base tarifaire calculée directement sur son prix d’achat.</small>
   </div>
 </div>
+
+<section class="formula-builder" id="formules">
+  <div class="formula-builder__head">
+    <span>Tarification automatique</span>
+    <h2>Matériel utilisé dans les formules</h2>
+    <p>Coche le matériel réellement prévu dans chaque formule. Le tarif catalogue correspond automatiquement à 5 % de la valeur d’achat totale des articles sélectionnés et actifs.</p>
+  </div>
+  <div class="formula-grid">
+    <?php foreach ($formulaNames as $formulaName): ?>
+      <form method="post" class="formula-card">
+        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+        <input type="hidden" name="action" value="save_formula_equipment">
+        <input type="hidden" name="formula" value="<?= e($formulaName) ?>">
+
+        <div class="formula-card__top">
+          <h3><?= e($formulaName) ?></h3>
+          <div class="formula-card__price">
+            <strong><?= e(equipment_money($formulaPrices[$formulaName])) ?> €</strong>
+            <span>5 % de <?= e(equipment_money($formulaPurchaseTotals[$formulaName])) ?> € de matériel</span>
+          </div>
+        </div>
+
+        <div class="formula-card__equipment">
+          <?php $hasActiveEquipment = false; ?>
+          <?php foreach ($items as $equipmentItem): ?>
+            <?php if (!(int)$equipmentItem['active']) continue; $hasActiveEquipment = true; ?>
+            <label class="formula-equipment-option">
+              <input type="checkbox" name="equipment_ids[]" value="<?= (int)$equipmentItem['id'] ?>" <?= in_array((int)$equipmentItem['id'], $formulaLinks[$formulaName], true) ? 'checked' : '' ?>>
+              <span>
+                <strong><?= e($equipmentItem['name']) ?></strong>
+                <small><?= e($equipmentItem['category']) ?> · achat <?= e(equipment_money((int)$equipmentItem['purchase_price_cents'])) ?> € · base 5 % <?= e(equipment_money((int)round((int)$equipmentItem['purchase_price_cents'] * .05))) ?> €</small>
+              </span>
+            </label>
+          <?php endforeach; ?>
+          <?php if (!$hasActiveEquipment): ?><div class="equipment-empty">Ajoute d’abord du matériel actif.</div><?php endif; ?>
+        </div>
+
+        <div class="formula-card__footer">
+          <span><?= count($formulaLinks[$formulaName]) ?> article<?= count($formulaLinks[$formulaName]) > 1 ? 's' : '' ?> sélectionné<?= count($formulaLinks[$formulaName]) > 1 ? 's' : '' ?></span>
+          <button class="btn btn--primary" type="submit">Enregistrer la formule</button>
+        </div>
+      </form>
+    <?php endforeach; ?>
+  </div>
+</section>
 
 <div class="equipment-layout">
   <section class="equipment-section">
