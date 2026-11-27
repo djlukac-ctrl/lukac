@@ -481,10 +481,15 @@ function sync_formula_prices_from_equipment(PDO $pdo): void
     $formulas = ['Essentiel', 'Ambiance', 'Expérience'];
 
     $sumStmt = $pdo->prepare(
-        'SELECT COALESCE(SUM(e.purchase_price_cents), 0)
+        "SELECT COALESCE(SUM(
+            CASE
+                WHEN e.category = 'Autre' THEN ROUND(e.purchase_price_cents * 0.02)
+                ELSE ROUND(e.purchase_price_cents * 0.05)
+            END
+        ), 0)
          FROM formula_equipment fe
          INNER JOIN equipment e ON e.id = fe.equipment_id
-         WHERE fe.formula_name = :formula AND e.active = 1'
+         WHERE fe.formula_name = :formula AND e.active = 1"
     );
     $updateStmt = $pdo->prepare(
         "UPDATE catalog_items
@@ -494,8 +499,7 @@ function sync_formula_prices_from_equipment(PDO $pdo): void
 
     foreach ($formulas as $formula) {
         $sumStmt->execute([':formula' => $formula]);
-        $purchaseTotal = (int) $sumStmt->fetchColumn();
-        $price = (int) round($purchaseTotal * 0.05);
+        $price = (int) $sumStmt->fetchColumn();
 
         $updateStmt->execute([
             ':price' => $price,
