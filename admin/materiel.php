@@ -203,10 +203,13 @@ foreach ($formulaNames as $formulaName) {
     foreach ($items as $equipmentItem) {
         if ((int)$equipmentItem['active'] !== 1) continue;
         if (!in_array((int)$equipmentItem['id'], $formulaLinks[$formulaName], true)) continue;
-        $sum += (int)$equipmentItem['purchase_price_cents'];
+        $purchasePrice = (int)$equipmentItem['purchase_price_cents'];
+        $sum += $purchasePrice;
+        $rate = $equipmentItem['category'] === 'Autre' ? 0.02 : 0.05;
+        $formulaPrices[$formulaName] = ($formulaPrices[$formulaName] ?? 0) + (int) round($purchasePrice * $rate);
     }
     $formulaPurchaseTotals[$formulaName] = $sum;
-    $formulaPrices[$formulaName] = (int) round($sum * 0.05);
+    $formulaPrices[$formulaName] = $formulaPrices[$formulaName] ?? 0;
 }
 
 
@@ -222,7 +225,9 @@ foreach ($items as &$item) {
     $current = $manualCurrent > 0 ? $manualCurrent : $autoCurrent;
     $item['_current_value_cents'] = $current;
     $item['_current_value_is_manual'] = $manualCurrent > 0;
-    $item['_pricing_base_cents'] = (int) round($purchase * 0.05);
+    $pricingRate = $item['category'] === 'Autre' ? 0.02 : 0.05;
+    $item['_pricing_rate'] = $pricingRate;
+    $item['_pricing_base_cents'] = (int) round($purchase * $pricingRate);
 
     if ((int) $item['active'] === 1) {
         $activeCount++;
@@ -282,7 +287,7 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
 <?php if ($error): ?><div class="flash flash--error"><?= e($error) ?></div><?php endif; ?>
 
 <p class="equipment-intro">
-  Suis ici ton matériel article par article. Pour chaque équipement, l’administration calcule automatiquement ta base tarifaire à 5 % du prix d’achat. La valeur actuelle est estimée automatiquement à partir de l’âge et de l’état, avec possibilité de la corriger manuellement.
+  Suis ici ton matériel article par article. L’administration calcule automatiquement la base tarifaire : 5 % du prix d’achat pour le matériel standard, et 2 % pour la catégorie « Autre » correspondant au confort personnel. La valeur actuelle est estimée automatiquement à partir de l’âge et de l’état, avec possibilité de la corriger manuellement.
 </p>
 
 <div class="equipment-metrics">
@@ -299,7 +304,7 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
   <div class="equipment-metric equipment-metric--accent">
     <span>Calcul tarifaire</span>
     <strong>5 % / article</strong>
-    <small>Chaque matériel affiche sa base tarifaire calculée directement sur son prix d’achat.</small>
+    <small>5 % sur le matériel visible/client, 2 % sur la catégorie « Autre » dédiée au confort personnel.</small>
   </div>
 </div>
 
@@ -307,7 +312,7 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
   <div class="formula-builder__head">
     <span>Tarification automatique</span>
     <h2>Matériel utilisé dans les formules</h2>
-    <p>Coche le matériel réellement prévu dans chaque formule. Le tarif catalogue correspond automatiquement à 5 % de la valeur d’achat totale des articles sélectionnés et actifs.</p>
+    <p>Coche le matériel réellement prévu dans chaque formule. Le calcul applique 5 % sur le matériel standard et 2 % sur les articles classés « Autre ».</p>
   </div>
   <div class="formula-grid">
     <?php foreach ($formulaNames as $formulaName): ?>
@@ -320,7 +325,7 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
           <h3><?= e($formulaName) ?></h3>
           <div class="formula-card__price">
             <strong><?= e(equipment_money($formulaPrices[$formulaName])) ?> €</strong>
-            <span>5 % de <?= e(equipment_money($formulaPurchaseTotals[$formulaName])) ?> € de matériel</span>
+            <span>Calcul selon le taux de chaque article sélectionné</span>
           </div>
         </div>
 
@@ -332,7 +337,8 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
               <input type="checkbox" name="equipment_ids[]" value="<?= (int)$equipmentItem['id'] ?>" <?= in_array((int)$equipmentItem['id'], $formulaLinks[$formulaName], true) ? 'checked' : '' ?>>
               <span>
                 <strong><?= e($equipmentItem['name']) ?></strong>
-                <small><?= e($equipmentItem['category']) ?> · achat <?= e(equipment_money((int)$equipmentItem['purchase_price_cents'])) ?> € · base 5 % <?= e(equipment_money((int)round((int)$equipmentItem['purchase_price_cents'] * .05))) ?> €</small>
+                <?php $formulaRate = $equipmentItem['category'] === 'Autre' ? .02 : .05; ?>
+                <small><?= e($equipmentItem['category']) ?> · achat <?= e(equipment_money((int)$equipmentItem['purchase_price_cents'])) ?> € · base <?= $equipmentItem['category'] === 'Autre' ? '2 %' : '5 %' ?> <?= e(equipment_money((int)round((int)$equipmentItem['purchase_price_cents'] * $formulaRate))) ?> €</small>
               </span>
             </label>
           <?php endforeach; ?>
@@ -367,7 +373,7 @@ if (isset($_GET['formula_saved'])) $flash = 'Matériel de la formule enregistré
             <span><?= e($item['category']) ?><?= $item['purchase_date'] ? ' · acheté le ' . e((new DateTimeImmutable($item['purchase_date']))->format('d/m/Y')) : '' ?></span>
           </div>
           <div class="equipment-value"><span>Achat</span><strong><?= e(equipment_money((int)$item['purchase_price_cents'])) ?> €</strong></div>
-          <div class="equipment-value equipment-value--pricing"><span>Base tarifaire · 5 %</span><strong><?= e(equipment_money((int)$item['_pricing_base_cents'])) ?> €</strong></div>
+          <div class="equipment-value equipment-value--pricing"><span>Base tarifaire · <?= $item['category'] === 'Autre' ? '2 %' : '5 %' ?></span><strong><?= e(equipment_money((int)$item['_pricing_base_cents'])) ?> €</strong></div>
           <div class="equipment-value"><span>Valeur actuelle<?= $item['_current_value_is_manual'] ? ' · manuelle' : ' · auto' ?></span><strong><?= e(equipment_money((int)$item['_current_value_cents'])) ?> €</strong></div>
           <div class="equipment-state <?= in_array($item['condition_status'], ['watch','replace'], true) ? 'equipment-state--' . e($item['condition_status']) : '' ?>"><?= e($conditions[$item['condition_status']] ?? $item['condition_status']) ?></div>
         </summary>
