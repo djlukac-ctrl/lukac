@@ -308,6 +308,15 @@ function db(): PDO
     )');
     $pdo->exec("INSERT OR IGNORE INTO equipment_settings(setting_key, setting_value) VALUES('annual_events', '35')");
 
+    $pdo->exec('CREATE TABLE IF NOT EXISTS formula_equipment (
+        formula_name TEXT NOT NULL,
+        equipment_id INTEGER NOT NULL,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (formula_name, equipment_id),
+        FOREIGN KEY(equipment_id) REFERENCES equipment(id) ON DELETE CASCADE
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_formula_equipment_formula ON formula_equipment(formula_name)');
+
     $pdo->exec('CREATE TABLE IF NOT EXISTS login_attempts (
         key_hash TEXT PRIMARY KEY,
         attempts INTEGER NOT NULL DEFAULT 0,
@@ -360,6 +369,7 @@ function db(): PDO
     seed_catalog($pdo);
     ensure_fee_catalog_items($pdo);
     ensure_quote_catalog_items($pdo);
+    sync_formula_prices_from_equipment($pdo);
     return $pdo;
 }
 
@@ -462,6 +472,34 @@ function seed_catalog(PDO $pdo): void
             ':mode'=>$mode,
             ':unit'=>$unit,
             ':sort'=>$sort,
+        ]);
+    }
+}
+
+function sync_formula_prices_from_equipment(PDO $pdo): void
+{
+    $formulas = ['Essentiel', 'Ambiance', 'Expérience'];
+
+    $sumStmt = $pdo->prepare(
+        'SELECT COALESCE(SUM(e.purchase_price_cents), 0)
+         FROM formula_equipment fe
+         INNER JOIN equipment e ON e.id = fe.equipment_id
+         WHERE fe.formula_name = :formula AND e.active = 1'
+    );
+    $updateStmt = $pdo->prepare(
+        "UPDATE catalog_items
+         SET price_cents=:price, price_mode='fixed', unit_label='Par événement', updated_at=CURRENT_TIMESTAMP
+         WHERE category='formule' AND name=:formula"
+    );
+
+    foreach ($formulas as $formula) {
+        $sumStmt->execute([':formula' => $formula]);
+        $purchaseTotal = (int) $sumStmt->fetchColumn();
+        $price = (int) round($purchaseTotal * 0.05);
+
+        $updateStmt->execute([
+            ':price' => $price,
+            ':formula' => $formula,
         ]);
     }
 }
