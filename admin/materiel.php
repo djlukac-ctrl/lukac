@@ -198,6 +198,7 @@ foreach ($items as &$item) {
     $item['_book_value_cents'] = $bookValue;
     $item['_current_value_cents'] = $current;
     $item['_current_value_is_manual'] = $manualCurrent > 0;
+    $item['_pricing_base_cents'] = (int) round($purchase * 0.05);
 
     if ((int) $item['active'] === 1) {
         $activeCount++;
@@ -211,7 +212,6 @@ foreach ($items as &$item) {
 unset($item);
 
 $costPerEvent = (int) round($totalAnnualDepreciation / $annualEvents);
-$pricingBaseCents = (int) round($totalPurchase * 0.05);
 
 admin_header('Matériel', 'materiel');
 
@@ -222,7 +222,7 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
 ?>
 <style>
 .equipment-intro{max-width:900px;margin:-6px 0 22px;color:#aaa6a0;font-size:13px;line-height:1.7}
-.equipment-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.equipment-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
 .equipment-metric{padding:18px;border:1px solid rgba(255,255,255,.08);border-radius:17px;background:linear-gradient(180deg,rgba(18,18,21,.98),rgba(10,10,13,.98));box-shadow:0 14px 32px rgba(0,0,0,.13)}
 .equipment-metric span{display:block;color:#77726c;font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
 .equipment-metric strong{display:block;margin-top:8px;color:#fff;font-size:24px;letter-spacing:-.03em}.equipment-metric small{display:block;margin-top:5px;color:#77726c;font-size:9px;line-height:1.4}
@@ -236,9 +236,9 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
 .equipment-section__head{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid rgba(255,255,255,.055)}
 .equipment-section__head h2{margin:0;color:#fff;font-size:18px}.equipment-section__head span{color:#77726c;font-size:9px}
 .equipment-item{border-bottom:1px solid rgba(255,255,255,.055)}.equipment-item:last-child{border-bottom:0}.equipment-item.is-disabled{opacity:.55}
-.equipment-summary{list-style:none;display:grid;grid-template-columns:minmax(0,1.3fr) .8fr .8fr .8fr auto;align-items:center;gap:14px;padding:14px 18px;cursor:pointer}.equipment-summary::-webkit-details-marker{display:none}.equipment-summary:hover{background:rgba(255,255,255,.015)}
+.equipment-summary{list-style:none;display:grid;grid-template-columns:minmax(0,1.3fr) .75fr .8fr .8fr .8fr auto;align-items:center;gap:14px;padding:14px 18px;cursor:pointer}.equipment-summary::-webkit-details-marker{display:none}.equipment-summary:hover{background:rgba(255,255,255,.015)}
 .equipment-name strong{display:block;color:#fff;font-size:13px}.equipment-name span{display:block;margin-top:3px;color:#77726c;font-size:9px}
-.equipment-value span{display:block;color:#69645f;font-size:8px;text-transform:uppercase;letter-spacing:.06em}.equipment-value strong{display:block;margin-top:3px;color:#ddd9d3;font-size:12px}
+.equipment-value span{display:block;color:#69645f;font-size:8px;text-transform:uppercase;letter-spacing:.06em}.equipment-value strong{display:block;margin-top:3px;color:#ddd9d3;font-size:12px}.equipment-value--pricing span{color:#d65a5f}.equipment-value--pricing strong{color:#ff5b61;font-size:14px}
 .equipment-state{padding:5px 8px;border-radius:999px;border:1px solid rgba(255,255,255,.08);color:#aaa6a0;font-size:8px;white-space:nowrap}
 .equipment-state--watch,.equipment-state--replace{border-color:rgba(227,34,40,.25);color:#ff696d;background:rgba(227,34,40,.06)}
 .equipment-edit{padding:2px 18px 17px}.equipment-form{display:grid;grid-template-columns:1.2fr .8fr .8fr .8fr .7fr .8fr;gap:11px;padding:14px;border:1px solid rgba(255,255,255,.06);border-radius:14px;background:#08080b}
@@ -257,7 +257,7 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
 <?php if ($error): ?><div class="flash flash--error"><?= e($error) ?></div><?php endif; ?>
 
 <p class="equipment-intro">
-  Suis ici la valeur de ton parc matériel, son amortissement et ta base tarifaire. Ta méthode actuelle est intégrée : 5 % de la valeur d’achat du matériel actif sert de référence pour construire tes tarifs. La valeur actuelle reste calculée automatiquement à partir de l’âge et de l’état.
+  Suis ici ton matériel article par article. Pour chaque équipement, l’administration calcule automatiquement ta base tarifaire à 5 % du prix d’achat. La valeur actuelle reste estimée automatiquement à partir de l’âge et de l’état.
 </p>
 
 <div class="equipment-metrics">
@@ -277,9 +277,9 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
     <small>Calcul linéaire selon la date d’achat et la durée choisie.</small>
   </div>
   <div class="equipment-metric equipment-metric--accent">
-    <span>Base tarifaire matériel · 5 %</span>
-    <strong><?= e(equipment_money($pricingBaseCents)) ?> €</strong>
-    <small>5 % de la valeur d’achat du parc actif. C’est ta méthode actuelle de calcul tarifaire.</small>
+    <span>Calcul tarifaire</span>
+    <strong>5 % / article</strong>
+    <small>Chaque matériel affiche désormais sa propre base tarifaire calculée sur son prix d’achat.</small>
   </div>
   <div class="equipment-metric">
     <span>Amortissement / prestation</span>
@@ -322,6 +322,7 @@ if (isset($_GET['settings'])) $flash = 'Hypothèse de prestations mise à jour.'
             <span><?= e($item['category']) ?><?= $item['purchase_date'] ? ' · acheté le ' . e((new DateTimeImmutable($item['purchase_date']))->format('d/m/Y')) : '' ?></span>
           </div>
           <div class="equipment-value"><span>Achat</span><strong><?= e(equipment_money((int)$item['purchase_price_cents'])) ?> €</strong></div>
+          <div class="equipment-value equipment-value--pricing"><span>Base tarifaire · 5 %</span><strong><?= e(equipment_money((int)$item['_pricing_base_cents'])) ?> €</strong></div>
           <div class="equipment-value"><span>Valeur actuelle<?= $item['_current_value_is_manual'] ? ' · manuelle' : ' · auto' ?></span><strong><?= e(equipment_money((int)$item['_current_value_cents'])) ?> €</strong></div>
           <div class="equipment-value"><span>Amort. / an</span><strong><?= e(equipment_money((int)$item['_annual_depreciation_cents'])) ?> €</strong></div>
           <div class="equipment-state <?= in_array($item['condition_status'], ['watch','replace'], true) ? 'equipment-state--' . e($item['condition_status']) : '' ?>"><?= e($conditions[$item['condition_status']] ?? $item['condition_status']) ?></div>
