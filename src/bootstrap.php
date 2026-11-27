@@ -285,6 +285,29 @@ function db(): PDO
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_catalog_items_category ON catalog_items(category, display_order, id)');
     $pdo->exec("DELETE FROM catalog_items WHERE category='formule' AND name IN ('Pack Instant Magique','Pack Instant Magique Signature')");
 
+    $pdo->exec('CREATE TABLE IF NOT EXISTS equipment (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        category TEXT NOT NULL DEFAULT "Autre",
+        purchase_date TEXT,
+        purchase_price_cents INTEGER NOT NULL DEFAULT 0,
+        current_value_cents INTEGER NOT NULL DEFAULT 0,
+        depreciation_years INTEGER NOT NULL DEFAULT 5,
+        condition_status TEXT NOT NULL DEFAULT "good",
+        notes TEXT,
+        active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+    $pdo->exec('CREATE INDEX IF NOT EXISTS idx_equipment_category ON equipment(category, name)');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS equipment_settings (
+        setting_key TEXT PRIMARY KEY,
+        setting_value TEXT NOT NULL,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )');
+    $pdo->exec("INSERT OR IGNORE INTO equipment_settings(setting_key, setting_value) VALUES('annual_events', '35')");
+
     $pdo->exec('CREATE TABLE IF NOT EXISTS login_attempts (
         key_hash TEXT PRIMARY KEY,
         attempts INTEGER NOT NULL DEFAULT 0,
